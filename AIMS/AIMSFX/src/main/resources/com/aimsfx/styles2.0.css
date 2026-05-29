@@ -1,0 +1,446 @@
+/* 
+ * AIMS Application Shared Stylesheet
+ * Contains common styles extracted from FXML files to follow DRY principle
+ */
+
+/* ==================== ROOT & GENERAL ==================== */
+.root {
+    -fx-font-family: "Roboto";
+    
+}
+
+/* ==================== BUTTON BASE STYLES ==================== */
+
+/* Primary action button - blue */
+.btn-primary {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1565c0;
+}
+
+/* Secondary action button - gray */
+.btn-secondary {
+    -fx-background-color: #757575;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-weight:bold;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #616161;
+}
+
+/* Success button - green */
+.btn-success {
+    -fx-background-color: #14ce0e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.btn-success:hover {
+    -fx-background-color: #43A047;
+}
+
+/* Warning button - orange */
+.btn-warning {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-warning:hover {
+    -fx-background-color: #FB8C00;
+}
+
+/* Danger button - red */
+.btn-danger {
+    -fx-background-color: #f34a3e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+
+}
+
+.btn-danger:hover {
+    -fx-background-color: #e53935;
+}
+
+/* Transparent/link style button */
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-link:hover {
+    -fx-text-fill: #1976d2;
+}
+
+/* Icon button - transparent with emoji/icon */
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-font-size: 20px;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-opacity: 0.7;
+}
+
+/* ==================== FILTER TAB BUTTONS ==================== */
+
+.filter-tab {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #666;
+    -fx-cursor: hand;
+}
+
+.filter-tab:hover {
+    -fx-text-fill: #1976d2;
+}
+
+/* Active filter tab - with underline */
+.filter-tab-active {
+    -fx-background-color: transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: #1976d2;
+    -fx-padding: 10 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1976d2;
+    -fx-font-weight: bold;
+}
+
+/* ==================== SORT BUTTONS ==================== */
+
+.sort-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.sort-btn:hover {
+    -fx-text-fill: #1976d2;
+}
+
+.sort-btn-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1976d2;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* ==================== LABELS ==================== */
+
+/* Header/Title label */
+.label-header {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Section title */
+.label-section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Subtitle/secondary text */
+.label-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #000000;
+}
+
+/* Price label - red and bold */
+.label-price {
+    -fx-font-size: 16px;
+    -fx-text-fill: #d32f2f;
+    -fx-font-weight: bold;
+}
+
+/* Total price - larger */
+.label-total {
+    -fx-font-size: 18px;
+    -fx-text-fill: #f44336;
+    -fx-font-weight: bold;
+}
+
+/* Field label - bold */
+.label-field {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Badge - small rounded label */
+.badge {
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 2 6;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* ==================== CONTAINERS ==================== */
+
+/* Card container with shadow */
+.card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
+}
+
+/* Summary panel with light background */
+.summary-panel {
+    -fx-background-color: #fafafa;
+    -fx-padding: 25;
+    -fx-background-radius: 8;
+}
+
+/* Header bar style */
+.header-bar {
+    -fx-background-color: white;
+    -fx-padding: 15 40;
+}
+
+/* Search box container */
+.search-box {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 15;
+}
+
+/* Search field - transparent */
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* Delivery info display panel */
+.delivery-info-panel {
+    -fx-background-color: #f9f9f9;
+    -fx-padding: 15;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+/* ==================== PRODUCT CARD ==================== */
+
+.product-card {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+    -fx-cursor: hand;
+}
+
+.product-card:hover {
+    -fx-border-color: #1976d2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
+}
+
+/* Product title in card */
+.product-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+}
+
+/* ==================== SCROLLPANE ==================== */
+
+.scroll-pane-transparent {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* ==================== SEPARATOR ==================== */
+
+.separator-light {
+    -fx-background-color: #e0e0e0;
+}
+.aims-panel-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
+}
+.aims-panel-info {
+    -fx-background-color: #fafafa;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1.5;
+    -fx-padding: 20;
+}
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 2;
+}
+.combo-box:hover {
+    -fx-border-color: #2196F3; /* Màu xanh khi hover để tạo tương tác */
+}
+.combo-box .arrow-button {
+    -fx-background-color: transparent; /* Bỏ màu nền của nút mũi tên */
+}
+.table-view .column-header {
+    -fx-background-color: #F8F9FA;
+    -fx-border-color: transparent transparent #E0E0E0 transparent; /* Chỉ giữ viền dưới */
+    -fx-size: 45; /* Tăng độ cao cho thoáng */
+}
+.table-view .column-header .label {
+    -fx-text-fill: #757575;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+.table-row-cell:hover {
+    -fx-background-color: #F1F8FF; /* Xanh cực nhạt khi lướt qua */
+}
+.table-row-cell:selected {
+    -fx-background-color: #E3F2FD; /* Màu chọn tinh tế hơn */
+    -fx-text-fill: #1976D2;
+}
+.table-row-cell {
+    -fx-cell-size: 40; /* Tăng khoảng cách dòng để dễ đọc */
+    -fx-border-color: transparent transparent #F5F5F5 transparent;
+}
+/* Áp dụng cho HBox bao ngoài Search */
+.search-container {
+    -fx-border-color: transparent;
+    -fx-transition: 0.3s;
+}
+.search-container:focused-within {
+    -fx-background-color: white;
+    -fx-border-color: #2196F3;
+    -fx-effect: dropshadow(three-pass-box, rgba(33,150,243,0.2), 8, 0, 0, 0);
+}
+.info-box {
+    -fx-background-color: #E3F2FD; /* Xanh dương nhẹ đặc trưng của Info */
+    -fx-border-color: #2196F3;
+    -fx-border-width: 0 0 0 4; /* Chỉ có thanh màu bên trái để tạo điểm nhấn */
+    -fx-padding: 15;
+}
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #DADCE0;
+    -fx-background-radius: 10;
+}
+.table-view .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+/* ==================== PAGINATION (MODERN REDESIGN) ==================== */
+
+/* Bỏ nền xám và đường viền mặc định của toàn bộ thanh điều khiển bên dưới */
+.pagination .pagination-control {
+    -fx-background-color: transparent;
+     
+}
+
+/* Căn giữa và tạo khoảng cách giãn đều giữa các nút số */
+.pagination .control-box {
+    -fx-spacing: 8;
+    -fx-alignment: center;
+}
+
+/* 1. Thiết kế cho các Nút Số (Page Numbers) */
+.pagination .number-button {
+    -fx-background-color: white;
+    -fx-text-fill: #757575; /* Chữ xám nhạt */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-color: #E0E0E0; /* Viền mỏng thanh lịch */
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-cursor: hand;
+}
+
+/* Hiệu ứng khi lướt chuột qua nút số (Chưa chọn) */
+.pagination .number-button:hover {
+    -fx-background-color: #F1F8FF; /* Xanh cực nhạt (lấy từ hover table của bạn) */
+    -fx-border-color: #2196F3;
+    -fx-text-fill: #1976d2;
+}
+
+/* 2. Thiết kế cho Trang Đang Được Chọn (Active Page) */
+.pagination .number-button:selected {
+    -fx-background-color: #1976d2; /* Màu xanh Primary */
+    -fx-border-color: #1976d2;
+    -fx-text-fill: white;
+}
+
+/* 3. Thiết kế cho nút Mũi tên (Prev / Next) */
+.pagination .left-arrow-button,
+.pagination .right-arrow-button {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-cursor: hand;
+}
+
+.pagination .left-arrow-button:hover,
+.pagination .right-arrow-button:hover {
+    -fx-background-color: #F1F8FF;
+    -fx-border-color: #2196F3;
+}
+
+/* 4. Custom Icon mũi tên bên trong cho sắc nét hơn */
+.pagination .left-arrow,
+.pagination .right-arrow {
+    -fx-background-color: #757575; /* Đổi icon thành màu xám đồng bộ */
+}
+
+/* Đổi icon thành màu xanh khi lướt chuột vào nút mũi tên */
+.pagination .left-arrow-button:hover .left-arrow,
+.pagination .right-arrow-button:hover .right-arrow {
+    -fx-background-color: #1976d2; 
+}
+
+/* Vô hiệu hóa mũi tên khi ở trang đầu/cuối (Opacity giảm) */
+.pagination .left-arrow-button:disabled,
+.pagination .right-arrow-button:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}
+
+/* 5. Căn chỉnh cụm text "Page 1 of 10" (Nếu bạn để hiển thị) */
+.pagination .page-information {
+    -fx-text-fill: #757575;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 0 15;
+}
