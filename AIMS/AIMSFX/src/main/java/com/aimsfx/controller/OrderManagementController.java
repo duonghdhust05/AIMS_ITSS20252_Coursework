@@ -4,6 +4,7 @@ import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
 import com.aimsfx.service.OrderReviewService;
 import com.aimsfx.utils.SessionManager;
+import com.aimsfx.view.OrderManagementView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -34,6 +35,7 @@ public class OrderManagementController {
     @FXML private Label totalPendingLabel;
 
     private final OrderReviewService orderReviewService = new OrderReviewService();
+    private final OrderManagementView view = new OrderManagementView();
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @FXML
@@ -107,7 +109,7 @@ public class OrderManagementController {
 
             loadPage(0);
         } catch (SQLException e) {
-            showError("Database Error", e.getMessage());
+            view.showError("Database Error", e.getMessage());
             disableUi("Failed to load orders.");
         }
     }
@@ -118,7 +120,7 @@ public class OrderManagementController {
                 List<OrderSummary> page = orderReviewService.listPendingReviewOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
                 ordersTable.getItems().setAll(page);
             } catch (SQLException e) {
-                showError("Database Error", e.getMessage());
+                view.showError("Database Error", e.getMessage());
             }
         });
     }
@@ -128,34 +130,40 @@ public class OrderManagementController {
         try {
             OrderDetail detail = orderReviewService.getOrderDetail(orderId);
             if (detail == null) {
-                showError("Not Found", "Order not found: " + orderId);
+                view.showError("Not Found", "Order not found: " + orderId);
                 return;
             }
-            showDetailDialog(detail);
+            view.showDetailDialog(detail);
         } catch (SQLException e) {
-            showError("Database Error", e.getMessage());
+            view.showError("Database Error", e.getMessage());
         }
     }
 
     private void onApprove(Integer orderId) {
         if (orderId == null) return;
-        if (!confirm("Approve Order", "Approve order #" + orderId + "?")) return;
+        if (!view.confirmAction("Approve Order", "Are you sure you want to approve order #" + orderId + "?")) return;
         try {
             orderReviewService.approve(orderId);
             refreshCurrentPage();
         } catch (SQLException e) {
-            showError("Database Error", e.getMessage());
+            view.showError("Database Error", e.getMessage());
         }
     }
 
     private void onReject(Integer orderId) {
         if (orderId == null) return;
-        if (!confirm("Reject Order", "Reject order #" + orderId + "?")) return;
+        if (!view.confirmAction("Reject Order", "Are you sure you want to reject order #" + orderId + "?")) return;
+        
+        String reason = view.showRejectReasonDialog();
+        if (reason == null || reason.trim().isEmpty()) {
+            return; // Cancelled or empty reason
+        }
+
         try {
-            orderReviewService.reject(orderId);
+            orderReviewService.reject(orderId, reason);
             refreshCurrentPage();
         } catch (SQLException e) {
-            showError("Database Error", e.getMessage());
+            view.showError("Database Error", e.getMessage());
         }
     }
 
@@ -164,61 +172,9 @@ public class OrderManagementController {
         loadPage(idx);
     }
 
-    private void showDetailDialog(OrderDetail detail) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Order #").append(detail.getSummary().getOrderId()).append("\n");
-        sb.append("Customer: ").append(nullToEmpty(detail.getSummary().getCustomerName())).append("\n");
-        sb.append("Total: ").append(detail.getSummary().getTotalAmount()).append(" VND").append("\n");
-        sb.append("Payment: ").append(nullToEmpty(detail.getSummary().getPaymentMethod()))
-                .append(" / ").append(nullToEmpty(detail.getSummary().getPaymentStatus())).append("\n");
-        sb.append("Status: ").append(detail.getSummary().getOrderStatus()).append("\n\n");
-        sb.append("Delivery:\n");
-        sb.append("- Email: ").append(nullToEmpty(detail.getDeliveryEmail())).append("\n");
-        sb.append("- Phone: ").append(nullToEmpty(detail.getDeliveryPhone())).append("\n");
-        sb.append("- Address: ").append(nullToEmpty(detail.getDeliveryAddress())).append("\n");
-        sb.append("- Province: ").append(nullToEmpty(detail.getDeliveryProvince())).append("\n");
-        sb.append("- Ward: ").append(nullToEmpty(detail.getDeliveryWard())).append("\n");
-        sb.append("- Instructions: ").append(nullToEmpty(detail.getDeliveryInstructions())).append("\n\n");
-        sb.append("Items:\n");
-        detail.getLines().forEach(line -> sb.append("- ")
-                .append(nullToEmpty(line.getProductTitle()))
-                .append(" x").append(line.getQuantity())
-                .append(" (").append(line.getUnitPrice()).append(")\n"));
-
-        TextArea area = new TextArea(sb.toString());
-        area.setEditable(false);
-        area.setWrapText(true);
-
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Order Detail");
-        dialog.getDialogPane().setContent(area);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        dialog.showAndWait();
-    }
-
     private void disableUi(String message) {
         if (ordersTable != null) ordersTable.setDisable(true);
         if (pagination != null) pagination.setDisable(true);
         if (totalPendingLabel != null) totalPendingLabel.setText(message);
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private boolean confirm(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
-    }
-
-    private static String nullToEmpty(String s) {
-        return s == null ? "" : s;
     }
 }

@@ -63,6 +63,7 @@ public class Order {
     private float deliveryFee; // #9: Delivery fee from delivery info (2.2.3)
     private float totalAmount; // #10: Final amount = subtotal + vat + deliveryFee
     private String paymentTransactionId; // #11: Reference to payment transaction (UUID String)
+    private String cancelReason;
 
     // Additional relationships
     private Invoice invoice;
@@ -230,6 +231,14 @@ public class Order {
         if (transactionInfo != null) {
             this.paymentTransactionId = transactionInfo.getTransactionId();
         }
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 
     // ==================== Business Methods (Table 2) ====================
