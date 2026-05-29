@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.aimsfx.view.ProductCardComponent" alignment="TOP_CENTER" prefWidth="250" spacing="10" style="-fx-padding: 15; -fx-cursor: hand;" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25">
+    
+    <Label style="-fx-font-size: 48px;" text="📦" />
+    <Label fx:id="titleLabel" maxWidth="220" style="-fx-font-size: 14px; -fx-font-weight: bold;" wrapText="true" />
+    <Label fx:id="priceLabel" style="-fx-font-size: 16px; -fx-text-fill: #d32f2f; -fx-font-weight: bold;" />
+    
+    <Button fx:id="viewDetailsBtn" prefHeight="23.0" prefWidth="124.0" style="-fx-cursor: hand;" styleClass="btn-secondary" text="View Details" />
+    <Button fx:id="addToCartBtn" style="-fx-cursor: hand;" styleClass="btn-primary" text="Add to Cart" />
+</VBox>
