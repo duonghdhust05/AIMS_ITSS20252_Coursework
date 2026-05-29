@@ -23,7 +23,7 @@ public class OrderQueryRepository {
     public int countByStatus(OrderStatus status) throws SQLException {
         String sql = "SELECT COUNT(*) AS cnt FROM orders WHERE order_status = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status.toDbValue());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -43,7 +43,8 @@ public class OrderQueryRepository {
                     total_amount,
                     payment_method,
                     payment_status,
-                    order_status
+                    order_status,
+                    cancel_reason
                 FROM orders
                 WHERE order_status = ?
                 ORDER BY created_at DESC
@@ -52,7 +53,7 @@ public class OrderQueryRepository {
 
         List<OrderSummary> results = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status.toDbValue());
             stmt.setInt(2, limit);
             stmt.setInt(3, offset);
@@ -84,13 +85,14 @@ public class OrderQueryRepository {
                     payment_method,
                     payment_status,
                     order_status,
-                    transaction_id
+                    transaction_id,
+                    cancel_reason
                 FROM orders
                 WHERE order_id = ?
                 """;
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement headerStmt = conn.prepareStatement(headerSql)) {
+                PreparedStatement headerStmt = conn.prepareStatement(headerSql)) {
             headerStmt.setInt(1, orderId);
             try (ResultSet rs = headerStmt.executeQuery()) {
                 if (!rs.next()) {
@@ -150,6 +152,13 @@ public class OrderQueryRepository {
         summary.setPaymentMethod(rs.getString("payment_method"));
         summary.setPaymentStatus(rs.getString("payment_status"));
         summary.setOrderStatus(OrderStatus.fromDbValue(rs.getString("order_status")));
+
+        try {
+            summary.setCancelReason(rs.getString("cancel_reason"));
+        } catch (java.sql.SQLException e) {
+            // column might not exist if schema not updated yet, ignore
+        }
+
         return summary;
     }
 

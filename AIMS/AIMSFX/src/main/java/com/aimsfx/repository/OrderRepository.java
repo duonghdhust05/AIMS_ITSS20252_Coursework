@@ -201,20 +201,26 @@ public class OrderRepository {
 
     /**
      * Update order_status for Product Manager review actions (approve/reject) or customer cancellation.
-     *
-     * Refund is intentionally excluded from this method (handled elsewhere).
      */
     public void updateOrderStatus(int orderId, String orderStatus) throws SQLException {
+        updateOrderStatus(orderId, orderStatus, null);
+    }
+
+    /**
+     * Update order_status and optionally cancel_reason.
+     */
+    public void updateOrderStatus(int orderId, String orderStatus, String cancelReason) throws SQLException {
         String sql = """
             UPDATE orders
-            SET order_status = ?, updated_at = CURRENT_TIMESTAMP
+            SET order_status = ?, cancel_reason = ?, updated_at = CURRENT_TIMESTAMP
             WHERE order_id = ?
             """;
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, orderStatus);
-            stmt.setInt(2, orderId);
+            stmt.setString(2, cancelReason);
+            stmt.setInt(3, orderId);
             stmt.executeUpdate();
         }
     }

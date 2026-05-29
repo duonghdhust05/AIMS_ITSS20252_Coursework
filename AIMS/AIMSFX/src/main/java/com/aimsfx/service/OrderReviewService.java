@@ -1,5 +1,6 @@
 package com.aimsfx.service;
 
+import com.aimsfx.model.Order;
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderStatus;
 import com.aimsfx.model.OrderSummary;
@@ -53,18 +54,39 @@ public class OrderReviewService {
 
     public void approve(int orderId) throws SQLException {
         commandRepository.updateOrderStatus(orderId, OrderStatus.APPROVED.toDbValue());
-        // Email notification hook: reuse existing update template.
-        // For now, this requires an Order-like status source. We will send a minimal update email later
-        // after wiring a richer Order domain object into the review flow.
+        
+        Order order = commandRepository.findById(orderId);
+        if (order != null) {
+            logAction(orderId, "APPROVE", "Approved by Product Manager");
+            if (order.getDeliveryInfo() != null) {
+                emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+            }
+        }
     }
 
-    public void reject(int orderId) throws SQLException {
-        commandRepository.updateOrderStatus(orderId, OrderStatus.REJECTED.toDbValue());
+    public void reject(int orderId, String reason) throws SQLException {
+        commandRepository.updateOrderStatus(orderId, OrderStatus.REJECTED.toDbValue(), reason);
+        
+        Order order = commandRepository.findById(orderId);
+        if (order != null) {
+            logAction(orderId, "REJECT", reason);
+            if (order.getDeliveryInfo() != null) {
+                emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+            }
+        }
         // Refund intentionally excluded.
     }
 
     public void cancelByCustomer(int orderId) throws SQLException {
         commandRepository.updateOrderStatus(orderId, OrderStatus.CANCELLED.toDbValue());
         // Refund intentionally excluded.
+    }
+    
+    private void logAction(int orderId, String action, String reason) {
+        try {
+            new com.aimsfx.repository.OrderActionLogRepository().logAction(orderId, action, reason);
+        } catch (SQLException e) {
+            System.err.println("Failed to log action: " + e.getMessage());
+        }
     }
 }
