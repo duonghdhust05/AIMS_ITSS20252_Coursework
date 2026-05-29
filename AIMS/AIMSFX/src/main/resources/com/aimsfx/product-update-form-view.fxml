@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="700" prefWidth="900" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.UpdateProductFormView">
+
+    <!-- Content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@styles2.0.css">
+            <VBox spacing="20" style="-fx-padding: 20;">
+                
+                <!-- Product ID (Hidden) -->
+                <TextField fx:id="productIdField" managed="false" visible="false">
+               <font>
+                  <Font name="Roboto" size="12.0" />
+               </font></TextField>
+
+                <!-- Common Fields -->
+                <VBox fx:id="commonFieldsContainer" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Basic Information" />
+                    
+                    <GridPane hgap="15" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="150" prefWidth="150" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                        
+                        <Label styleClass="label-subtitle" text="Product Type:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="productTypeField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        
+                        <Label styleClass="label-subtitle" text="Barcode*:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <TextField fx:id="barcodeField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        
+                        <Label styleClass="label-subtitle" text="Title*:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <TextField fx:id="titleField" promptText="Enter title" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        
+                        <Label styleClass="label-subtitle" text="Category*:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="categoryField" promptText="Enter category" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        
+                        <Label styleClass="label-subtitle" text="Original Price*:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                        <TextField fx:id="originalPriceField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        
+                        <Label styleClass="label-subtitle" text="Current Price*:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                        <TextField fx:id="currentPriceField" promptText="Enter current price" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        
+                        <Label styleClass="label-subtitle" text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                        <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Enter description" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        
+                        <Label styleClass="label-subtitle" text="Weight (kg)*:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                        <TextField fx:id="weightField" promptText="Enter weight" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        
+                        <Label styleClass="label-subtitle" text="Dimensions*:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                        <TextField fx:id="dimensionsField" promptText="LxWxH (e.g., 20x15x5)" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        
+                        <Label styleClass="label-subtitle" text="Stock:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                        <HBox prefHeight="21.0" prefWidth="640.0" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                            <TextField fx:id="stockField" editable="false" promptText="Stock quantity" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="updateStockButton" prefHeight="15.0" prefWidth="129.0" style="-fx-cursor: hand;" styleClass="btn-primary" text="Update Stock" />
+                        </HBox>
+                        
+                        <Label styleClass="label-subtitle" text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                        <ComboBox fx:id="statusComboBox" prefWidth="300" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                        
+                        <Label styleClass="label-subtitle" text="VAT Rate (%):" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+                        <TextField fx:id="vatRateField" promptText="Enter VAT rate" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
+                    </GridPane>
+                </VBox>
+
+                <!-- Specific Fields (Dynamic) -->
+                <VBox fx:id="specificFieldsSection" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
+                    <Label fx:id="specificFieldsTitle" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Product Specific Information" />
+                    <GridPane fx:id="specificFieldsGrid" hgap="15" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="150" prefWidth="150" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                    </GridPane>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Footer Buttons -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;" stylesheets="@styles2.0.css">
+            <Button onAction="#handleUpdate" style="-fx-cursor: hand;" styleClass="btn-success" text="Update Product" />
+            <Button onAction="#handleCancel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;" styleClass="btn-secondary" text="Cancel" />
+        </HBox>
+    </bottom>
+   <top>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="900.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="44.0" prefWidth="138.0" text="AIMS">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <font>
+                              <Font name="Roboto Black" size="28.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="37.0" prefWidth="229.0">
+                     <children>
+                        <Label prefHeight="96.0" prefWidth="360.0" text="Update Product Information">
+                           <font>
+                              <Font name="Roboto Bold" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+
+</BorderPane>

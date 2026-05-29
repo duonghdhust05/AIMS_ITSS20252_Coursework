@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="400" prefWidth="450" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.LoginView">
+   
+   <center>
+      <VBox alignment="CENTER" spacing="20" style="-fx-padding: 40;" stylesheets="@styles2.0.css">
+         <VBox spacing="10" styleClass="aims-panel-card">
+            
+            <Label styleClass="label-section-title" text="Username" />
+            <TextField fx:id="usernameField" prefWidth="300" promptText="Enter username" style="-fx-font-size: 14; -fx-padding: 10;" styleClass="search-box" />
+            
+            <Label styleClass="label-section-title" text="Password" />
+            <PasswordField fx:id="passwordField" prefWidth="300" promptText="Enter password" style="-fx-font-size: 14; -fx-padding: 10;" styleClass="search-box" />
+            
+            <Label fx:id="errorLabel" style="-fx-text-fill: #f44336; -fx-font-size: 12;" text="" />
+            
+            <HBox alignment="CENTER" spacing="10">
+               <Button onAction="#handleLogin" prefWidth="140" styleClass="btn-primary" text="Login" />
+               <Button onAction="#handleCancel" prefHeight="42.0" prefWidth="140" styleClass="btn-secondary" text="Cancel" />
+            </HBox>
+            
+         </VBox>
+         
+         <Label text="Note: Customers do not need to log in">
+            <font>
+               <Font name="Roboto Italic" size="12.0" />
+            </font></Label>
+      </VBox>
+   </center>
+   <top>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="450.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="37.0" prefWidth="167.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="37.0" prefWidth="158.0" text="AIMS">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <font>
+                              <Font name="Roboto Black" size="28.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label prefHeight="96.0" prefWidth="360.0" text="Login">
+                           <font>
+                              <Font name="Roboto Bold" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   
+</BorderPane>

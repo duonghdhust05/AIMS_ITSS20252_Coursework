@@ -1,0 +1,20 @@
+services:
+
+  postgres:
+    image: postgres:17
+    
+    container_name: aims_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: hd123456!
+      POSTGRES_DB: aims_dtb
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      - "5454:7774"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+volumes:
+  pgdata:
