@@ -157,7 +157,8 @@ CREATE TABLE orders (
     payment_status VARCHAR(50) DEFAULT 'Pending',
     order_status VARCHAR(50) DEFAULT 'Processing',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cancel_reason VARCHAR(255)
 );
 
 -- Order items table
