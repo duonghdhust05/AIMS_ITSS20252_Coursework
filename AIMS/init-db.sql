@@ -1,0 +1,350 @@
+-- AIMS Database Schema
+-- PostgreSQL database schema for AIMS (Advanced Inventory Management System)
+
+-- Drop existing tables if they exist (for fresh installation)
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS cart_items CASCADE;
+DROP TABLE IF EXISTS carts CASCADE;
+DROP TABLE IF EXISTS tracks CASCADE;
+DROP TABLE IF EXISTS stock_change_log CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS user_delete_count CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- Users table
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,  -- Hashed password
+    roles VARCHAR(100) NOT NULL,  -- Multiple roles comma-separated: PRODUCT_MANAGER, ADMINISTRATOR
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',  -- ACTIVE, BLOCKED
+    full_name VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User delete count tracking (for daily deletion limits)
+CREATE TABLE user_delete_count (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    day_id DATE NOT NULL,
+    delete_count INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, day_id)
+);
+
+-- Create default administrator account (password: admin123)
+-- Password is hashed using SHA-256: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
+INSERT INTO users (username, password, roles, status, full_name) 
+VALUES ('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'ADMINISTRATOR,PRODUCT_MANAGER', 'ACTIVE', 'System Administrator'),
+       ('pm', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'PRODUCT_MANAGER', 'ACTIVE', 'Product Manager'),
+       ('admin_only', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'ADMINISTRATOR', 'ACTIVE', 'Administrator Only');
+
+-- Products table (single table inheritance - all product types in one table)
+-- DESIGN IMPROVEMENT: Single table inheritance pattern
+-- - Database auto-generates IDs (SERIAL) - no application-side ID management
+-- - All product-specific fields in one table with nullable columns
+-- - Eliminates joins for basic queries, simplifies persistence logic
+-- - Trade-off: Some nullable columns, but much simpler architecture
+-- - History tracking: barcode is NOT unique (multiple versions share same barcode)
+--   Only (barcode, is_current=true) combination should be unique
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    barcode VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(255),
+    original_price DOUBLE PRECISION NOT NULL,
+    current_price DOUBLE PRECISION NOT NULL,
+    description VARCHAR(255),
+    weight DOUBLE PRECISION,
+    dimensions VARCHAR(255),
+    stock INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(255) DEFAULT 'available' CHECK (status IN ('available', 'deactivated')),
+    vat_rate DOUBLE PRECISION DEFAULT 0.1,
+    product_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expired_date TIMESTAMP,
+    is_current BOOLEAN NOT NULL DEFAULT true,
+
+    -- Book-specific fields
+    author VARCHAR(255),
+    publisher VARCHAR(255),
+    publication_date VARCHAR(255),
+    language VARCHAR(255),
+    pages INTEGER,
+    cover_type VARCHAR(255),
+    genre VARCHAR(255),
+    
+    -- CD-specific fields
+    artist VARCHAR(255),
+    record_label VARCHAR(255),
+    track_count INTEGER,
+    release_date TIMESTAMP,
+    
+    -- DVD-specific fields
+    director VARCHAR(255),
+    studio VARCHAR(255),
+    subtitle VARCHAR(255),
+    disc_type VARCHAR(255),
+    duration INTEGER,
+    
+    -- Newspaper-specific fields
+    issn VARCHAR(255),
+    frequency VARCHAR(255),
+    editor_in_chief VARCHAR(255),
+    section TEXT
+);
+
+CREATE TABLE tracks (
+    track_id SERIAL PRIMARY KEY,
+    product_barcode VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    duration INTEGER NOT NULL
+);
+
+CREATE TABLE stock_change_log (
+    id SERIAL PRIMARY KEY,
+    barcode VARCHAR(255) NOT NULL,
+    from_stock INTEGER NOT NULL,
+    to_stock INTEGER NOT NULL,
+    change_reason VARCHAR(255) NOT NULL,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Partial unique index: only one current version per barcode
+CREATE UNIQUE INDEX unique_current_barcode ON products (barcode) 
+    WHERE (is_current = true);
+
+-- Carts table
+CREATE TABLE carts (
+    cart_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Cart items table
+CREATE TABLE cart_items (
+    cart_item_id SERIAL PRIMARY KEY,
+    cart_id INTEGER NOT NULL REFERENCES carts(cart_id) ON DELETE CASCADE,
+    product_id INTEGER NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(cart_id, product_id)
+);
+
+-- Orders table
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    delivery_name VARCHAR(100),
+    delivery_phone VARCHAR(20),
+    delivery_email VARCHAR(100),
+    delivery_address TEXT NOT NULL,
+    delivery_province VARCHAR(100),
+    delivery_ward VARCHAR(100),
+    delivery_instructions TEXT,
+    shipping_fee DECIMAL(15,2) DEFAULT 0,
+    rush_delivery BOOLEAN DEFAULT FALSE,
+    rush_fee DECIMAL(15,2) DEFAULT 0,
+    subtotal DECIMAL(15,2) NOT NULL,
+    total_amount DECIMAL(15,2) NOT NULL,
+    payment_method VARCHAR(50),
+    payment_status VARCHAR(50) DEFAULT 'Pending',
+    order_status VARCHAR(50) DEFAULT 'Processing',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Order items table
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES products(product_id) ON DELETE SET NULL,
+    product_title VARCHAR(255) NOT NULL,
+    product_type VARCHAR(20) NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit_price DECIMAL(15,2) NOT NULL,
+    total_price DECIMAL(15,2) NOT NULL
+);
+
+-- Transactions table (for VietQR and PayPal payments)
+CREATE TABLE transactions (
+    transaction_id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    amount DECIMAL(15,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,  -- 'VIETQR' or 'PAYPAL'
+    status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, COMPLETED, FAILED, CANCELLED
+    currency VARCHAR(20) DEFAULT 'VND',   -- 'VND' or 'USD'
+    failure_reason VARCHAR(255),
+    
+    -- VietQR callback fields (all required fields from Transaction Sync API)
+    external_transaction_id VARCHAR(100), -- VietQR transactionid or PayPal Order ID
+    bank_account VARCHAR(50),             -- bankaccount - bank account used for payment
+    trans_type VARCHAR(10),               -- transType - D (debit) or C (credit)
+    content VARCHAR(255),                 -- content - transfer message
+    transaction_time TIMESTAMP,           -- transactiontime - when payment was made
+    reference_number VARCHAR(100),        -- referencenumber - bank reference code
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP
+);
+
+-- Add transaction_id reference to orders table
+ALTER TABLE orders ADD COLUMN transaction_id INTEGER REFERENCES transactions(transaction_id);
+
+-- Indexes for better query performance
+CREATE INDEX idx_transactions_order ON transactions(order_id);
+CREATE INDEX idx_transactions_external ON transactions(external_transaction_id);
+CREATE INDEX idx_transactions_status ON transactions(status);
+CREATE INDEX idx_transactions_method ON transactions(payment_method);
+CREATE INDEX idx_products_barcode ON products(barcode);
+CREATE INDEX idx_products_category ON products(category);
+CREATE INDEX idx_products_type ON products(product_type);
+CREATE INDEX idx_products_status ON products(status);
+CREATE INDEX idx_products_current ON products(is_current);
+CREATE INDEX idx_products_barcode_current ON products(barcode, is_current);
+CREATE INDEX idx_cart_items_cart ON cart_items(cart_id);
+CREATE INDEX idx_cart_items_product ON cart_items(product_id);
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(order_status);
+CREATE INDEX idx_orders_date ON orders(order_date);
+CREATE INDEX idx_order_items_order ON order_items(order_id);
+CREATE INDEX idx_order_items_product ON order_items(product_id);
+CREATE INDEX idx_user_delete_count_lookup ON user_delete_count(user_id, day_id);
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers for automatic updated_at updates
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_carts_updated_at BEFORE UPDATE ON carts
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_user_delete_count_updated_at BEFORE UPDATE ON user_delete_count
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ================================================================================
+-- Sample Data
+-- ================================================================================
+
+-- Sample Books (using single table inheritance)
+INSERT INTO products (barcode, title, category, original_price, current_price, description,
+                     weight, dimensions, stock, status, vat_rate, product_type,
+                     author, publisher, publication_date, language, pages, cover_type, genre)
+VALUES
+    ('BC00141231342', 'Clean Code', 'Programming', 450000.0, 450000.0,
+     'A handbook of agile software craftsmanship', 0.5, '20x15x3', 50, 'available', 0.1, 'BOOK',
+     'Robert C. Martin', 'Prentice Hall', '2008', 'English', 388, 'Paperback', 'Software Engineering'),
+    ('BC000002', 'Design Patterns', 'Programming', 550000.0, 550000.0,
+     'Elements of reusable object-oriented software', 0.6, '23x18x3', 40, 'available', 0.1, 'BOOK',
+     'Gang of Four', 'Addison-Wesley', '1994', 'English', 395, 'Hardcover', 'Software Engineering'),
+    ('BC000003', 'Effective Java', 'Programming', 520000.0, 520000.0,
+     'Best practices for the Java platform', 0.55, '21x16x3', 60, 'available', 0.1, 'BOOK',
+     'Joshua Bloch', 'Addison-Wesley', '2017', 'English', 412, 'Paperback', 'Programming'),
+    ('BC000004', 'The Pragmatic Programmer', 'Programming', 480000.0, 480000.0,
+     'Your journey to mastery', 0.52, '22x17x3', 45, 'available', 0.1, 'BOOK',
+     'Andrew Hunt', 'Addison-Wesley', '2019', 'English', 352, 'Hardcover', 'Software Engineering');
+
+-- Sample CDs (using single table inheritance)
+INSERT INTO products (barcode, title, category, original_price, current_price, description,
+                     weight, dimensions, stock, status, vat_rate, product_type,
+                     artist, record_label, genre, track_count, release_date)
+VALUES
+    ('CD000001', 'Greatest Hits Album', 'Music', 120000.0, 120000.0,
+     'Collection of popular songs', 0.1, '14x12x1', 75, 'available', 0.1, 'CD',
+     'Various Artists', 'Universal Music', 'Pop', 15, '2024-01-15'),
+    ('CD000002', 'Classical Symphony', 'Music', 150000.0, 150000.0,
+     'Best classical music collection', 0.1, '14x12x1', 50, 'available', 0.1, 'CD',
+     'London Symphony Orchestra', 'Decca Records', 'Classical', 12, '2023-06-20'),
+    ('CD000003', 'Jazz Essentials', 'Music', 130000.0, 130000.0,
+     'Essential jazz recordings', 0.1, '14x12x1', 60, 'available', 0.1, 'CD',
+     'Miles Davis', 'Columbia Records', 'Jazz', 10, '2023-03-10');
+
+-- Sample DVDs (using single table inheritance)
+INSERT INTO products (barcode, title, category, original_price, current_price, description,
+                     weight, dimensions, stock, status, vat_rate, product_type,
+                     director, studio, subtitle, disc_type, duration, genre, release_date)
+VALUES
+    ('DVD00001', 'The Matrix Collection', 'Movie', 299000.0, 299000.0,
+     'Complete Matrix trilogy', 0.2, '19x14x2', 25, 'available', 0.1, 'DVD',
+     'Wachowski Sisters', 'Warner Bros', 'Vietnamese', 'DVD-9', 467, 'Sci-Fi', '2022-05-10'),
+    ('DVD00002', 'The Lord of the Rings Trilogy', 'Movie', 450000.0, 450000.0,
+     'Extended edition trilogy', 0.3, '19x14x3', 30, 'available', 0.1, 'DVD',
+     'Peter Jackson', 'New Line Cinema', 'Vietnamese, Spanish', 'Blu-ray', 682, 'Fantasy', '2021-12-15'),
+    ('DVD00003', 'Inception', 'Movie', 199000.0, 199000.0,
+     'Mind-bending thriller', 0.15, '19x14x1', 40, 'available', 0.1, 'DVD',
+     'Christopher Nolan', 'Warner Bros', 'Vietnamese', 'DVD-9', 148, 'Thriller', '2023-08-20');
+
+-- Sample Newspapers (using single table inheritance)
+INSERT INTO products (barcode, title, category, original_price, current_price, description,
+                     weight, dimensions, stock, status, vat_rate, product_type,
+                     issn, frequency, editor_in_chief, publisher, publication_date, language, section)
+VALUES
+    ('NP000001', 'Daily News', 'Newspaper', 15000.0, 15000.0,
+     'Daily newspaper', 0.2, '40x30x0.5', 500, 'available', 0.1, 'NEWSPAPER',
+     '2026-001', 'Daily', 'Nguyen Van A', 'News Corp Vietnam', '2026-01-09', 'Vietnamese', 'Politics, Economy, Sports, Entertainment'),
+    ('NP000002', 'Tech Weekly', 'Newspaper', 25000.0, 25000.0,
+     'Weekly technology news', 0.3, '40x30x1', 400, 'available', 0.1, 'NEWSPAPER',
+     'W01-2026', 'Weekly', 'Tran Thi B', 'Tech Media Group', '2026-01-05', 'Vietnamese, English', 'Technology, Innovation, Startups');
+
+-- Sample Tracks for CDs
+INSERT INTO tracks (product_barcode, title, duration)
+VALUES
+    -- Tracks for CD000001: Greatest Hits Album
+    ('CD000001', 'Summer Nights', 240),
+    ('CD000001', 'Dancing Queen', 230),
+    ('CD000001', 'Sweet Dreams', 215),
+    ('CD000001', 'Eternal Love', 265),
+    ('CD000001', 'Midnight City', 220),
+    ('CD000001', 'Golden Hour', 255),
+    ('CD000001', 'Hearts on Fire', 210),
+    ('CD000001', 'Starlight', 245),
+    ('CD000001', 'Ocean Waves', 230),
+    ('CD000001', 'Thunder Road', 275),
+    ('CD000001', 'Moonlight Serenade', 235),
+    ('CD000001', 'Crystal Clear', 200),
+    ('CD000001', 'Rainbow Dreams', 225),
+    ('CD000001', 'Forever Young', 260),
+    ('CD000001', 'Silent Echo', 215),
+    
+    -- Tracks for CD000002: Classical Symphony
+    ('CD000002', 'Symphony No. 5 - Movement I', 420),
+    ('CD000002', 'Symphony No. 5 - Movement II', 380),
+    ('CD000002', 'Symphony No. 5 - Movement III', 310),
+    ('CD000002', 'Symphony No. 5 - Movement IV', 450),
+    ('CD000002', 'Piano Concerto No. 21 - Andante', 390),
+    ('CD000002', 'The Four Seasons - Spring', 350),
+    ('CD000002', 'The Four Seasons - Summer', 340),
+    ('CD000002', 'The Four Seasons - Autumn', 360),
+    ('CD000002', 'The Four Seasons - Winter', 355),
+    ('CD000002', 'Moonlight Sonata', 420),
+    ('CD000002', 'Canon in D Major', 310),
+    ('CD000002', 'Air on G String', 330),
+    
+    -- Tracks for CD000003: Jazz Essentials
+    ('CD000003', 'So What', 544),
+    ('CD000003', 'Freddie Freeloader', 588),
+    ('CD000003', 'Blue in Green', 324),
+    ('CD000003', 'All Blues', 691),
+    ('CD000003', 'Flamenco Sketches', 563),
+    ('CD000003', 'Round Midnight', 354),
+    ('CD000003', 'Take Five', 324),
+    ('CD000003', 'My Funny Valentine', 372),
+    ('CD000003', 'Autumn Leaves', 426),
+    ('CD000003', 'Summertime', 390);

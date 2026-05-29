@@ -1,0 +1,28 @@
+# 1. DATABASE SUPABASE CONFIGURATION
+spring.datasource.url=jdbc:postgresql://<your_supabase_url>:6543/postgres?user=<your_username>&password=<your_password>&sslmode=require
+spring.datasource.username=<your_username>
+spring.datasource.password=<your_password>
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# 2. SERVER CONFIGURATION
+server.port=8080
+
+# 3. VietQR Partner Credentials
+vietqr.partner.username=<your_vietqr_username>
+vietqr.partner.password=<your_vietqr_password>
+
+# 4. PayPal API Credentials
+paypal.mode=sandbox
+paypal.client.id=<your_paypal_client_id>
+paypal.client.secret=<your_paypal_secret>
+paypal.connection.timeout=30000
+paypal.read.timeout=30000
+paypal.url.return=http://localhost:8081/api/paypal/success
+paypal.url.cancel=http://localhost:8081/api/paypal/cancel
+
+# 5. Email Configuration
+email.smtp.host=smtp.gmail.com
+email.smtp.port=587
+email.username=<your_email_address>
+email.password=<your_app_password>
+email.from.name=AIMS Store
