@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="900" prefWidth="1600" style="-fx-background-color: white;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.CartController">
+   <top>
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1920.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="44.0" prefWidth="138.0" text="AIMS">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <font>
+                              <Font name="Roboto Black" size="28.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label prefHeight="96.0" prefWidth="360.0" text="🛒 Shopping Cart">
+                           <font>
+                              <Font name="Roboto Bold" size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <HBox alignment="CENTER_RIGHT" prefHeight="44.0" prefWidth="416.0" spacing="15">
+                     <children>
+                        <HBox alignment="CENTER" prefHeight="44.0" prefWidth="238.0" spacing="10" style="-fx-background-color: #f5f5f5; -fx-background-radius: 5; -fx-padding: 8 15;" HBox.hgrow="NEVER">
+                           <children>
+                              <TextField prefHeight="25.0" prefWidth="180.0" promptText="Search curated artifacts..." style="-fx-background-color: transparent; -fx-border-width: 0;" HBox.hgrow="NEVER" />
+                              <Label style="-fx-font-size: 16px;" text="🔍" />
+                           </children>
+                        </HBox>
+                        <Button prefHeight="44.0" prefWidth="49.0" style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;" text="👤" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #f5f5f5;" stylesheets="@styles2.0.css" BorderPane.alignment="TOP_LEFT">
+         <children>
+                
+                <!-- Icons -->
+                <HBox alignment="CENTER_LEFT" prefHeight="78.0" prefWidth="1920.0" spacing="20">
+                    <Button onAction="#onContinueShopping" styleClass="btn-secondary" text="← Back to Shop">
+                  <HBox.margin>
+                     <Insets left="40.0" />
+                  </HBox.margin></Button>
+                </HBox>
+              <HBox prefHeight="791.0" prefWidth="1920.0" spacing="30" style="-fx-padding: 20 40;">
+                  <!-- Cart Items Section -->
+                  <VBox spacing="20" styleClass="aims-panel-card" HBox.hgrow="ALWAYS">
+                      <Label fx:id="cartCountLabel" style="-fx-font-size: 20px;" styleClass="label-section-title" text="Cart (0)" />
+                      
+                            <!-- Cart Items with ScrollPane for scrolling -->
+                      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-width: 0;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                          <VBox fx:id="cartItemsContainer" spacing="15" style="-fx-padding: 5;">
+                        <!-- Cart items will be dynamically loaded here -->
+                    </VBox>
+                      </ScrollPane>
+                  </VBox>
+                  
+                        <!-- Summary Section -->
+                  <VBox prefWidth="350" spacing="20" styleClass="aims-panel-card">
+                      <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Summary" />
+                      
+                            <VBox spacing="12">
+                          <HBox alignment="CENTER_LEFT">
+                              <Label style="-fx-font-size: 14px; -fx-text-fill: #666;" text="Subtotal" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="subtotalLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="0 đ" />
+                          </HBox>
+                          
+                                <HBox alignment="CENTER_LEFT">
+                              <Label style="-fx-font-size: 14px; -fx-text-fill: #666;" text="VAT (10%)" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="vatLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="0 đ" />
+                          </HBox>
+                          
+                                <Separator />
+                          
+                                <HBox alignment="CENTER_LEFT">
+                              <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="totalLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="0 đ" />
+                          </HBox>
+                      </VBox>
+                      
+                            <Button maxWidth="Infinity" onAction="#onCheckout" prefHeight="45" style="-fx-background-color: black; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="Checkout" />
+                      
+                            <Label style="-fx-font-size: 12px; -fx-text-fill: #888; -fx-text-alignment: center;" text="Shipping calculated at checkout" wrapText="true" />
+                  </VBox>
+              </HBox>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

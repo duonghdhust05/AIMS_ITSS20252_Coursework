@@ -1,0 +1,281 @@
+/* 
+ * AIMS Application Shared Stylesheet
+ * Contains common styles extracted from FXML files to follow DRY principle
+ */
+
+/* ==================== ROOT & GENERAL ==================== */
+.root {
+    -fx-font-family: "System";
+}
+
+/* ==================== BUTTON BASE STYLES ==================== */
+
+/* Primary action button - blue */
+.btn-primary {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1565c0;
+}
+
+/* Secondary action button - gray */
+.btn-secondary {
+    -fx-background-color: #757575;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #616161;
+}
+
+/* Success button - green */
+.btn-success {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 15;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-success:hover {
+    -fx-background-color: #43A047;
+}
+
+/* Warning button - orange */
+.btn-warning {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-warning:hover {
+    -fx-background-color: #FB8C00;
+}
+
+/* Danger button - red */
+.btn-danger {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #e53935;
+}
+
+/* Transparent/link style button */
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-link:hover {
+    -fx-text-fill: #1976d2;
+}
+
+/* Icon button - transparent with emoji/icon */
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-font-size: 20px;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-opacity: 0.7;
+}
+
+/* ==================== FILTER TAB BUTTONS ==================== */
+
+.filter-tab {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #666;
+    -fx-cursor: hand;
+}
+
+.filter-tab:hover {
+    -fx-text-fill: #1976d2;
+}
+
+/* Active filter tab - with underline */
+.filter-tab-active {
+    -fx-background-color: transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: #1976d2;
+    -fx-padding: 10 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1976d2;
+    -fx-font-weight: bold;
+}
+
+/* ==================== SORT BUTTONS ==================== */
+
+.sort-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.sort-btn:hover {
+    -fx-text-fill: #1976d2;
+}
+
+.sort-btn-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1976d2;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* ==================== LABELS ==================== */
+
+/* Header/Title label */
+.label-header {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Section title */
+.label-section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Subtitle/secondary text */
+.label-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #666;
+}
+
+/* Price label - red and bold */
+.label-price {
+    -fx-font-size: 16px;
+    -fx-text-fill: #d32f2f;
+    -fx-font-weight: bold;
+}
+
+/* Total price - larger */
+.label-total {
+    -fx-font-size: 18px;
+    -fx-text-fill: #f44336;
+    -fx-font-weight: bold;
+}
+
+/* Field label - bold */
+.label-field {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Badge - small rounded label */
+.badge {
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 2 6;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* ==================== CONTAINERS ==================== */
+
+/* Card container with shadow */
+.card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
+}
+
+/* Summary panel with light background */
+.summary-panel {
+    -fx-background-color: #fafafa;
+    -fx-padding: 25;
+    -fx-background-radius: 8;
+}
+
+/* Header bar style */
+.header-bar {
+    -fx-background-color: white;
+    -fx-padding: 15 40;
+}
+
+/* Search box container */
+.search-box {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 15;
+}
+
+/* Search field - transparent */
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* Delivery info display panel */
+.delivery-info-panel {
+    -fx-background-color: #f9f9f9;
+    -fx-padding: 15;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+/* ==================== PRODUCT CARD ==================== */
+
+.product-card {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 15;
+    -fx-cursor: hand;
+}
+
+.product-card:hover {
+    -fx-border-color: #1976d2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
+}
+
+/* Product title in card */
+.product-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ==================== SCROLLPANE ==================== */
+
+.scroll-pane-transparent {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* ==================== SEPARATOR ==================== */
+
+.separator-light {
+    -fx-background-color: #e0e0e0;
+}
