@@ -15,7 +15,8 @@ import java.util.Optional;
  * 
  * SOLID PRINCIPLES:
  * - SRP: Single responsibility = data persistence and retrieval
- * - OCP: Can swap implementations (in-memory, database, file) without changing clients
+ * - OCP: Can swap implementations (in-memory, database, file) without changing
+ * clients
  * - DIP: Clients depend on abstraction, not concrete implementation
  * - ISP: Minimal interface with only necessary operations
  * 
@@ -25,9 +26,9 @@ import java.util.Optional;
  * - Can switch storage mechanism without affecting business layer
  */
 public interface ProductRepository {
-    
+
     Product save(Product product);
-    
+
     Optional<Product> findById(Long id);
 
     Optional<Product> findCurrentByBarcode(String barcode);
@@ -41,6 +42,26 @@ public interface ProductRepository {
     List<Product> findHistoryByProductId(Long productId);
 
     boolean updateStock(Long productId, Integer newStock);
+
+    /**
+     * Atomically deducts stock from the database (solves Race Condition).
+     * 
+     * @param productId The ID of the product
+     * @param quantity  The amount to deduct
+     * @return true if successful, false if out of stock or product not found
+     */
+    boolean deductStockAtomically(Long productId, int quantity);
+
+    /**
+     * Atomically restores stock to the database (used for Compensating
+     * Transactions).
+     * 
+     * @param productId The ID of the product
+     * @param quantity  The amount to restore
+     * @return true if successful, false otherwise
+     */
+
+    boolean restoreStock(Long productId, int quantity);
 
     boolean updateStock(String barcode, Integer newStock, String reason);
 

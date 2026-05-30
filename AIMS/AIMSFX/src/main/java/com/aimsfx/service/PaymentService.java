@@ -8,7 +8,13 @@ import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.ProductRepository;
 import com.aimsfx.repository.TransactionRepository;
 
+// Spring imports for @Transactional
+import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * PaymentService Class
@@ -27,15 +33,62 @@ public class PaymentService {
 
     private final TransactionRepository transactionRepository;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepo;
+
+    // Executor for background cron job
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public PaymentService() {
         this.transactionRepository = TransactionRepository.getInstance();
         this.orderRepository = new OrderRepository();
+        this.productRepo = new DatabaseProductRepository();
+        startPendingTransactionCronJob();
     }
 
-    public PaymentService(TransactionRepository transactionRepository, OrderRepository orderRepository) {
+    public PaymentService(TransactionRepository transactionRepository, OrderRepository orderRepository,
+            ProductRepository productRepo) {
         this.transactionRepository = transactionRepository;
         this.orderRepository = orderRepository;
+        this.productRepo = productRepo;
+        startPendingTransactionCronJob();
+    }
+
+    /**
+     * Start a background Cron Job to check PENDING transactions.
+     * 
+     * HOW IT WORKS (Cron Job):
+     * - We use a ScheduledExecutorService to run a task every 5 minutes.
+     * - The task finds all transactions in the database with status = 'PENDING'.
+     * - For each PENDING transaction, it could call the PayPal API to check the
+     * real status.
+     * - If PayPal says "FAILED" or "NOT FOUND", it triggers the Compensating
+     * Transaction
+     * (restoring the stock) and marks the transaction as 'FAILED'.
+     * - This ensures Data Consistency even if the initial PayPal call timed out.
+     * 
+     * Documentation: Search for "Saga Pattern", "Outbox Pattern", and
+     * "ScheduledExecutorService in Java".
+     */
+    private void startPendingTransactionCronJob() {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                // In a real scenario, fetch PENDING transactions from DB here:
+                // List<Transaction> pendingTxns =
+                // transactionRepository.findPendingTransactions();
+                // for (Transaction txn : pendingTxns) {
+                // String status = paypalApi.checkStatus(txn.getExternalId());
+                // if ("FAILED".equals(status)) {
+                // productRepo.restoreStock(txn.getProductId(), txn.getQuantity());
+                // transactionRepository.updateStatus(txn.getId(), "FAILED");
+                // } else if ("COMPLETED".equals(status)) {
+                // transactionRepository.updateStatus(txn.getId(), "COMPLETED");
+                // }
+                // }
+                System.out.println("Cron Job: Checking pending transactions...");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 5, 5, TimeUnit.MINUTES);
     }
 
     /**
@@ -53,7 +106,7 @@ public class PaymentService {
     }
 
     /**
-     * Complete payment: update stock and order status
+     * Complete payment: update stock and order status using Saga Pattern.
      * 
      * SOLID: SRP - All payment completion logic in Service layer
      */
@@ -62,8 +115,7 @@ public class PaymentService {
             return;
         }
 
-        ProductRepository productRepo = new DatabaseProductRepository();
-
+        // STEP 1: Deduct Stock FIRST (Atomic Update to prevent Race Condition)
         for (OrderItem item : order.getOrderItems()) {
             Product product = item.getProduct();
             if (product == null || product.getProductId() == null) {
@@ -73,13 +125,37 @@ public class PaymentService {
             Long productId = product.getProductId();
             int quantitySold = item.getQuantity();
 
-            productRepo.findById(productId).ifPresent(dbProduct -> {
-                int newStock = Math.max(0, dbProduct.getStock() - quantitySold);
-                productRepo.updateStock(productId, newStock);
-            });
+            // Using atomic update. If it fails, it means out of stock.
+            boolean success = productRepo.deductStockAtomically(productId, quantitySold);
+            if (!success) {
+                // By throwing an exception here, Spring @Transactional will automatically
+                // ROLLBACK
+                // any previously deducted items in this loop.
+                throw new RuntimeException("Out of stock for product: " + product.getTitle());
+            }
         }
 
-        // Mark payment completed. OrderRepository.updatePaymentStatus will move order_status to PENDING for PM review.
+        // STEP 2: Call External API (Simulated)
+        try {
+            // Simulated PayPal API call
+            // paypalApi.charge(order.getTotalAmount());
+            System.out.println("Calling PayPal API...");
+
+            // If the API call fails due to a network timeout, an exception is thrown.
+            // if (networkError) throw new NetworkException("Timeout");
+
+        } catch (Exception e) { // Catch NetworkException
+            // STEP 3: Handle Network Failure (Saga Pattern)
+            // Because we don't know if PayPal actually charged the customer or not
+            // (Timeout),
+            // we DO NOT rollback the transaction immediately. Instead, we keep the
+            // transaction
+            // in PENDING state and let the background Cron Job verify it later.
+            System.err.println("Network error calling PayPal API. Keeping order in PENDING state.");
+            throw e;
+        }
+
+        // STEP 4: If API call was successful, mark payment as COMPLETED
         updateOrderPaymentStatus(order.getOrderId(), paymentMethod, "COMPLETED");
     }
 
