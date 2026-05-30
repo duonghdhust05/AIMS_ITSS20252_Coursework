@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS stock_change_log CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS user_delete_count CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS order_action_logs CASCADE;
 
 -- Users table
 CREATE TABLE users (
@@ -68,6 +69,9 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expired_date TIMESTAMP,
     is_current BOOLEAN NOT NULL DEFAULT true,
+
+    -- Add Check Constraint to prevent negative stock
+    CONSTRAINT check_stock_positive CHECK (stock >= 0),
 
     -- Book-specific fields
     author VARCHAR(255),
@@ -171,6 +175,14 @@ CREATE TABLE order_items (
     quantity INTEGER NOT NULL,
     unit_price DECIMAL(15,2) NOT NULL,
     total_price DECIMAL(15,2) NOT NULL
+);
+
+CREATE TABLE order_action_logs (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(order_id),
+    action VARCHAR(50) NOT NULL,
+    reason TEXT, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Transactions table (for VietQR and PayPal payments)
