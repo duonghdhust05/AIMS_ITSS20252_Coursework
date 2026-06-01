@@ -17,6 +17,7 @@ public class HomepageController {
 
     private List<Product> allProducts = new ArrayList<>();
     private List<Product> currentDisplayedProducts = new ArrayList<>();
+    private List<Product> random20Products = new ArrayList<>();
 
     public HomepageController(HomepageView view) {
         this.view = view;
@@ -35,7 +36,7 @@ public class HomepageController {
 
     public void performSearch(String query) {
         if (query == null || query.trim().isEmpty()) {
-            currentDisplayedProducts = new ArrayList<>(allProducts);
+            currentDisplayedProducts = new ArrayList<>(random20Products);
         } else {
             String lowerQuery = query.toLowerCase().trim();
             currentDisplayedProducts = allProducts.stream()
@@ -182,9 +183,10 @@ public class HomepageController {
 
         List<Product> randomList = new ArrayList<>(allProducts);
         Collections.shuffle(randomList);
-        currentDisplayedProducts = randomList.stream()
+        random20Products = randomList.stream()
                 .limit(20)
                 .collect(Collectors.toList());
+        currentDisplayedProducts = new ArrayList<>(random20Products);
     }
 
     public void handleViewDetail(String productId) {

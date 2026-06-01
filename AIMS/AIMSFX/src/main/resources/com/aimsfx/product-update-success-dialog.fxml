@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="20" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductUpdateSuccessDialog">
+<VBox alignment="CENTER" spacing="20" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.ProductUpdateSuccessDialog">
    <padding>
       <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
    </padding>
