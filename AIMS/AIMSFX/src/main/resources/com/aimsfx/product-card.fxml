@@ -4,7 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:controller="com.aimsfx.view.ProductCardComponent" alignment="TOP_CENTER" prefWidth="250" spacing="10" style="-fx-padding: 15; -fx-cursor: hand;" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25">
+<VBox fx:controller="com.aimsfx.view.ProductView.ProductCardComponent" alignment="TOP_CENTER" prefWidth="250" spacing="10" style="-fx-padding: 15; -fx-cursor: hand;" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25">
     
     <Label style="-fx-font-size: 48px;" text="📦" />
     <Label fx:id="titleLabel" maxWidth="220" style="-fx-font-size: 14px; -fx-font-weight: bold;" wrapText="true" />
