@@ -8,14 +8,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record VietQRCallbackRequest(
-        @JsonProperty("transactionid") String transactionId,
-        @JsonProperty("transactiontime") Long transactionTime,
-        @JsonProperty("referencenumber") String referenceNumber,
-        @JsonProperty("amount") Long amount,
-        @JsonProperty("content") String content,
-        @JsonProperty("bankaccount") String bankAccount,
-        @JsonProperty("orderId") String orderId,
-        @JsonProperty("transType") String transType,
-        @JsonProperty("terminalCode") String terminalCode,
-        @JsonProperty("sign") String sign
-) {}
+                @JsonProperty("transactionid") String transactionid,
+                @JsonProperty("transactiontime") Long transactiontime,
+                @JsonProperty("referencenumber") String referencenumber,
+                @JsonProperty("amount") Long amount,
+                @JsonProperty("content") String content,
+                @JsonProperty("bankAccount") String bankAccount,
+                @JsonProperty("orderId") String orderId,
+                @JsonProperty("transType") String transType,
+                @JsonProperty("terminalCode") String terminalCode,
+                @JsonProperty("sign") String sign,
+                @JsonProperty("bankCode") String bankCode) {
+}

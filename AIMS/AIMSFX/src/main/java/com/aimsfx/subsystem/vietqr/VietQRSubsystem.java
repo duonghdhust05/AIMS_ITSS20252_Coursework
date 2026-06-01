@@ -96,10 +96,12 @@ public class VietQRSubsystem implements IPaymentQRCode {
         try {
             String token = getAccessToken();
             interaction.postSimulationRequest(
-                    orderId, amount, content,
+                    "TRANSFER", amount, content,
                     config.getBankCode(),
                     config.getBankAccount(),
-                    token);
+                    token,
+                    orderId,
+                    "SIM_" + System.currentTimeMillis());
         } catch (PaymentException e) {
             throw e;
         } catch (Exception e) {
