@@ -1,6 +1,6 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
-import com.aimsfx.controller.ProductController;
+import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
@@ -24,39 +24,57 @@ import java.util.Map;
  * 
  * REFACTORED: Now UI-only
  * - Collects user input from JavaFX controls
- * - Calls ONE controller method to submit (handleUpdateProduct / handleUpdateStock)
+ * - Calls ONE controller method to submit (handleUpdateProduct /
+ * handleUpdateStock)
  * - Does NOT parse numbers or construct ProductDTO
  * - Does NOT perform orchestrations
  */
 public class UpdateProductFormView {
 
     // Common Fields
-    @FXML private TextField productIdField;
-    @FXML private TextField productTypeField;
-    @FXML private TextField barcodeField;
-    @FXML private TextField titleField;
-    @FXML private TextField categoryField;
-    @FXML private TextField originalPriceField;
-    @FXML private TextField currentPriceField;
-    @FXML private TextArea descriptionField;
-    @FXML private TextField weightField;
-    @FXML private TextField dimensionsField;
-    @FXML private TextField stockField;
-    @FXML private Button updateStockButton;
-    @FXML private ComboBox<String> statusComboBox;
-    @FXML private TextField vatRateField;
+    @FXML
+    private TextField productIdField;
+    @FXML
+    private TextField productTypeField;
+    @FXML
+    private TextField barcodeField;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private TextField categoryField;
+    @FXML
+    private TextField originalPriceField;
+    @FXML
+    private TextField currentPriceField;
+    @FXML
+    private TextArea descriptionField;
+    @FXML
+    private TextField weightField;
+    @FXML
+    private TextField dimensionsField;
+    @FXML
+    private TextField stockField;
+    @FXML
+    private Button updateStockButton;
+    @FXML
+    private ComboBox<String> statusComboBox;
+    @FXML
+    private TextField vatRateField;
 
     // Specific Fields Section
-    @FXML private VBox specificFieldsSection;
-    @FXML private Label specificFieldsTitle;
-    @FXML private GridPane specificFieldsGrid;
+    @FXML
+    private VBox specificFieldsSection;
+    @FXML
+    private Label specificFieldsTitle;
+    @FXML
+    private GridPane specificFieldsGrid;
 
     // OCP SOLUTION: Dynamic fields storage by key (not by index)
     private Map<String, Control> dynamicControls = new HashMap<>();
-    
+
     // Legacy support: Keep for backward compatibility
     private List<Control> specificFieldControls = new ArrayList<>();
-    
+
     private ProductController controller;
     private String productType;
     private Runnable onProductUpdated;
@@ -64,14 +82,14 @@ public class UpdateProductFormView {
     @FXML
     public void initialize() {
         controller = ProductController.getInstance();
-        
+
         // Initialize status combo with only two valid values
         statusComboBox.getItems().addAll("available", "deactivated");
-        
+
         // Make stock field read-only
         stockField.setEditable(false);
         stockField.setStyle("-fx-background-color: #f0f0f0;");
-        
+
         // Setup update stock button
         if (updateStockButton != null) {
             updateStockButton.setOnAction(e -> handleUpdateStock());
@@ -99,7 +117,7 @@ public class UpdateProductFormView {
         try {
             // Get product details from controller (not repository!)
             Map<String, Object> productData = controller.getProductDetails(productId);
-            
+
             if (productData == null) {
                 showAlert("Error", "Product not found!");
                 handleCancel();
@@ -108,7 +126,7 @@ public class UpdateProductFormView {
 
             // Load product type
             this.productType = getString(productData, "product_type");
-            
+
             // Populate common fields
             productIdField.setText(productId.toString());
             productTypeField.setText(productType);
@@ -153,13 +171,13 @@ public class UpdateProductFormView {
             // OCP: Render fields based on metadata (no product-type checks)
             for (int i = 0; i < configs.size(); i++) {
                 AttributeMeta meta = configs.get(i);
-                
+
                 Label label = new Label(meta.getLabel());
                 label.setStyle("-fx-font-size: 13px;");
-                
+
                 // Create Input Control based on InputType
                 Control inputControl = createInputControl(meta);
-                
+
                 // Store control by KEY (not by index)
                 dynamicControls.put(meta.getKey(), inputControl);
                 specificFieldControls.add(inputControl); // Legacy support
@@ -175,7 +193,7 @@ public class UpdateProductFormView {
             showAlert("Error", "Failed to generate fields: " + e.getMessage());
         }
     }
-    
+
     /**
      * Create input control based on AttributeMeta
      */
@@ -225,16 +243,16 @@ public class UpdateProductFormView {
      * 
      * OCP SOLUTION: Uses key-based lookup from dynamicControls
      * BEFORE: switch (productType) { case "BOOK" -> setValue(0, ...); }
-     * AFTER:  for each key: setValueByKey(key, productData.get("specific_" + key))
+     * AFTER: for each key: setValueByKey(key, productData.get("specific_" + key))
      */
     private void populateSpecificFields(Map<String, Object> productData) {
         // Get attribute config from Controller (not directly from Factory!)
         List<AttributeMeta> configs = controller.getAttributeConfig(productType);
-        
+
         for (AttributeMeta meta : configs) {
             String key = meta.getKey();
             String dataKey = "specific_" + key;
-            
+
             // Special handling for CD trackCount - load from tracks table
             if ("CD".equals(productType) && "trackCount".equals(key)) {
                 String barcode = getString(productData, "barcode");
@@ -255,15 +273,16 @@ public class UpdateProductFormView {
             }
         }
     }
-    
+
     /**
      * Set value to a specific field control by key
      * OCP SOLUTION: Uses key-based lookup instead of index
      */
     private void setValueByKey(String key, String value) {
         Control control = dynamicControls.get(key);
-        if (control == null) return;
-        
+        if (control == null)
+            return;
+
         if (control instanceof TextField tf) {
             tf.setText(value != null ? value : "");
         } else if (control instanceof ComboBox<?>) {
@@ -275,10 +294,11 @@ public class UpdateProductFormView {
 
     /**
      * Set value to a specific field control by index
+     * 
      * @deprecated Use setValueByKey() instead
      */
     @SuppressWarnings("unused")
-	@Deprecated
+    @Deprecated
     private void setValue(int index, String value) {
         if (index < specificFieldControls.size()) {
             Control control = specificFieldControls.get(index);
@@ -316,29 +336,28 @@ public class UpdateProductFormView {
             commonFields.put("dimensions", dimensionsField.getText().trim());
             commonFields.put("status", statusComboBox.getValue());
             commonFields.put("vatRate", vatRateField.getText().trim());
-            
+
             // Step 2: Collect specific attributes as Map
             Map<String, String> specificAttributes = collectSpecificAttributesAsMap();
-            
+
             // Step 3: Call controller ONCE - controller handles everything
             Product product = controller.handleUpdateProduct(
                     productIdField.getText().trim(),
                     productType,
                     commonFields,
-                    specificAttributes
-            );
-            
+                    specificAttributes);
+
             // Step 4: Show success
             showSuccess("Product updated successfully!\nBarcode: " + product.getBarcode());
-            
+
             // Step 5: Trigger callback
             if (onProductUpdated != null) {
                 onProductUpdated.run();
             }
-            
+
             // Step 6: Close form
             handleCancel();
-            
+
         } catch (IllegalArgumentException e) {
             // Controller throws IllegalArgumentException with user-friendly messages
             showAlert("Validation Error", e.getMessage());
@@ -354,17 +373,17 @@ public class UpdateProductFormView {
      */
     private Map<String, String> collectSpecificAttributesAsMap() {
         Map<String, String> attributesMap = new HashMap<>();
-        
+
         for (Map.Entry<String, Control> entry : dynamicControls.entrySet()) {
             String key = entry.getKey();
             Control control = entry.getValue();
             String value = extractValueFromControl(control);
             attributesMap.put(key, value);
         }
-        
+
         return attributesMap;
     }
-    
+
     /**
      * Extract value from any Control type
      */
@@ -379,19 +398,20 @@ public class UpdateProductFormView {
         }
         return "";
     }
-    
+
     /**
      * Collect specific attributes from dynamic fields
+     * 
      * @deprecated Use collectSpecificAttributesAsMap() instead
      */
     @SuppressWarnings("unused")
-	@Deprecated
+    @Deprecated
     private String[] collectSpecificAttributes() {
         String[] attributes = new String[specificFieldControls.size()];
-        
+
         for (int i = 0; i < specificFieldControls.size(); i++) {
             Control control = specificFieldControls.get(i);
-            
+
             if (control instanceof TextField) {
                 attributes[i] = ((TextField) control).getText().trim();
             } else if (control instanceof ComboBox) {
@@ -400,10 +420,10 @@ public class UpdateProductFormView {
                 attributes[i] = comboBox.getValue() != null ? comboBox.getValue() : "";
             }
         }
-        
+
         return attributes;
     }
-    
+
     /**
      * Handle cancel button
      */
@@ -412,7 +432,7 @@ public class UpdateProductFormView {
         Stage stage = (Stage) titleField.getScene().getWindow();
         stage.close();
     }
-    
+
     /**
      * Handle update stock button - opens dialog to update stock with reason
      * 
@@ -428,35 +448,35 @@ public class UpdateProductFormView {
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Update Stock");
             dialog.setHeaderText("Update Stock for Product");
-            
+
             // Create form
             GridPane grid = new GridPane();
             grid.setHgap(10);
             grid.setVgap(10);
-            
+
             Label currentStockLabel = new Label("Current Stock:");
             Label currentStockValue = new Label(stockField.getText().trim());
             currentStockValue.setStyle("-fx-font-weight: bold;");
-            
+
             Label newStockLabel = new Label("New Stock:");
             TextField newStockField = new TextField();
             newStockField.setPromptText("Enter new stock quantity");
-            
+
             Label reasonLabel = new Label("Reason:");
             TextArea reasonField = new TextArea();
             reasonField.setPromptText("Enter reason for stock change (required)");
             reasonField.setPrefRowCount(3);
-            
+
             grid.add(currentStockLabel, 0, 0);
             grid.add(currentStockValue, 1, 0);
             grid.add(newStockLabel, 0, 1);
             grid.add(newStockField, 1, 1);
             grid.add(reasonLabel, 0, 2);
             grid.add(reasonField, 1, 2);
-            
+
             dialog.getDialogPane().setContent(grid);
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-            
+
             // Show dialog and process result
             dialog.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
@@ -465,16 +485,16 @@ public class UpdateProductFormView {
                         String barcode = barcodeField.getText().trim();
                         String newStockRaw = newStockField.getText().trim();
                         String reason = reasonField.getText().trim();
-                        
+
                         // Call controller ONCE - controller handles parsing and validation
                         controller.handleUpdateStock(barcode, newStockRaw, reason);
-                        
+
                         // Update display - refetch the value to ensure consistency
                         stockField.setText(newStockRaw);
-                        
+
                         // Show success
                         showSuccess("Stock updated successfully!");
-                        
+
                     } catch (IllegalArgumentException e) {
                         // Controller throws IllegalArgumentException with user-friendly messages
                         showAlert("Validation Error", e.getMessage());
@@ -484,7 +504,7 @@ public class UpdateProductFormView {
                     }
                 }
             });
-            
+
         } catch (Exception e) {
             showAlert("Error", "Failed to open stock update dialog: " + e.getMessage());
             e.printStackTrace();
@@ -492,24 +512,25 @@ public class UpdateProductFormView {
     }
 
     // Utility methods
-    
+
     private String getString(Map<String, Object> data, String key) {
         Object value = data.get(key);
         return value != null ? value.toString() : "";
     }
-    
+
     private String getDateString(Map<String, Object> data, String key) {
         Object value = data.get(key);
-        if (value == null) return "";
-        
+        if (value == null)
+            return "";
+
         if (value instanceof Date) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             return sdf.format((Date) value);
         }
-        
+
         return value.toString();
     }
-    
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -517,7 +538,7 @@ public class UpdateProductFormView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private void showSuccess(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");

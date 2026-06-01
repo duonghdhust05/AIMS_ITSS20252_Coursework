@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.UserView;
 
 import com.aimsfx.controller.UserController;
 import com.aimsfx.utils.SessionManager;

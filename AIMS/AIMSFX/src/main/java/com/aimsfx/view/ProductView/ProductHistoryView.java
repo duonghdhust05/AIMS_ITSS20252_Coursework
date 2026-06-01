@@ -1,6 +1,6 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
-import com.aimsfx.controller.ProductController;
+import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

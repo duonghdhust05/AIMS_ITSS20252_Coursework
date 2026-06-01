@@ -1,4 +1,4 @@
-package com.aimsfx.view.payment;
+package com.aimsfx.view.PaymentUI;
 
 import com.aimsfx.controller.PayOrderController;
 import com.aimsfx.exception.PaymentException;

@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.ProductManagerController;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
