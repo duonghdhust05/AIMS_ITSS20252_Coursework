@@ -53,7 +53,7 @@ public class VietQRPaymentHandler implements IPaymentMethodHandler {
 
     @Override
     public String getConfirmButtonText() {
-        return "Xác nhận Thanh toán (VietQR)";
+        return "Pay with VietQR";
     }
 
     @Override

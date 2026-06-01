@@ -39,7 +39,7 @@ public class PlaceOrderView {
     private Label vatLabel;
     private Label totalLabel;
     private Label deliveryFeeLabel;
-    
+
     // Display labels for delivery info
     private Label displayNameLabel;
     private Label displayPhoneLabel;
@@ -48,7 +48,7 @@ public class PlaceOrderView {
     private Label displaySubDistrictLabel;
     private Label displayAddressLabel;
     private Label displayInstructionsLabel;
-    
+
     // Order success view labels
     private Label orderIdLabel;
     private Label customerNameLabel;
@@ -60,7 +60,7 @@ public class PlaceOrderView {
     private Label paymentMethodLabel;
     private Label transactionDateLabel;
     private Label statusLabel;
-    
+
     // Form components
     private GridPane deliveryFormGrid;
     private VBox deliveryInfoDisplay;
@@ -68,13 +68,13 @@ public class PlaceOrderView {
     private ComboBox<String> provinceComboBox;
 
     // ==================== CONSTRUCTOR ====================
-    
+
     public PlaceOrderView() {
         // Default constructor
     }
 
     // ==================== COMPONENT BINDING ====================
-    
+
     /**
      * Bind FXML components to this view
      * Called from Controller after FXML loading
@@ -86,7 +86,7 @@ public class PlaceOrderView {
             Label totalLabel,
             Label deliveryFeeLabel,
             ComboBox<String> provinceComboBox) {
-        
+
         this.cartItemsContainer = cartItemsContainer;
         this.subtotalLabel = subtotalLabel;
         this.vatLabel = vatLabel;
@@ -109,7 +109,7 @@ public class PlaceOrderView {
             GridPane deliveryFormGrid,
             VBox deliveryInfoDisplay,
             Button addDeliveryInfoButton) {
-        
+
         this.displayNameLabel = displayNameLabel;
         this.displayPhoneLabel = displayPhoneLabel;
         this.displayEmailLabel = displayEmailLabel;
@@ -136,7 +136,7 @@ public class PlaceOrderView {
             Label paymentMethodLabel,
             Label transactionDateLabel,
             Label statusLabel) {
-        
+
         this.orderIdLabel = orderIdLabel;
         this.customerNameLabel = customerNameLabel;
         this.phoneNumberLabel = phoneNumberLabel;
@@ -230,16 +230,16 @@ public class PlaceOrderView {
     /**
      * Create UI box for a cart item with quantity controls
      * 
-     * @param cartItem CartItem to display
+     * @param cartItem         CartItem to display
      * @param onQuantityChange Callback when quantity changes
-     * @param onRemove Callback when remove button clicked
+     * @param onRemove         Callback when remove button clicked
      * @return HBox containing the cart item UI
      */
     public HBox createCartItemBox(CartItem cartItem, Runnable onQuantityChange, Runnable onRemove) {
         HBox itemBox = new HBox(15);
         itemBox.setStyle(
                 "-fx-padding: 15; -fx-background-color: white; -fx-border-color: #e0e0e0; " +
-                "-fx-border-radius: 5; -fx-background-radius: 5;");
+                        "-fx-border-radius: 5; -fx-background-radius: 5;");
 
         Product product = cartItem.getProduct();
 
@@ -247,7 +247,7 @@ public class PlaceOrderView {
         Label imageLabel = new Label("📦");
         imageLabel.setStyle(
                 "-fx-font-size: 40px; -fx-pref-width: 80; -fx-pref-height: 80; -fx-alignment: center; " +
-                "-fx-background-color: #f5f5f5; -fx-background-radius: 5;");
+                        "-fx-background-color: #f5f5f5; -fx-background-radius: 5;");
 
         // Product info
         VBox infoBox = new VBox(5);
@@ -317,12 +317,13 @@ public class PlaceOrderView {
     /**
      * Load cart items into the container
      * 
-     * @param items List of cart items in cart
+     * @param items            List of cart items in cart
      * @param onQuantityChange Callback when any quantity changes
      */
     public void loadCartItems(List<CartItem> items, Runnable onQuantityChange) {
-        if (cartItemsContainer == null) return;
-        
+        if (cartItemsContainer == null)
+            return;
+
         cartItemsContainer.getChildren().clear();
 
         if (items == null || items.isEmpty()) {
@@ -342,8 +343,8 @@ public class PlaceOrderView {
      * Update totals display
      * 
      * @param subtotal Subtotal amount
-     * @param vat VAT amount
-     * @param total Total amount
+     * @param vat      VAT amount
+     * @param total    Total amount
      */
     public void updateTotals(double subtotal, double vat, double total) {
         if (subtotalLabel != null) {
@@ -372,7 +373,8 @@ public class PlaceOrderView {
      * Update delivery info display labels
      */
     public void updateDeliveryInfoDisplay(DeliveryInfo info) {
-        if (info == null) return;
+        if (info == null)
+            return;
 
         if (displayNameLabel != null) {
             displayNameLabel.setText(info.getRecipientName());
@@ -382,22 +384,23 @@ public class PlaceOrderView {
         }
         if (displayEmailLabel != null) {
             displayEmailLabel.setText(
-                info.getEmail() == null || info.getEmail().trim().isEmpty() ? "-" : info.getEmail());
+                    info.getEmail() == null || info.getEmail().trim().isEmpty() ? "-" : info.getEmail());
         }
         if (displayProvinceLabel != null) {
             displayProvinceLabel.setText(info.getProvince());
         }
         if (displaySubDistrictLabel != null) {
             displaySubDistrictLabel.setText(
-                info.getWard() == null || info.getWard().trim().isEmpty() ? "-" : info.getWard());
+                    info.getWard() == null || info.getWard().trim().isEmpty() ? "-" : info.getWard());
         }
         if (displayAddressLabel != null) {
             displayAddressLabel.setText(info.getAddress());
         }
         if (displayInstructionsLabel != null) {
             displayInstructionsLabel.setText(
-                info.getDeliveryInstructions() == null || info.getDeliveryInstructions().trim().isEmpty() 
-                    ? "-" : info.getDeliveryInstructions());
+                    info.getDeliveryInstructions() == null || info.getDeliveryInstructions().trim().isEmpty()
+                            ? "-"
+                            : info.getDeliveryInstructions());
         }
 
         // Switch to display mode
@@ -451,8 +454,8 @@ public class PlaceOrderView {
         }
 
         if (transactionDateLabel != null && txn != null) {
-            java.time.format.DateTimeFormatter formatter = 
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                    .ofPattern("dd/MM/yyyy HH:mm:ss");
             transactionDateLabel.setText(txn.getCreatedAt().format(formatter));
         }
 
@@ -476,7 +479,7 @@ public class PlaceOrderView {
     /**
      * Show alert dialog
      * 
-     * @param title Alert title
+     * @param title   Alert title
      * @param message Alert message
      */
     public void showAlert(String title, String message) {
@@ -519,7 +522,7 @@ public class PlaceOrderView {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        
+
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
@@ -536,7 +539,7 @@ public class PlaceOrderView {
         }
 
         Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Chi tiết đơn hàng");
+        dialog.setTitle("Detail Information");
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
 
         // Main container
@@ -577,12 +580,12 @@ public class PlaceOrderView {
         VBox header = new VBox(8);
         header.setStyle("-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); " +
                 "-fx-padding: 20; -fx-background-radius: 8 8 0 0;");
-        
-        Label titleLabel = new Label("📋 CHI TIẾT ĐƠN HÀNG");
+
+        Label titleLabel = new Label("📋 ORDER INFORMATION");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         Label orderIdLabel = new Label(
-                "Đơn hàng #" + order.getOrderId() + " | Hóa đơn #" + invoice.getInvoiceId());
+                "Order #" + order.getOrderId() + " | Hóa đơn #" + invoice.getInvoiceId());
         orderIdLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);");
 
         header.getChildren().addAll(titleLabel, orderIdLabel);
@@ -594,7 +597,7 @@ public class PlaceOrderView {
         section.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
-        Label title = new Label("🛍️ SẢN PHẨM");
+        Label title = new Label("🛍️ PRODUCTS");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
         section.getChildren().add(title);
 
@@ -639,20 +642,20 @@ public class PlaceOrderView {
         section.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
-        Label title = new Label("💰 THANH TOÁN");
+        Label title = new Label("💰 PAYMENT");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
         section.getChildren().add(title);
 
         section.getChildren().add(new Separator());
 
         section.getChildren().addAll(
-                createSummaryRow("Tạm tính:", String.format("%,.0f ₫", (double) invoice.getSubtotal()), false),
+                createSummaryRow("Subtotal:", String.format("%,.0f ₫", (double) invoice.getSubtotal()), false),
                 createSummaryRow("VAT (10%):", String.format("%,.0f ₫", (double) invoice.getVat()), false),
-                createSummaryRow("Phí vận chuyển:", String.format("%,.0f ₫", (double) invoice.getDeliveryFee()), false));
+                createSummaryRow("Shipping Fee:", String.format("%,.0f ₫", (double) invoice.getDeliveryFee()), false));
 
         if (invoice.getDiscount() > 0) {
             section.getChildren().add(
-                    createSummaryRow("Giảm giá:", String.format("-%,.0f ₫", (double) invoice.getDiscount()), 
+                    createSummaryRow("Discount:", String.format("-%,.0f ₫", (double) invoice.getDiscount()),
                             false, "#27ae60"));
         }
 
@@ -661,7 +664,7 @@ public class PlaceOrderView {
         section.getChildren().add(sep);
 
         section.getChildren().add(
-                createSummaryRow("TỔNG CỘNG:", String.format("%,.0f ₫", (double) invoice.getTotalAmount()), true));
+                createSummaryRow("TOTAL:", String.format("%,.0f ₫", (double) invoice.getTotalAmount()), true));
 
         return section;
     }
@@ -671,19 +674,19 @@ public class PlaceOrderView {
         section.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
 
-        Label title = new Label("🔐 GIAO DỊCH");
+        Label title = new Label("🔐 TRANSACTION");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
         section.getChildren().add(title);
 
         section.getChildren().add(new Separator());
 
-        java.time.format.DateTimeFormatter formatter = 
-            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                .ofPattern("dd/MM/yyyy HH:mm:ss");
 
         section.getChildren().addAll(
                 createInfoRow("Mã giao dịch:", txn.getTransactionId()),
                 createInfoRow("Phương thức:", txn.getPaymentMethod()),
-                createInfoRow("Trạng thái:", txn.getStatus().toString().toUpperCase(), 
+                createInfoRow("Trạng thái:", txn.getStatus().toString().toUpperCase(),
                         getStatusColor(txn.getStatus().toString())),
                 createInfoRow("Thời gian:", txn.getCreatedAt().format(formatter)));
 
@@ -702,7 +705,8 @@ public class PlaceOrderView {
     }
 
     private String getStatusColor(String status) {
-        if (status == null) return "#666";
+        if (status == null)
+            return "#666";
         switch (status.toUpperCase()) {
             case "SUCCESS":
             case "COMPLETED":
@@ -775,16 +779,18 @@ public class PlaceOrderView {
     public ComboBox<String> getProvinceComboBox() {
         return provinceComboBox;
     }
-    
+
     // ==================== ADDITIONAL UI METHODS ====================
-    
+
     /**
      * Show empty cart message in cart container
+     * 
      * @param container The container to add message to
      */
     public void showEmptyCartMessage(VBox container) {
-        if (container == null) return;
-        
+        if (container == null)
+            return;
+
         container.getChildren().clear();
         Label emptyLabel = new Label("Your cart is empty");
         emptyLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #999; -fx-padding: 40;");
@@ -795,13 +801,14 @@ public class PlaceOrderView {
 
     /**
      * Restore delivery info to form fields
-     * @param deliveryInfo The delivery info to restore
-     * @param nameField Name text field
-     * @param phoneField Phone text field
-     * @param emailField Email text field
-     * @param provinceComboBox Province combo box
-     * @param subDistrictField Sub-district text field
-     * @param addressArea Address text area
+     * 
+     * @param deliveryInfo             The delivery info to restore
+     * @param nameField                Name text field
+     * @param phoneField               Phone text field
+     * @param emailField               Email text field
+     * @param provinceComboBox         Province combo box
+     * @param subDistrictField         Sub-district text field
+     * @param addressArea              Address text area
      * @param deliveryInstructionsArea Delivery instructions text area
      */
     public void restoreDeliveryInfoToForm(
@@ -813,8 +820,9 @@ public class PlaceOrderView {
             TextField subDistrictField,
             TextArea addressArea,
             TextArea deliveryInstructionsArea) {
-        
-        if (deliveryInfo == null) return;
+
+        if (deliveryInfo == null)
+            return;
 
         // Restore basic fields
         if (deliveryInfo.getRecipientName() != null && nameField != null) {
@@ -842,11 +850,13 @@ public class PlaceOrderView {
 
     /**
      * Update delivery display labels and switch to display mode
+     * 
      * @param deliveryInfo The delivery info to display
      */
     public void updateDeliveryDisplayAndSwitchMode(DeliveryInfo deliveryInfo) {
-        if (deliveryInfo == null) return;
-        
+        if (deliveryInfo == null)
+            return;
+
         // Update display labels
         if (displayNameLabel != null) {
             displayNameLabel.setText(deliveryInfo.getRecipientName() != null ? deliveryInfo.getRecipientName() : "-");
@@ -855,23 +865,26 @@ public class PlaceOrderView {
             displayPhoneLabel.setText(deliveryInfo.getPhoneNumber() != null ? deliveryInfo.getPhoneNumber() : "-");
         }
         if (displayEmailLabel != null) {
-            displayEmailLabel.setText(deliveryInfo.getEmail() != null && !deliveryInfo.getEmail().trim().isEmpty() 
-                    ? deliveryInfo.getEmail() : "-");
+            displayEmailLabel.setText(deliveryInfo.getEmail() != null && !deliveryInfo.getEmail().trim().isEmpty()
+                    ? deliveryInfo.getEmail()
+                    : "-");
         }
         if (displayProvinceLabel != null) {
             displayProvinceLabel.setText(deliveryInfo.getProvince() != null ? deliveryInfo.getProvince() : "-");
         }
         if (displaySubDistrictLabel != null) {
-            displaySubDistrictLabel.setText(deliveryInfo.getWard() != null && !deliveryInfo.getWard().trim().isEmpty() 
-                    ? deliveryInfo.getWard() : "-");
+            displaySubDistrictLabel.setText(deliveryInfo.getWard() != null && !deliveryInfo.getWard().trim().isEmpty()
+                    ? deliveryInfo.getWard()
+                    : "-");
         }
         if (displayAddressLabel != null) {
             displayAddressLabel.setText(deliveryInfo.getAddress() != null ? deliveryInfo.getAddress() : "-");
         }
         if (displayInstructionsLabel != null) {
-            displayInstructionsLabel.setText(deliveryInfo.getDeliveryInstructions() != null 
-                    && !deliveryInfo.getDeliveryInstructions().trim().isEmpty() 
-                    ? deliveryInfo.getDeliveryInstructions() : "-");
+            displayInstructionsLabel.setText(deliveryInfo.getDeliveryInstructions() != null
+                    && !deliveryInfo.getDeliveryInstructions().trim().isEmpty()
+                            ? deliveryInfo.getDeliveryInstructions()
+                            : "-");
         }
 
         // Switch to display mode, hide form
@@ -892,8 +905,9 @@ public class PlaceOrderView {
      * Initialize province combo box with Vietnamese provinces
      */
     public void initializeProvinceComboBox() {
-        if (provinceComboBox == null) return;
-        
+        if (provinceComboBox == null)
+            return;
+
         provinceComboBox.getItems().addAll(
                 "Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Hải Phòng",
                 "Cần Thơ", "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang",
@@ -904,22 +918,23 @@ public class PlaceOrderView {
 
     /**
      * Populate success page with order details
-     * @param order Order information
-     * @param invoice Invoice information
-     * @param txn Transaction information
+     * 
+     * @param order    Order information
+     * @param invoice  Invoice information
+     * @param txn      Transaction information
      * @param delivery Delivery information
-     * @param labels Label references from Controller
+     * @param labels   Label references from Controller
      */
     public void populateSuccessPage(
-            com.aimsfx.model.Order order, 
-            com.aimsfx.model.Invoice invoice, 
-            com.aimsfx.model.TransactionInfo txn, 
+            com.aimsfx.model.Order order,
+            com.aimsfx.model.Invoice invoice,
+            com.aimsfx.model.TransactionInfo txn,
             com.aimsfx.model.DeliveryInfo delivery,
             Label orderIdLabel, Label customerNameLabel, Label phoneNumberLabel,
             Label addressLabel, Label provinceLabel, Label totalAmountLabel,
             Label transactionIdLabel, Label paymentMethodLabel, Label transactionDateLabel,
             Label statusLabel) {
-        
+
         if (orderIdLabel != null) {
             orderIdLabel.setText("#" + order.getOrderId());
         }
@@ -977,16 +992,17 @@ public class PlaceOrderView {
 
     /**
      * Update total labels with calculated values
+     * 
      * @param subtotalLabel Subtotal label reference
-     * @param vatLabel VAT label reference
-     * @param totalLabel Total label reference
-     * @param subtotal Subtotal value
-     * @param vat VAT value
-     * @param total Total value
-     * @param currency Currency suffix
+     * @param vatLabel      VAT label reference
+     * @param totalLabel    Total label reference
+     * @param subtotal      Subtotal value
+     * @param vat           VAT value
+     * @param total         Total value
+     * @param currency      Currency suffix
      */
     public void updateTotalLabels(Label subtotalLabel, Label vatLabel, Label totalLabel,
-                                   double subtotal, double vat, double total, String currency) {
+            double subtotal, double vat, double total, String currency) {
         if (subtotalLabel != null) {
             subtotalLabel.setText(formatPrice(subtotal) + " " + currency);
         }
@@ -998,19 +1014,21 @@ public class PlaceOrderView {
         }
     }
 
-    // ==================== MESSAGE BUILDING (LAYER 1 - UI STRINGS) ====================
+    // ==================== MESSAGE BUILDING (LAYER 1 - UI STRINGS)
+    // ====================
 
     /**
      * Build delivery fee calculation message for display
-     * @param province Selected province
+     * 
+     * @param province    Selected province
      * @param totalWeight Total weight in kg
      * @param originalFee Original delivery fee
-     * @param discount Discount amount
-     * @param finalFee Final delivery fee after discount
+     * @param discount    Discount amount
+     * @param finalFee    Final delivery fee after discount
      * @return Formatted message string for display
      */
     public String buildDeliveryFeeMessage(String province, float totalWeight,
-                                           float originalFee, float discount, float finalFee) {
+            float originalFee, float discount, float finalFee) {
         if (discount > 0) {
             return String.format(
                     "✓ Delivery fee calculated successfully!\n\n" +
@@ -1041,15 +1059,15 @@ public class PlaceOrderView {
      * Show delivery information dialog and return user input
      * LAYER 1 responsibility: UI dialog display and user interaction
      * 
-     * @param ownerWindow The owner window for modal dialog
-     * @param totalWeight Total order weight for fee calculation
-     * @param totalAmount Total order amount
-     * @param existingName Existing name if editing
-     * @param existingPhone Existing phone if editing
-     * @param existingEmail Existing email if editing
-     * @param existingProvince Existing province if editing
-     * @param existingSubDistrict Existing sub-district if editing
-     * @param existingAddress Existing address if editing
+     * @param ownerWindow          The owner window for modal dialog
+     * @param totalWeight          Total order weight for fee calculation
+     * @param totalAmount          Total order amount
+     * @param existingName         Existing name if editing
+     * @param existingPhone        Existing phone if editing
+     * @param existingEmail        Existing email if editing
+     * @param existingProvince     Existing province if editing
+     * @param existingSubDistrict  Existing sub-district if editing
+     * @param existingAddress      Existing address if editing
      * @param existingInstructions Existing instructions if editing
      * @return Map with dialog results or null if cancelled
      */
@@ -1059,11 +1077,11 @@ public class PlaceOrderView {
             String existingName, String existingPhone, String existingEmail,
             String existingProvince, String existingSubDistrict,
             String existingAddress, String existingInstructions) {
-        
+
         try {
             // Load the dialog FXML
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                getClass().getResource("/com/aimsfx/delivery-info-dialog.fxml"));
+                    getClass().getResource("/com/aimsfx/delivery-info-dialog.fxml"));
             javafx.scene.layout.VBox dialogRoot = loader.load();
 
             // Get the controller
@@ -1105,7 +1123,7 @@ public class PlaceOrderView {
                 result.put("deliveryFee", controller.getDeliveryFee());
                 return result;
             }
-            
+
             return null; // User cancelled
 
         } catch (Exception ex) {
@@ -1116,7 +1134,8 @@ public class PlaceOrderView {
     }
 
     // ==================== NAVIGATION METHODS ====================
-    // View handles navigation to other views (View creates View - acceptable pattern)
+    // View handles navigation to other views (View creates View - acceptable
+    // pattern)
 
     /**
      * Navigate to Payment screen
@@ -1124,34 +1143,34 @@ public class PlaceOrderView {
      * PURPOSE: Controller delegates navigation to View (correct layering)
      * PATTERN: View creates View - acceptable, avoids Controller creating UI
      * 
-     * @param order Current order to pay
-     * @param invoice Current invoice with amounts
+     * @param order              Current order to pay
+     * @param invoice            Current invoice with amounts
      * @param payOrderController Controller for payment processing
-     * @param currentStage Stage to switch scene
+     * @param currentStage       Stage to switch scene
      */
     public void navigateToPaymentScreen(Order order, Invoice invoice,
-                                         com.aimsfx.controller.PayOrderController payOrderController,
-                                         javafx.stage.Stage currentStage) {
+            com.aimsfx.controller.PayOrderController payOrderController,
+            javafx.stage.Stage currentStage) {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/payment-view.fxml"));
-            
+
             // View creates PaymentUI (View creates View - acceptable)
             loader.setControllerFactory(c -> new PaymentUI(payOrderController));
-            
+
             javafx.scene.Parent root = loader.load();
-            
+
             // Pass data to Payment screen
             PaymentUI paymentUI = loader.getController();
             paymentUI.initializeData(order, invoice);
-            
+
             // Switch scene
             currentStage.setScene(new javafx.scene.Scene(root));
             currentStage.setTitle("AIMS - Payment");
             currentStage.centerOnScreen();
-            
+
             System.out.println("✅ Navigated to Payment screen for Order #" + order.getOrderId());
-            
+
         } catch (java.io.IOException e) {
             showAlert("Error", "Could not load Payment Screen: " + e.getMessage());
             e.printStackTrace();
@@ -1161,30 +1180,30 @@ public class PlaceOrderView {
     /**
      * Navigate to Order Success screen
      * 
-     * @param order Completed order
-     * @param invoice Invoice with payment details
-     * @param transaction Transaction info
-     * @param delivery Delivery information
+     * @param order        Completed order
+     * @param invoice      Invoice with payment details
+     * @param transaction  Transaction info
+     * @param delivery     Delivery information
      * @param currentStage Stage to switch scene
      */
     public void navigateToSuccessScreen(Order order, Invoice invoice,
-                                         TransactionInfo transaction, DeliveryInfo delivery,
-                                         javafx.stage.Stage currentStage) {
+            TransactionInfo transaction, DeliveryInfo delivery,
+            javafx.stage.Stage currentStage) {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/order-success-view.fxml"));
             javafx.scene.Parent successView = loader.load();
-            
+
             // Get controller and pass data
             com.aimsfx.controller.PlaceOrderController controller = loader.getController();
             controller.setSuccessData(order, invoice, transaction, delivery);
-            
+
             // Switch scene
             currentStage.setScene(new javafx.scene.Scene(successView));
             currentStage.setTitle("AIMS - Order Success");
-            
+
             System.out.println("✅ Navigated to Success screen for Order #" + order.getOrderId());
-            
+
         } catch (java.io.IOException e) {
             showAlert("Error", "Could not load success page: " + e.getMessage());
             e.printStackTrace();
@@ -1201,10 +1220,10 @@ public class PlaceOrderView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/cart-view.fxml"));
             javafx.scene.Parent cartView = loader.load();
-            
+
             currentStage.setScene(new javafx.scene.Scene(cartView));
             currentStage.setTitle("AIMS - Shopping Cart");
-            
+
         } catch (java.io.IOException e) {
             showAlert("Error", "Could not load cart view: " + e.getMessage());
             e.printStackTrace();
@@ -1220,14 +1239,14 @@ public class PlaceOrderView {
         try {
             // Clear cart on successful order completion
             CartManager.getInstance().clearCart();
-            
+
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/homepage-view.fxml"));
             javafx.scene.Parent homepageView = loader.load();
-            
+
             currentStage.setScene(new javafx.scene.Scene(homepageView));
             currentStage.setTitle("AIMS - Homepage");
-            
+
         } catch (java.io.IOException e) {
             showAlert("Error", "Could not load homepage: " + e.getMessage());
             e.printStackTrace();
