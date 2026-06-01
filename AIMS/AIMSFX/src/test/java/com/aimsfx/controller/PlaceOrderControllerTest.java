@@ -42,7 +42,6 @@ class PlaceOrderControllerTest {
 
     // ==================== MOCKS ====================
     @Mock private PlaceOrderService mockPlaceOrderService;
-    @Mock private PlaceOrderView mockPlaceOrderView;
     @Mock private InvoiceUI mockInvoiceUI;
     @Mock private ViewCartUI mockViewCartUI;
     @Mock private OrderRepository mockOrderRepository;
@@ -99,7 +98,7 @@ class PlaceOrderControllerTest {
     void setUp() {
         // Initialize controller with mocked dependencies
         controller = new PlaceOrderController(
-            mockPlaceOrderService, mockPlaceOrderView, 
+            mockPlaceOrderService,  
             mockInvoiceUI, mockViewCartUI, mockOrderRepository);
 
         // Setup test cart

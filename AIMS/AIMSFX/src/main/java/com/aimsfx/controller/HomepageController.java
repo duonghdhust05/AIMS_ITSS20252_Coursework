@@ -177,23 +177,31 @@ public class HomepageController {
     public void refreshAllProducts() {
         allProducts.clear();
         allProducts.addAll(productController.getProducts());
-        currentDisplayedProducts = new ArrayList<>(allProducts);
+
+        List<Product> randomList = new ArrayList<>(allProducts);
+        Collections.shuffle(randomList);
+        currentDisplayedProducts = randomList.stream()
+                .limit(20)
+                .collect(Collectors.toList());
     }
 
     public void handleViewDetail(String productId) {
         try {
             ViewProductController viewController = ViewProductController.getInstance();
-            Map<String, Object> productData = viewController.getProductDetail(productId); // Retrieves detailed data from DB
+            Map<String, Object> productData = viewController.getProductDetail(productId); // Retrieves detailed data
+                                                                                          // from DB
             view.showProductDetail(viewController, productData);
         } catch (ProductNotFoundException e) {
-            // [ADDED] Explicitly handling DB exception when product is not found, matching original controller
+            // [ADDED] Explicitly handling DB exception when product is not found, matching
+            // original controller
             view.showAlert("Error", "Product not found: " + e.getMessage());
         } catch (Exception e) {
             view.showAlert("Error", "Failed to load product details: " + e.getMessage());
         }
     }
 
-    // [ADDED] Expose cart getter for external dependencies and testing to match original HomepageController capability
+    // [ADDED] Expose cart getter for external dependencies and testing to match
+    // original HomepageController capability
     public Cart getCart() {
         return cartManager.getCart();
     }
