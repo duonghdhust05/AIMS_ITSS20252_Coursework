@@ -63,21 +63,6 @@ public class DatabaseConnection {
 
         }
     }
-
-    /**
-     * Default configuration if properties file is missing or has errors
-     * 
-     * private void setDefaultConfig() {
-     * this.url =
-     * "jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?user=***REMOVED***&password=Aims2025!@&sslmode=require";
-     * this.username = "***REMOVED***";
-     * this.password = "Aims2025!@";
-     * this.maxConnections = 20;
-     * this.minConnections = 5;
-     * this.connectionTimeout = 30000;
-     * }
-     */
-
     /**
      * Khởi tạo HikariCP connection pool
      */
