@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900" prefWidth="1600" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductListView">
+<BorderPane prefHeight="900" prefWidth="1600" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.ProductListView">
    <center>
       <VBox spacing="10" stylesheets="@styles2.0.css">
          <padding>
@@ -30,9 +30,10 @@
                <TableColumn fx:id="selectColumn" prefWidth="50.0" text="Select" />
                <TableColumn fx:id="barcodeColumn" prefWidth="150.0" text="Barcode" />
                <TableColumn fx:id="titleColumn" prefWidth="250.0" text="Title" />
-               <TableColumn fx:id="typeColumn" prefWidth="100.0" text="Type" />
-               <TableColumn fx:id="stockColumn" prefWidth="80.0" text="Stock" />
-               <TableColumn fx:id="actionsColumn" prefWidth="300.0" text="Actions" />
+               <TableColumn fx:id="typeColumn" prefWidth="127.0" text="Type" />
+               <TableColumn fx:id="stockColumn" prefWidth="127.0" text="Stock" />
+               <TableColumn fx:id="actionsColumn" prefWidth="226.0" text="Actions" />
+               <TableColumn fx:id="statusColumn" prefWidth="210.0" text="Status" />
             </columns>
          </TableView>
          <BorderPane.margin>

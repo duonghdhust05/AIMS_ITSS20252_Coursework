@@ -1,4 +1,4 @@
-package com.aimsfx.view.payment;
+package com.aimsfx.view.PaymentUI;
 
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.ImageView;

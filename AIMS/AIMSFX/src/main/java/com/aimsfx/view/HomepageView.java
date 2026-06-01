@@ -1,9 +1,13 @@
 package com.aimsfx.view;
 
 import com.aimsfx.controller.HomepageController;
-import com.aimsfx.controller.ViewProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.UserMenuAction;
+import com.aimsfx.view.ProductView.ProductCardComponent;
+import com.aimsfx.view.ProductView.ProductDetailUI;
+import com.aimsfx.view.ProductView.ProductListView;
+import com.aimsfx.view.UserView.LoginView;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,6 +62,9 @@ public class HomepageView {
     @FXML
     private Label productCountLabel;
 
+    @FXML
+    private Button btnAccount;
+
     private HomepageController controller;
 
     @FXML
@@ -68,7 +75,20 @@ public class HomepageView {
 
         Platform.runLater(() -> {
             controller.initData();
+            if (com.aimsfx.utils.SessionManager.getInstance().isLoggedIn()) {
+                updateAccountUI(true, com.aimsfx.utils.SessionManager.getInstance().getCurrentUser().getUsername());
+            }
         });
+    }
+
+    public void updateAccountUI(boolean isLoggedIn, String username) {
+        if (btnAccount != null) {
+            if (isLoggedIn && username != null) {
+                btnAccount.setText("👤 " + username);
+            } else {
+                btnAccount.setText("👤 Login");
+            }
+        }
     }
 
     // Filter buttons state
@@ -369,7 +389,7 @@ public class HomepageView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/change-password-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.view.ChangePasswordView controller = loader.getController();
+            com.aimsfx.view.UserView.ChangePasswordView controller = loader.getController();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Change Password");

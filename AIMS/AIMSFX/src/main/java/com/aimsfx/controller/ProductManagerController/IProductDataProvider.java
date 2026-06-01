@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.ProductManagerController;
 
 import com.aimsfx.model.Product;
 import javafx.collections.ObservableList;

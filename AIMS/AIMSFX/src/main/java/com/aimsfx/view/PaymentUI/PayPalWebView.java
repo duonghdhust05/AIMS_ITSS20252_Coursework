@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PaymentUI;
 
 import com.aimsfx.subsystem.paypal.IPayPalView;
 import javafx.scene.Scene;

@@ -3,7 +3,7 @@ package com.aimsfx.service;
 import com.aimsfx.controller.PayOrderController;
 import com.aimsfx.subsystem.paypal.*;
 import com.aimsfx.subsystem.vietqr.*;
-import com.aimsfx.view.PayPalWebView;
+import com.aimsfx.view.PaymentUI.PayPalWebView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

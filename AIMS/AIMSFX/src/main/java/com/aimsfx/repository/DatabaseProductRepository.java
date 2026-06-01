@@ -38,9 +38,9 @@ public class DatabaseProductRepository implements ProductRepository {
             // DVD columns (director, studio, subtitle, disc_type, duration, genre,
             // release_date already added)
             "director, studio, subtitle, disc_type, duration, " +
-            // Newspaper columns (issue_number, frequency, editor_in_chief,
+            // Newspaper columns (issn, frequency, editor_in_chief,
             // publisher/publication_date/language already added, section)
-            "issue_number, frequency, editor_in_chief, section" +
+            "issn, frequency, editor_in_chief, section" +
             ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
             +
             "RETURNING product_id";
