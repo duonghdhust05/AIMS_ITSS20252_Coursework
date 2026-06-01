@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.ProductManagerController;
 
 import com.aimsfx.dto.ProductDTO;
 import com.aimsfx.exception.InvalidProductDataException;

@@ -1,12 +1,10 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PaymentUI;
 
 import com.aimsfx.controller.PayOrderController;
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
 import com.aimsfx.model.TransactionInfo;
-import com.aimsfx.view.payment.IPaymentMethodHandler;
-import com.aimsfx.view.payment.PayPalPaymentHandler;
-import com.aimsfx.view.payment.VietQRPaymentHandler;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -208,7 +206,7 @@ public class PaymentUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-success-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.controller.OrderSuccessController controller = loader.getController();
+            com.aimsfx.controller.PlaceOrderController.OrderSuccessController controller = loader.getController();
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();

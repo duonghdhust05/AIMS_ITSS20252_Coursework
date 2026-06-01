@@ -3,6 +3,8 @@ package com.aimsfx.controller;
 import com.aimsfx.model.*;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.view.HomepageView;
+import com.aimsfx.controller.ProductManagerController.ProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.exception.ProductNotFoundException;
 
 import java.util.*;

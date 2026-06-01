@@ -1,7 +1,9 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
-import com.aimsfx.controller.ViewProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.*;
+import com.aimsfx.view.BaseView;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,13 +32,14 @@ public class ProductDetailUI extends BaseView {
     private Label barcodeLabel;
     private Label statusLabel;
     private Label stockLabel;
-    private Label descriptionLabel;
     private Label dimensionsLabel;
-    private Label vatRateLabel;
-    
     private GridPane specificDetailsPanel;
+    private Label descriptionLabel;
+
+    private Label vatRateLabel;
+
     private ICartManager cartManager = CartManager.getInstance();
-    
+
     public void setCartManager(ICartManager cartManager) {
         this.cartManager = cartManager;
     }
@@ -56,8 +59,9 @@ public class ProductDetailUI extends BaseView {
         stockLabel = new Label();
         descriptionLabel = new Label();
         dimensionsLabel = new Label();
+
         vatRateLabel = new Label();
-        
+
         specificDetailsPanel = new GridPane();
         specificDetailsPanel.setHgap(15);
         specificDetailsPanel.setVgap(10);
@@ -102,10 +106,10 @@ public class ProductDetailUI extends BaseView {
     private VBox createHeaderSection() {
         VBox headerBox = new VBox(10);
         headerBox.setPadding(new Insets(0, 0, 20, 0));
-        headerBox.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 20;");
+        headerBox.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 20px;");
 
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
-        
+
         HBox typeAndCategoryBox = new HBox(20);
         categoryLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666;");
         typeAndCategoryBox.getChildren().addAll(categoryLabel);
@@ -119,17 +123,19 @@ public class ProductDetailUI extends BaseView {
         contentBox.setPadding(new Insets(20));
 
         VBox commonSection = new VBox(10);
-        Label commonTitle = new Label("General Information");
+
+        Label commonTitle = new Label("Common Specifications");
         commonTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        
+
         GridPane commonGrid = createCommonInfoGrid();
-        
+
         commonSection.getChildren().addAll(commonTitle, new Separator(), commonGrid);
 
         VBox specificSection = new VBox(10);
-        Label specificTitle = new Label("Product-Specific Details");
+
+        Label specificTitle = new Label("Specific Specifications");
         specificTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        
+
         specificSection.getChildren().addAll(specificTitle, new Separator(), specificDetailsPanel);
 
         contentBox.getChildren().addAll(commonSection, specificSection);
@@ -191,7 +197,7 @@ public class ProductDetailUI extends BaseView {
 
         Button addToCartButton = new Button("Add to Cart");
         addToCartButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; " +
-                                "-fx-padding: 10 30; -fx-font-size: 14px;");
+                "-fx-padding: 10 30; -fx-font-size: 14px;");
         addToCartButton.setOnAction(e -> handleAddToCart());
 
         buttonBox.getChildren().addAll(addToCartButton, closeButton);
@@ -204,13 +210,12 @@ public class ProductDetailUI extends BaseView {
         }
 
         titleLabel.setText(getStringValue("title", "Untitled Product"));
-        
+
         String productType = getStringValue("productType", "Unknown");
         String category = getStringValue("category", "N/A");
         categoryLabel.setText("Type: " + productType + " | Category: " + category);
-
         barcodeLabel.setText(getStringValue("barcode", "N/A"));
-        
+
         Double currentPrice = (Double) productData.get("currentPrice");
         Double originalPrice = (Double) productData.get("originalPrice");
         String priceText = currentPrice != null ? String.format("%,.0f VND", currentPrice) : "N/A";
@@ -218,20 +223,19 @@ public class ProductDetailUI extends BaseView {
             priceText += String.format(" (Original: %,.0f đ)", originalPrice);
         }
         priceLabel.setText(priceText);
-
         Integer stock = (Integer) productData.get("stock");
         stockLabel.setText(stock != null ? stock.toString() : "N/A");
-        
+
         statusLabel.setText(getStringValue("status", "Available"));
-        
+
         Double weight = (Double) productData.get("weight");
         weightLabel.setText(weight != null ? weight + " kg" : "N/A");
-        
+
         dimensionsLabel.setText(getStringValue("dimensions", "N/A"));
-        
+
         Double vatRate = (Double) productData.get("vatRate");
         vatRateLabel.setText(vatRate != null ? (vatRate * 100) + "%" : "N/A");
-        
+
         descriptionLabel.setText(getStringValue("description", "No description available"));
 
         populateSpecificDetails();
@@ -289,9 +293,9 @@ public class ProductDetailUI extends BaseView {
     private void addSpecificField(String labelText, String dataKey, int row) {
         Label label = createFieldLabel(labelText);
         Label valueLabel = new Label(getStringValue(dataKey, "N/A"));
-        valueLabel.setWrapText(true);
+
         valueLabel.setMaxWidth(400);
-        
+
         specificDetailsPanel.add(label, 0, row);
         specificDetailsPanel.add(valueLabel, 1, row);
     }
@@ -300,8 +304,9 @@ public class ProductDetailUI extends BaseView {
         Label label = createFieldLabel(labelText);
         Object dateValue = productData.get(dataKey);
         String formattedDate = formatDate(dateValue);
+
         Label valueLabel = new Label(formattedDate);
-        
+
         specificDetailsPanel.add(label, 0, row);
         specificDetailsPanel.add(valueLabel, 1, row);
     }
@@ -315,8 +320,10 @@ public class ProductDetailUI extends BaseView {
         if (dateObj == null) {
             return "N/A";
         }
-        
-        try {
+
+        try
+
+        {
             if (dateObj instanceof Date) {
                 return new java.text.SimpleDateFormat("MMM dd, yyyy").format((Date) dateObj);
             } else if (dateObj instanceof LocalDateTime) {
@@ -356,7 +363,7 @@ public class ProductDetailUI extends BaseView {
             }
 
             boolean added = cartManager.addProduct(cartProduct, 1);
-            
+
             if (added) {
                 CartEvents.notifyCartUpdated();
                 displayInfo("Added to cart");
