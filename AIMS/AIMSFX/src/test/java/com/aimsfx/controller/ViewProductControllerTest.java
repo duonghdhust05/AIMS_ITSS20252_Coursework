@@ -1,5 +1,7 @@
 package com.aimsfx.controller;
 
+import com.aimsfx.controller.ProductManagerController.IProductDataProvider;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.exception.ProductNotFoundException;
 import com.aimsfx.model.*;
 import org.junit.jupiter.api.BeforeEach;

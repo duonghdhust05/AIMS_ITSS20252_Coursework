@@ -1,5 +1,6 @@
 package com.aimsfx.controller;
 
+import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.dto.ProductDTO;
 import com.aimsfx.exception.InvalidProductDataException;
 import com.aimsfx.exception.ProductNotFoundException;

@@ -1,7 +1,9 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
-import com.aimsfx.controller.ViewProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.Product;
+import com.aimsfx.view.BaseView;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -30,7 +32,8 @@ public class ProductListUI extends BaseView {
     private ObservableList<Product> displayedProducts;
     private Label productCountLabel;
 
-    /**
+    /* 
+     *   
      * Creates a ProductListUI with specified controller and parent stage
      * @param controller ViewProductController instance
      * @param parentStage Parent stage for modal dialog
@@ -73,16 +76,16 @@ public class ProductListUI extends BaseView {
         bottomPanel.getChildren().add(productCountLabel);
         root.setBottom(bottomPanel);
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root, 800, 600);
         stage.setScene(scene);
-        
-        // Load initial products
+
         refreshProductList();
         
         stage.show();
     }
 
-    /**
+    /* 
+     * 
      * Creates the top panel with search and filter controls
      * @return VBox containing search and filter UI
      */
@@ -128,7 +131,8 @@ public class ProductListUI extends BaseView {
         return topPanel;
     }
 
-    /**
+    /* 
+     * 
      * Displays a list of products in the UI
      * @param products List of maps containing product data
      */
@@ -151,7 +155,8 @@ public class ProductListUI extends BaseView {
         updateProductCount(products.size());
     }
 
-    /**
+    /* 
+     * 
      * Creates a product card UI component
      * @param productData Map containing product information
      * @return HBox representing a product card
@@ -205,7 +210,8 @@ public class ProductListUI extends BaseView {
         return card;
     }
 
-    /**
+    /* 
+     * 
      * Handles click event to view product details
      * @param productId The ID of the product to view
      */
@@ -223,10 +229,10 @@ public class ProductListUI extends BaseView {
     /**
      * Refreshes the product list from the controller
      */
-    private void refreshProductList() {
+    private void refreshProductList() { 
         try {
             ObservableList<Product> allProducts = 
-                    com.aimsfx.controller.ProductController.getInstance().getProducts();
+                    com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts();
             displayedProducts.setAll(allProducts);
             displayProducts(displayedProducts);
         } catch (Exception e) {
@@ -239,7 +245,7 @@ public class ProductListUI extends BaseView {
      */
     private void filterProducts() {
         ObservableList<Product> allProducts = 
-                com.aimsfx.controller.ProductController.getInstance().getProducts();
+                com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts();
         
         String searchText = searchField.getText().toLowerCase().trim();
         String filterType = filterComboBox.getValue();
@@ -249,7 +255,7 @@ public class ProductListUI extends BaseView {
                     // Filter by search text
                     boolean matchesSearch = searchText.isEmpty() ||
                             (product.getTitle() != null && 
-                             product.getTitle().toLowerCase().contains(searchText)) ||
+                                    product.getTitle().toLowerCase().contains(searchText)) ||
                             (product.getBarcode() != null && 
                              product.getBarcode().toLowerCase().contains(searchText));
 
@@ -274,7 +280,8 @@ public class ProductListUI extends BaseView {
         refreshProductList();
     }
 
-    /**
+    /* 
+     * 
      * Displays products in the UI
      * @param products ObservableList of products to display
      */
@@ -295,7 +302,8 @@ public class ProductListUI extends BaseView {
         displayProductList(productDataList);
     }
 
-    /**
+    /* 
+     * 
      * Updates the product count label
      * @param count Number of products displayed
      */

@@ -1,6 +1,6 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
-import com.aimsfx.controller.ProductController;
+import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
@@ -31,46 +31,69 @@ import java.util.Map;
 public class ProductFormView {
 
     // Common Fields
-    @FXML private ComboBox<String> productTypeComboBox;
-    @FXML private TextField barcodeField;
-    @FXML private TextField titleField;
-    @FXML private TextField categoryField;
-    @FXML private TextField priceField;
-    @FXML private TextField originalPriceField;
-    @FXML private TextField currentPriceField;
-    @FXML private TextArea descriptionField;
-    @FXML private TextField weightField;
-    @FXML private TextField dimensionsField;
-    @FXML private TextField stockField;
-    @FXML private ComboBox<String> statusComboBox;
-    @FXML private TextField vatRateField;
-    @FXML private VBox commonFieldsContainer;
-
+    @FXML
+    private ComboBox<String> productTypeComboBox;
+    @FXML
+    private TextField barcodeField;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private TextField categoryField;
+    @FXML
+    private TextField priceField;
+    @FXML
+    private TextField originalPriceField;
+    @FXML
+    private TextField currentPriceField;
+    @FXML
+    private TextArea descriptionField;
+    @FXML
+    private TextField weightField;
+    @FXML
+    private TextField dimensionsField;
+    @FXML
+    private TextField stockField;
+    @FXML
+    private ComboBox<String> statusComboBox;
+    @FXML
+    private TextField vatRateField;
+    @FXML
+    private VBox commonFieldsContainer;
 
     // Specific Fields Section
-    @FXML private VBox specificFieldsSection;
-    @FXML private Label specificFieldsTitle;
-    @FXML private GridPane specificFieldsGrid;
-    @FXML private Button addProductButton;
+    @FXML
+    private VBox specificFieldsSection;
+    @FXML
+    private Label specificFieldsTitle;
+    @FXML
+    private GridPane specificFieldsGrid;
+    @FXML
+    private Button addProductButton;
 
     // CD Tracks Section
-    @FXML private VBox tracksSection;
-    @FXML private TextField trackTitleField;
-    @FXML private TextField trackDurationField;
-    @FXML private VBox tracksList;
-    @FXML private Label tracksCountLabel;
-    @FXML private VBox tracksListContainer;
+    @FXML
+    private VBox tracksSection;
+    @FXML
+    private TextField trackTitleField;
+    @FXML
+    private TextField trackDurationField;
+    @FXML
+    private VBox tracksList;
+    @FXML
+    private Label tracksCountLabel;
+    @FXML
+    private VBox tracksListContainer;
 
     // OCP SOLUTION: Dynamic fields storage by key (not by index)
     // Key: attributeKey (e.g., "author", "coverType")
     // Value: Control (TextField, ComboBox, DatePicker)
     private Map<String, Control> dynamicControls = new HashMap<>();
-    
+
     // Legacy support: Keep for backward compatibility during transition
     private List<Control> specificFieldControls = new ArrayList<>();
-    
+
     private List<Track> cdTracks = new ArrayList<>();
-    
+
     private ProductController controller;
     private Runnable onProductAdded;
     private Stage dialogStage;
@@ -78,25 +101,25 @@ public class ProductFormView {
     @FXML
     public void initialize() {
         controller = ProductController.getInstance();
-        
+
         // Initialize product type combo
         productTypeComboBox.getItems().addAll(controller.getSupportedTypes());
         productTypeComboBox.setOnAction(e -> handleProductTypeChange());
-        
-        // Hide status field - it will be set automatically to "available" when creating product
+
+        // Hide status field - it will be set automatically to "available" when creating
+        // product
         if (statusComboBox != null) {
             statusComboBox.setVisible(false);
             statusComboBox.setManaged(false);
         }
-        
+
         // Set default values
         vatRateField.setText("10.0");
-        
+
         // Start in type-selection state only
         showTypeSelectionState();
     }
 
-    
     /**
      * Set product type (called from external view)
      */
@@ -105,11 +128,13 @@ public class ProductFormView {
         handleProductTypeChange();
     }
 
-    /* Set the owning dialog stage so this view can close itself reliably.
-    */
-   public void setDialogStage(Stage dialogStage) {
-       this.dialogStage = dialogStage;
-   }
+    /*
+     * Set the owning dialog stage so this view can close itself reliably.
+     */
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
+
     /**
      * Set callback to run after product is added
      */
@@ -121,20 +146,21 @@ public class ProductFormView {
      * Handle product type change - generate specific fields dynamically
      * 
      * OCP SOLUTION: Uses metadata from Factory instead of hardcoded conditions
-     * BEFORE: if (selectedType.equals("BOOK") && i == 5) { ... } // Content Coupling
-     * AFTER:  switch (meta.getInputType()) { ... }              // OCP Compliant
+     * BEFORE: if (selectedType.equals("BOOK") && i == 5) { ... } // Content
+     * Coupling
+     * AFTER: switch (meta.getInputType()) { ... } // OCP Compliant
      */
     private void handleProductTypeChange() {
         String selectedType = productTypeComboBox.getValue();
         if (selectedType == null) {
-        	showTypeSelectionState();
+            showTypeSelectionState();
             return;
         }
 
         try {
-        	
-        	showFormSections();
-        	
+
+            showFormSections();
+
             // Clear previous fields
             specificFieldsGrid.getChildren().clear();
             dynamicControls.clear();
@@ -149,18 +175,18 @@ public class ProductFormView {
             // OCP: Render fields based on metadata (no product-type checks)
             for (int i = 0; i < configs.size(); i++) {
                 AttributeMeta meta = configs.get(i);
-                
+
                 // Create Label
                 Label label = new Label(meta.getLabel());
                 label.setStyle("-fx-font-size: 13px;");
-                
+
                 // Create Input Control based on InputType (OCP: no "BOOK", "CD" checks)
                 Control inputControl = createInputControl(meta);
-                
+
                 // Store control by KEY (not by index)
                 dynamicControls.put(meta.getKey(), inputControl);
                 specificFieldControls.add(inputControl); // Legacy support
-                
+
                 // Add to Grid
                 specificFieldsGrid.add(label, 0, i);
                 specificFieldsGrid.add(inputControl, 1, i);
@@ -170,7 +196,7 @@ public class ProductFormView {
             specificFieldsTitle.setText(selectedType + " Specific Information");
             specificFieldsSection.setVisible(true);
             specificFieldsSection.setManaged(true);
-            
+
             // Show tracks section only for CD products
             if (selectedType.equals("CD")) {
                 tracksSection.setVisible(true);
@@ -187,7 +213,7 @@ public class ProductFormView {
             showAlert("Error", "Failed to load product fields: " + e.getMessage());
         }
     }
-    
+
     /**
      * Create input control based on AttributeMeta
      * 
@@ -252,7 +278,7 @@ public class ProductFormView {
                 showAlert("Validation Error", "Please select a product type!");
                 return;
             }
-            
+
             // Step 2: Collect common fields as raw strings (no parsing!)
             Map<String, String> commonFields = new HashMap<>();
             commonFields.put("barcode", barcodeField.getText().trim());
@@ -264,36 +290,35 @@ public class ProductFormView {
             commonFields.put("dimensions", dimensionsField.getText().trim());
             commonFields.put("stock", stockField.getText().trim());
             commonFields.put("vatRate", vatRateField.getText().trim());
-            
+
             // Step 3: Collect specific attributes as Map
             Map<String, String> specificAttributes = collectSpecificAttributesAsMap();
-            
+
             // Step 4: Collect tracks (for CD only)
             List<Track> tracks = new ArrayList<>(cdTracks);
-            
+
             // Step 5: Call controller ONCE - controller handles everything
             Product product = controller.handleAddProduct(
                     productType,
                     commonFields,
                     specificAttributes,
-                    tracks
-            );
-            
+                    tracks);
+
             // Step 6: Show success
             String successMessage = "Product added successfully!\nBarcode: " + product.getBarcode();
             if ("CD".equals(productType)) {
                 successMessage += "\nTracks added: " + cdTracks.size();
             }
             showSuccess(successMessage);
-            
+
             // Step 7: Trigger callback
             if (onProductAdded != null) {
                 onProductAdded.run();
             }
-            
+
             // Step 8: Close form
             handleCancel();
-            
+
         } catch (IllegalArgumentException e) {
             // Controller throws IllegalArgumentException with user-friendly messages
             showAlert("Validation Error", e.getMessage());
@@ -308,21 +333,21 @@ public class ProductFormView {
      * 
      * OCP SOLUTION: Uses key-based lookup instead of index-based
      * BEFORE: attributes[i] = ((TextField) specificFieldControls.get(i)).getText();
-     * AFTER:  attributesMap.put(key, getValue(control));
+     * AFTER: attributesMap.put(key, getValue(control));
      */
     private Map<String, String> collectSpecificAttributesAsMap() {
         Map<String, String> attributesMap = new HashMap<>();
-        
+
         for (Map.Entry<String, Control> entry : dynamicControls.entrySet()) {
             String key = entry.getKey();
             Control control = entry.getValue();
             String value = extractValueFromControl(control);
             attributesMap.put(key, value);
         }
-        
+
         return attributesMap;
     }
-    
+
     /**
      * Extract value from any Control type
      */
@@ -337,7 +362,7 @@ public class ProductFormView {
         }
         return "";
     }
-    
+
     /**
      * Handle add track button
      */
@@ -345,53 +370,53 @@ public class ProductFormView {
     private void handleAddTrack() {
         String title = trackTitleField.getText().trim();
         String durationStr = trackDurationField.getText().trim();
-        
+
         // Validate track fields
         if (title.isEmpty()) {
             showAlert("Validation Error", "Track title is required!");
             trackTitleField.requestFocus();
             return;
         }
-        
+
         if (durationStr.isEmpty()) {
             showAlert("Validation Error", "Track duration is required!");
             trackDurationField.requestFocus();
             return;
         }
-        
+
         try {
             Integer duration = Integer.parseInt(durationStr);
-            
+
             if (duration <= 0) {
                 showAlert("Validation Error", "Duration must be greater than 0 seconds!");
                 trackDurationField.requestFocus();
                 return;
             }
-            
+
             // Create track (barcode will be set when product is created)
             Track track = new Track(null, null, title, duration);
             cdTracks.add(track);
-            
+
             // Add track to UI list
             addTrackToList(track, cdTracks.size() - 1);
-            
+
             // Clear input fields
             trackTitleField.clear();
             trackDurationField.clear();
             trackTitleField.requestFocus();
-            
+
             // Update tracks count
             updateTracksCount();
-            
+
             // Update Track Count field (index 3 for CD products)
             updateCDTrackCountField();
-            
+
         } catch (NumberFormatException e) {
             showAlert("Validation Error", "Duration must be a valid number (in seconds)!");
             trackDurationField.requestFocus();
         }
     }
-    
+
     /**
      * Add track to the visual list
      */
@@ -399,30 +424,32 @@ public class ProductFormView {
         HBox trackItem = new HBox(10);
         trackItem.setAlignment(Pos.CENTER_LEFT);
         trackItem.setPadding(new Insets(5));
-        trackItem.setStyle("-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-background-radius: 3;");
-        
+        trackItem.setStyle(
+                "-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-background-radius: 3;");
+
         Label numberLabel = new Label(String.valueOf(index + 1) + ".");
         numberLabel.setPrefWidth(30);
         numberLabel.setStyle("-fx-font-weight: bold;");
-        
+
         Label titleLabel = new Label(track.getTitle());
         titleLabel.setPrefWidth(300);
-        
+
         Label durationLabel = new Label(formatDuration(track.getDuration()));
         durationLabel.setPrefWidth(80);
         durationLabel.setStyle("-fx-text-fill: #666;");
-        
+
         Button removeBtn = new Button("Remove");
-        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 5 10;");
+        removeBtn.setStyle(
+                "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 5 10;");
         removeBtn.setOnAction(e -> {
             cdTracks.remove(index);
             refreshTracksList();
         });
-        
+
         trackItem.getChildren().addAll(numberLabel, titleLabel, durationLabel, removeBtn);
         tracksList.getChildren().add(trackItem);
     }
-    
+
     /**
      * Refresh tracks list display
      */
@@ -434,20 +461,20 @@ public class ProductFormView {
         updateTracksCount();
         updateCDTrackCountField();
     }
-    
+
     /**
      * Update tracks count label
      */
     private void updateTracksCount() {
         tracksCountLabel.setText("Tracks: " + cdTracks.size());
     }
-    
+
     /**
      * Update CD Track Count field with current track count
      * 
      * OCP SOLUTION: Uses key-based lookup instead of magic index
-     * BEFORE: specificFieldControls.get(3)  // Magic number!
-     * AFTER:  dynamicControls.get("trackCount")  // Clear intent
+     * BEFORE: specificFieldControls.get(3) // Magic number!
+     * AFTER: dynamicControls.get("trackCount") // Clear intent
      */
     private void updateCDTrackCountField() {
         String productType = productTypeComboBox.getValue();
@@ -458,12 +485,13 @@ public class ProductFormView {
             }
         }
     }
-    
+
     /**
      * Format duration from seconds to MM:SS
      */
     private String formatDuration(Integer seconds) {
-        if (seconds == null) return "00:00";
+        if (seconds == null)
+            return "00:00";
         int minutes = seconds / 60;
         int secs = seconds % 60;
         return String.format("%02d:%02d", minutes, secs);
@@ -474,7 +502,7 @@ public class ProductFormView {
      */
     @FXML
     private void handleCancel() {
-    	if (dialogStage != null) {
+        if (dialogStage != null) {
             dialogStage.close();
             return;
         }
@@ -514,7 +542,7 @@ public class ProductFormView {
     }
 
     // Utility methods
-    
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -522,7 +550,7 @@ public class ProductFormView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private void showSuccess(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");

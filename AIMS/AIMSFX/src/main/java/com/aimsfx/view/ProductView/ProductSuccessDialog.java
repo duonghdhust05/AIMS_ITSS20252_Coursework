@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.ProductView;
 
 import com.aimsfx.model.*;
 import javafx.fxml.FXML;
@@ -14,14 +14,22 @@ import java.util.ResourceBundle;
 
 public class ProductSuccessDialog implements Initializable {
 
-    @FXML private Label titleLabel;
-    @FXML private Label typeLabel;
-    @FXML private Label categoryLabel;
-    @FXML private Label priceLabel;
-    @FXML private Label quantityLabel;
-    @FXML private Label statusLabel;
-    @FXML private VBox specificInfoContainer;
-    @FXML private Button okButton;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Label typeLabel;
+    @FXML
+    private Label categoryLabel;
+    @FXML
+    private Label priceLabel;
+    @FXML
+    private Label quantityLabel;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private VBox specificInfoContainer;
+    @FXML
+    private Button okButton;
 
     private Runnable onCloseAction;
 

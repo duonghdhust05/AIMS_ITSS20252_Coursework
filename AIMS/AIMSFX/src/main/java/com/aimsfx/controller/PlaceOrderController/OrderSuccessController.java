@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.PlaceOrderController;
 
 import com.aimsfx.model.CartManager;
 import com.aimsfx.model.DeliveryInfo;
