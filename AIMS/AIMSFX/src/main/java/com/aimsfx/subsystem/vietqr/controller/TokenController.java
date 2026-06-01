@@ -18,13 +18,13 @@ import java.util.Date;
 public class TokenController {
 
     // Inject values from application.properties
-	@Value("${vietqr.partner.username:customer-gr1hust-user26591}")
+    @Value("${vietqr.client.username}")
     private String validUsername;
 
-    @Value("${vietqr.partner.password:Y3VzdG9tZXItZ3IxaHVzdC11c2VyMjY1OTE=}")
+    @Value("${vietqr.client.password}")
     private String validPassword;
 
-    @Value("${app.jwt.secret:e9584d17b9116f1a8d9398b30ae62828}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
     @PostMapping("/token_generate")
@@ -55,7 +55,8 @@ public class TokenController {
     // --- Internal Helper Methods ---
 
     private boolean isBasicAuthValid(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Basic ")) return false;
+        if (authHeader == null || !authHeader.startsWith("Basic "))
+            return false;
         try {
             String base64Credentials = authHeader.substring("Basic ".length()).trim();
             String credentials = new String(Base64.getDecoder().decode(base64Credentials), StandardCharsets.UTF_8);
