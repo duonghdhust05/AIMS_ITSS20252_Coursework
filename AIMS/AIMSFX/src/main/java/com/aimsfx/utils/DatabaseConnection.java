@@ -90,6 +90,8 @@ public class DatabaseConnection {
             config.setUsername(username);
             config.setPassword(password);
             config.setDriverClassName("org.postgresql.Driver");
+            config.addDataSourceProperty("prepareThreshold", "0");
+            config.addDataSourceProperty("preparedStatementCacheQueries", "0");
 
             // Cấu hình connection pool
             config.setMaximumPoolSize(maxConnections);
