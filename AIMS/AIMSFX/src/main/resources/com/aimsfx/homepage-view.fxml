@@ -75,13 +75,13 @@
                                     <Font name="Roboto" size="12.0" />
                                  </font>
                               </TextField>
-                              <Label style="-fx-font-size: 16px;" text="🔍" />
+                              <Label prefHeight="25.0" prefWidth="26.0" style="-fx-font-size: 16px;" text="🔍" />
                            </children>
                         </HBox>
-                        <Button onAction="#onAccount" prefHeight="44.0" prefWidth="49.0" style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;" text="👤" />
+                        <Button fx:id="btnAccount" onAction="#onAccount" prefHeight="44.0" prefWidth="120.0" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-cursor: hand; -fx-font-weight: bold;" text="👤 Login" />
                         <StackPane style="-fx-cursor: hand;">
                            <children>
-                              <Button onAction="#onCartClick" style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;" text="🛒" />
+                              <Button onAction="#onCartClick" prefHeight="44.0" prefWidth="58.0" style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;" text="🛒" />
                               <Label fx:id="cartBadge" mouseTransparent="true" style="-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 6; -fx-font-size: 10px; -fx-font-weight: bold;" text="0" translateX="10" translateY="-10" />
                            </children>
                         </StackPane>

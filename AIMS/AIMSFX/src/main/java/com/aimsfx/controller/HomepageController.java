@@ -105,6 +105,7 @@ public class HomepageController {
         SessionManager sessionManager = SessionManager.getInstance();
         if (sessionManager.isLoggedIn()) {
             String username = sessionManager.getCurrentUser().getUsername();
+            view.updateAccountUI(true, username);
             view.showAlert("Success", "Login successful! Welcome, " + username);
         }
     }
@@ -154,6 +155,7 @@ public class HomepageController {
                 break;
             case LOGOUT:
                 UserController.getInstance().logout();
+                view.updateAccountUI(false, null);
                 view.showAlert("Success", "Logged out successfully!");
                 break;
         }

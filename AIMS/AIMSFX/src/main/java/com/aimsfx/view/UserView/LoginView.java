@@ -21,42 +21,45 @@ import java.util.ResourceBundle;
  * - Error messaging
  */
 public class LoginView implements Initializable {
-    
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private Label errorLabel;
-    
+
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Label errorLabel;
+
     private UserController userController;
     private Stage dialogStage;
     private Runnable onLoginSuccess;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userController = UserController.getInstance();
         SessionManager.getInstance();
-        
+
         // Clear error on input
         usernameField.textProperty().addListener((obs, old, newVal) -> errorLabel.setText(""));
         passwordField.textProperty().addListener((obs, old, newVal) -> errorLabel.setText(""));
-        
+
         // Login on Enter key
         passwordField.setOnAction(e -> handleLogin());
     }
-    
+
     /**
      * Set the dialog stage
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
-    
+
     /**
      * Set callback for successful login
      */
     public void setOnLoginSuccess(Runnable callback) {
         this.onLoginSuccess = callback;
     }
-    
+
     /**
      * Handle login button click
      */
@@ -64,23 +67,23 @@ public class LoginView implements Initializable {
     private void handleLogin() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
-        
+
         // Validation
         if (username.isEmpty()) {
             errorLabel.setText("Username is required!");
             usernameField.requestFocus();
             return;
         }
-        
+
         if (password.isEmpty()) {
             errorLabel.setText("Password is required!");
             passwordField.requestFocus();
             return;
         }
-        
+
         // Attempt login
         boolean success = userController.login(username, password);
-        
+
         if (success) {
             // Login successful
             if (onLoginSuccess != null) {
@@ -96,7 +99,7 @@ public class LoginView implements Initializable {
             usernameField.requestFocus();
         }
     }
-    
+
     /**
      * Handle cancel button click
      */

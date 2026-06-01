@@ -62,6 +62,9 @@ public class HomepageView {
     @FXML
     private Label productCountLabel;
 
+    @FXML
+    private Button btnAccount;
+
     private HomepageController controller;
 
     @FXML
@@ -72,7 +75,20 @@ public class HomepageView {
 
         Platform.runLater(() -> {
             controller.initData();
+            if (com.aimsfx.utils.SessionManager.getInstance().isLoggedIn()) {
+                updateAccountUI(true, com.aimsfx.utils.SessionManager.getInstance().getCurrentUser().getUsername());
+            }
         });
+    }
+
+    public void updateAccountUI(boolean isLoggedIn, String username) {
+        if (btnAccount != null) {
+            if (isLoggedIn && username != null) {
+                btnAccount.setText("👤 " + username);
+            } else {
+                btnAccount.setText("👤 Login");
+            }
+        }
     }
 
     // Filter buttons state

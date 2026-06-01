@@ -38,6 +38,8 @@ public class ProductListView implements Initializable {
     @FXML
     private TableColumn<Product, Integer> stockColumn;
     @FXML
+    private TableColumn<Product, String> statusColumn;
+    @FXML
     private TableColumn<Product, Void> actionsColumn;
     @FXML
     private Button addProductButton;
@@ -68,6 +70,7 @@ public class ProductListView implements Initializable {
         barcodeColumn.setCellValueFactory(new PropertyValueFactory<>("barcode"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Custom cell value factory for product type
         typeColumn.setCellValueFactory(cellData -> {
