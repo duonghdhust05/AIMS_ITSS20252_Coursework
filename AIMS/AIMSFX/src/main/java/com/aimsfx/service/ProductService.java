@@ -28,21 +28,21 @@ import java.util.List;
  * 
  * SOLID PRINCIPLES APPLIED:
  * SRP: Single responsibility = Product business operations
- *    - No longer manages data storage (delegated to Repository)
- *    - No longer handles UI concerns (delegated to Factory)
- *    - No longer contains validation logic (delegated to Validators)
+ * - No longer manages data storage (delegated to Repository)
+ * - No longer handles UI concerns (delegated to Factory)
+ * - No longer contains validation logic (delegated to Validators)
  * 
  * OCP: Open for extension, closed for modification
- *    - New product types don't require changes here
- *    - Uses Factory and Validator registries
+ * - New product types don't require changes here
+ * - Uses Factory and Validator registries
  * 
  * LSP: Not applicable (not part of inheritance hierarchy)
  * 
  * ISP: Interface (if created) would be focused on product operations
  * 
  * DIP: Depends on abstractions (Repository, Factory, Validator interfaces)
- *    - Uses constructor injection (no Singleton!)
- *    - Easy to test with mocks
+ * - Uses constructor injection (no Singleton!)
+ * - Easy to test with mocks
  * 
  * DEPENDENCIES (all injected):
  * - ProductRepository: Data access
@@ -54,18 +54,19 @@ import java.util.List;
  * AFTER: ProductService orchestrates specialized components
  */
 public class ProductService {
-    
+
     private static ProductService instance;
-    
+
     private final ProductRepository repository;
     private final CommonProductValidator commonValidator;
     private final UserDeleteLimitService deleteLimitService;
     private final TrackRepository trackRepository;
-    
+
     /**
      * Static factory method - provides default instance
      * 
-     * COMPOSITION ROOT: This is the only place that knows about concrete repository.
+     * COMPOSITION ROOT: This is the only place that knows about concrete
+     * repository.
      * This is acceptable because:
      * - Constructor still depends on abstraction (ProductRepository)
      * - Other methods don't cast or use instanceof
@@ -79,7 +80,7 @@ public class ProductService {
         }
         return instance;
     }
-    
+
     /**
      * Constructor Injection
      * For testing or custom configurations
@@ -100,13 +101,13 @@ public class ProductService {
         return repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + id));
     }
-    
+
     public List<String> getSupportedTypes() {
         return ProductFactoryRegistry.getSupportedTypes();
     }
 
     @SuppressWarnings("deprecation")
-	public String[] getAttributeLabels(String type) throws UnsupportedProductTypeException {
+    public String[] getAttributeLabels(String type) throws UnsupportedProductTypeException {
         ProductFactory factory = ProductFactoryRegistry.getFactory(type);
         return factory.getAttributeLabels();
     }
@@ -115,7 +116,7 @@ public class ProductService {
         ProductFactory factory = ProductFactoryRegistry.getFactory(type);
         return factory.getAttributeConfig();
     }
-    
+
     /**
      * 
      * REFACTORED: Uses ProductDTO instead of long parameter list
@@ -126,52 +127,58 @@ public class ProductService {
      * 3. Create product (ProductFactory from registry)
      * 4. Save to repository
      */
-    public Product addProduct(ProductDTO dto) 
+    public Product addProduct(ProductDTO dto)
             throws InvalidProductDataException, UnsupportedProductTypeException {
-        
+
         String type = dto.getType();
-        
+
         // Get Factory and attribute keys (OCP: Factory owns the metadata)
         ProductFactory factory = ProductFactoryRegistry.getFactory(type);
         @SuppressWarnings("deprecation")
-		String[] keys = factory.getAttributeKeys();
-        
+        String[] keys = factory.getAttributeKeys();
+
         // Extract attributes array using keys from Factory
         String[] attributes = dto.getAttributesAsArray(keys);
-        
+
         // Step 1: Validate common fields
-        commonValidator.validateCommonFields(type, dto.getBarcode(), dto.getTitle(), 
+        commonValidator.validateCommonFields(type, dto.getBarcode(), dto.getTitle(),
                 dto.getOriginalPrice(), dto.getCurrentPrice(),
                 dto.getCategory(), dto.getWeight(), dto.getDimensions(), dto.getStock());
-        
-        // Step 1.5: Validate price range
+
+        // Step 1.1: Validate price range
         commonValidator.validatePriceRange(dto.getOriginalPrice(), dto.getCurrentPrice());
-        
+
+        // Step 1.2: Check barcode duplication
+        if (repository.findCurrentByBarcode(dto.getBarcode()).isPresent()) {
+            throw new InvalidProductDataException(
+                    "Barcode '" + dto.getBarcode() + "' is already in use by another active product.");
+        }
+
         // Step 2: Validate type-specific attributes
         ProductValidator validator = ValidatorRegistry.getValidator(type);
         validator.validateSpecificAttributes(attributes);
-        
+
         // Step 3: Create product using factory
         // Pass null as ID for new products - database will auto-generate the ID
-        // Status is always set to "available" for new products (handled in Product constructor)
+        // Status is always set to "available" for new products (handled in Product
+        // constructor)
         // OCP: Single unified call - factory knows how to handle weight/dimensions
         // Physical factories use them, digital factories ignore them
         Product product = factory.createProduct(
-            null, dto.getBarcode(), dto.getTitle(), dto.getCategory(), 
-            dto.getOriginalPrice(), dto.getCurrentPrice(),
-            dto.getDescription(), dto.getWeight(), dto.getDimensions(),
-            dto.getStock(), "available", dto.getVatRate(),
-            attributes
-        );
-        
+                null, dto.getBarcode(), dto.getTitle(), dto.getCategory(),
+                dto.getOriginalPrice(), dto.getCurrentPrice(),
+                dto.getDescription(), dto.getWeight(), dto.getDimensions(),
+                dto.getStock(), "available", dto.getVatRate(),
+                attributes);
+
         // Set creation timestamp
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
-        
+
         // Step 4: Save to repository
         return repository.save(product);
     }
-    
+
     /**
      * WORKFLOW:
      * 1. Find existing product
@@ -183,55 +190,62 @@ public class ProductService {
      */
     public Product updateProduct(ProductDTO dto)
             throws InvalidProductDataException, UnsupportedProductTypeException, ProductNotFoundException {
-        
+
         Long productId = dto.getProductId();
         String type = dto.getType();
-        
+
         // Get Factory and attribute keys (OCP: Factory owns the metadata)
         ProductFactory factory = ProductFactoryRegistry.getFactory(type);
         @SuppressWarnings("deprecation")
-		String[] keys = factory.getAttributeKeys();
-        
+        String[] keys = factory.getAttributeKeys();
+
         // Extract attributes array using keys from Factory
         String[] attributes = dto.getAttributesAsArray(keys);
-        
+
         // Step 1: Find existing product
         Product existingProduct = repository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
-        
+
         // Step 2: Validate common fields
-        commonValidator.validateCommonFields(type, dto.getBarcode(), dto.getTitle(), 
+        commonValidator.validateCommonFields(type, dto.getBarcode(), dto.getTitle(),
                 dto.getOriginalPrice(), dto.getCurrentPrice(),
                 dto.getCategory(), dto.getWeight(), dto.getDimensions(), existingProduct.getStock());
-        
-        // Step 2.5: Validate price range for update
+
+        // Step 2.1: Validate price range for update
         commonValidator.validatePriceRange(dto.getOriginalPrice(), dto.getCurrentPrice());
-        
+
+        // Step 2.2: Check barcode duplication if changed
+        if (!existingProduct.getBarcode().equals(dto.getBarcode())) {
+            if (repository.findCurrentByBarcode(dto.getBarcode()).isPresent()) {
+                throw new InvalidProductDataException(
+                        "Barcode '" + dto.getBarcode() + "' is already in use by another active product.");
+            }
+        }
+
         // Step 3: Validate type-specific attributes
         ProductValidator validator = ValidatorRegistry.getValidator(type);
         validator.validateSpecificAttributes(attributes);
-        
+
         // Step 4: Verify type hasn't changed (business rule)
         ProductType existingType = getProductType(existingProduct);
         ProductType newType = ProductType.fromString(type);
         if (existingType != newType) {
             throw new InvalidProductDataException(
-                "Cannot change product type from " + existingType + " to " + newType);
+                    "Cannot change product type from " + existingType + " to " + newType);
         }
-        
+
         // Step 5: Create updated product with same ID
         // OCP: Single unified call - factory knows how to handle weight/dimensions
         Product updatedProduct = factory.createProduct(
-            productId, dto.getBarcode(), dto.getTitle(), dto.getCategory(), 
-            dto.getOriginalPrice(), dto.getCurrentPrice(),
-            dto.getDescription(), dto.getWeight(), dto.getDimensions(),
-            existingProduct.getStock(), dto.getStatus(), dto.getVatRate(),
-            attributes
-        );
-        
+                productId, dto.getBarcode(), dto.getTitle(), dto.getCategory(),
+                dto.getOriginalPrice(), dto.getCurrentPrice(),
+                dto.getDescription(), dto.getWeight(), dto.getDimensions(),
+                existingProduct.getStock(), dto.getStatus(), dto.getVatRate(),
+                attributes);
+
         updatedProduct.setCreatedAt(existingProduct.getCreatedAt());
         updatedProduct.setUpdatedAt(LocalDateTime.now());
-        
+
         // Step 6: Save to repository
         return repository.save(updatedProduct);
     }
@@ -240,7 +254,7 @@ public class ProductService {
         if (reason == null || reason.trim().isEmpty()) {
             throw new IllegalArgumentException("Reason for stock change is required");
         }
-        
+
         if (newStock < 0) {
             throw new IllegalArgumentException("Stock cannot be negative");
         }
@@ -260,37 +274,40 @@ public class ProductService {
     public List<Product> getProductHistory(Long productId) {
         return repository.findHistoryByProductId(productId);
     }
-    
+
     /**
      * BUSINESS RULES:
-     * 1. If stock = 0: Soft delete (set is_current = false and expired_date = NOW())
+     * 1. If stock = 0: Soft delete (set is_current = false and expired_date =
+     * NOW())
      * 2. If stock > 0: Deactivate (set status = "deactivated")
      * 3. Users can only delete 20 products per day
      * 
      * @param productId Product ID to delete
-     * @param userId User ID performing the deletion
+     * @param userId    User ID performing the deletion
      * @return true if deleted/deactivated successfully
-     * @throws ProductNotFoundException if product not found
-     * @throws com.aimsfx.exception.DeletionLimitExceededException if user exceeded daily limit
+     * @throws ProductNotFoundException                            if product not
+     *                                                             found
+     * @throws com.aimsfx.exception.DeletionLimitExceededException if user exceeded
+     *                                                             daily limit
      */
-    public boolean deleteProduct(Long productId, Long userId) throws ProductNotFoundException, com.aimsfx.exception.DeletionLimitExceededException {
+    public boolean deleteProduct(Long productId, Long userId)
+            throws ProductNotFoundException, com.aimsfx.exception.DeletionLimitExceededException {
         // Verify product exists first
         Product product = repository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
-        
+
         // Check if user can delete (hasn't exceeded daily limit)
         if (!deleteLimitService.canDeleteProduct(userId)) {
             int currentCount = deleteLimitService.getDeleteCount(userId, java.time.LocalDate.now());
             int maxLimit = deleteLimitService.getMaxDeletionsPerDay();
             throw new com.aimsfx.exception.DeletionLimitExceededException(
-                "Daily deletion limit exceeded. You can only delete " + maxLimit + " products per day.",
-                currentCount,
-                maxLimit
-            );
+                    "Daily deletion limit exceeded. You can only delete " + maxLimit + " products per day.",
+                    currentCount,
+                    maxLimit);
         }
-        
+
         boolean result;
-        
+
         // Check stock level to determine action
         if (product.getStock() == null || product.getStock() == 0) {
             // Stock = 0: Perform soft delete
@@ -302,46 +319,48 @@ public class ProductService {
             Product updatedProduct = repository.save(product);
             result = updatedProduct != null;
         }
-        
+
         // If operation successful, increment deletion count
         if (result) {
             deleteLimitService.incrementDeleteCount(userId);
         }
-        
+
         return result;
     }
 
     public int getRemainingDeletionQuota(Long userId) {
         return deleteLimitService.getRemainingQuota(userId);
     }
-    
+
     /**
      * Validate and delete multiple products
      * 
      * BUSINESS RULES:
-     * 1. If any product has stock > 0, throw exception with list of barcodes (don't delete anything)
+     * 1. If any product has stock > 0, throw exception with list of barcodes (don't
+     * delete anything)
      * 2. Check if deletion count would exceed daily limit
      * 3. Only perform deletion if all validations pass
      * 
      * @param products List of products to delete
-     * @param userId User ID performing the deletion
+     * @param userId   User ID performing the deletion
      * @return Number of successfully deleted products
-     * @throws com.aimsfx.exception.BulkDeleteValidationException if validation fails
+     * @throws com.aimsfx.exception.BulkDeleteValidationException if validation
+     *                                                            fails
      */
-    public int deleteMultipleProducts(List<Product> products, Long userId) 
+    public int deleteMultipleProducts(List<Product> products, Long userId)
             throws com.aimsfx.exception.BulkDeleteValidationException {
-        
+
         // Step 1: Check daily deletion limit
         int remainingQuota = deleteLimitService.getRemainingQuota(userId);
         int requestedCount = products.size();
-        
+
         if (requestedCount > remainingQuota) {
             throw new com.aimsfx.exception.BulkDeleteValidationException(remainingQuota, requestedCount);
         }
-        
+
         // Step 2: Perform deletion or deactivation
         int successCount = 0;
-        
+
         for (Product product : products) {
             boolean result = false;
             if (product.getStock() == null || product.getStock() == 0) {
@@ -354,13 +373,13 @@ public class ProductService {
                 Product updatedProduct = repository.save(product);
                 result = updatedProduct != null;
             }
-            
+
             if (result) {
                 deleteLimitService.incrementDeleteCount(userId);
                 successCount++;
             }
         }
-        
+
         return successCount;
     }
 

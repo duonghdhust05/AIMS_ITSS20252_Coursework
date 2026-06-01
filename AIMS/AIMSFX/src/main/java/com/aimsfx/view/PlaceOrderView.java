@@ -684,11 +684,11 @@ public class PlaceOrderView {
                 .ofPattern("dd/MM/yyyy HH:mm:ss");
 
         section.getChildren().addAll(
-                createInfoRow("Mã giao dịch:", txn.getTransactionId()),
-                createInfoRow("Phương thức:", txn.getPaymentMethod()),
-                createInfoRow("Trạng thái:", txn.getStatus().toString().toUpperCase(),
+                createInfoRow("Transaction Code:", txn.getTransactionId()),
+                createInfoRow("Payment Method:", txn.getPaymentMethod()),
+                createInfoRow("Status:", txn.getStatus().toString().toUpperCase(),
                         getStatusColor(txn.getStatus().toString())),
-                createInfoRow("Thời gian:", txn.getCreatedAt().format(formatter)));
+                createInfoRow("Time:", txn.getCreatedAt().format(formatter)));
 
         return section;
     }
