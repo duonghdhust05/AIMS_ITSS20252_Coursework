@@ -9,7 +9,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * Singleton class để quản lý connection pool database PostgreSQL sử dụng HikariCP
+ * Singleton class để quản lý connection pool database PostgreSQL sử dụng
+ * HikariCP
  */
 public class DatabaseConnection {
     private static DatabaseConnection instance;
@@ -33,44 +34,49 @@ public class DatabaseConnection {
     private void loadDatabaseConfig() {
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader()
-                .getResourceAsStream("database.properties")) {
-            
+                .getResourceAsStream("application.properties")) {
+
             if (input == null) {
-                System.out.println("Database properties file not found");
-                setDefaultConfig();
+                System.out.println("application.properties file not found");
                 return;
             }
-            
+
             props.load(input);
-            this.url = props.getProperty("db.url");
-            this.username = props.getProperty("db.username");
-            this.password = props.getProperty("db.password");
-            
+            this.url = props.getProperty("spring.datasource.url");
+            this.username = props.getProperty("spring.datasource.username");
+            this.password = props.getProperty("spring.datasource.password");
+
             // Load connection pool settings
-            this.maxConnections = Integer.parseInt(props.getProperty("db.max.connections", "200"));
+            this.maxConnections = Integer.parseInt(props.getProperty("db.max.connections", "20"));
             this.minConnections = Integer.parseInt(props.getProperty("db.min.connections", "5"));
             this.connectionTimeout = Long.parseLong(props.getProperty("db.connection.timeout", "30000"));
-            
+
+            if (this.url == null || this.username == null || this.password == null) {
+                System.out.println("Database credentials not found in application.properties, using defaults");
+            }
+
         } catch (IOException ex) {
             System.err.println("Error reading database configuration file: " + ex.getMessage());
-            setDefaultConfig();
+
         } catch (NumberFormatException ex) {
             System.err.println("Number format error in configuration: " + ex.getMessage());
-            setDefaultConfig();
+
         }
     }
 
     /**
      * Default configuration if properties file is missing or has errors
+     * 
+     * private void setDefaultConfig() {
+     * this.url =
+     * "jdbc:postgresql://aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?user=***REMOVED***&password=Aims2025!@&sslmode=require";
+     * this.username = "***REMOVED***";
+     * this.password = "Aims2025!@";
+     * this.maxConnections = 20;
+     * this.minConnections = 5;
+     * this.connectionTimeout = 30000;
+     * }
      */
-    private void setDefaultConfig() {
-        this.url = "***REMOVED***sslmode=require";
-        this.username = "***REMOVED***";
-        this.password = "Aims2025!@";
-        this.maxConnections = 20;
-        this.minConnections = 5;
-        this.connectionTimeout = 30000;
-    }
 
     /**
      * Khởi tạo HikariCP connection pool
@@ -78,13 +84,13 @@ public class DatabaseConnection {
     private void initializeConnectionPool() {
         try {
             HikariConfig config = new HikariConfig();
-            
+
             // Cấu hình database
             config.setJdbcUrl(url);
             config.setUsername(username);
             config.setPassword(password);
             config.setDriverClassName("org.postgresql.Driver");
-            
+
             // Cấu hình connection pool
             config.setMaximumPoolSize(maxConnections);
             config.setMinimumIdle(minConnections);
@@ -92,18 +98,18 @@ public class DatabaseConnection {
             config.setIdleTimeout(600000); // 10 phút
             config.setMaxLifetime(1800000); // 30 phút
             config.setLeakDetectionThreshold(60000); // 1 phút
-            
+
             // Cấu hình connection validation
             config.setConnectionTestQuery("SELECT 1");
             config.setValidationTimeout(5000);
-            
+
             // Pool name
             config.setPoolName("AIMS-Supabase-Pool");
-            
+
             this.dataSource = new HikariDataSource(config);
             System.out.println("SUCCESS: Connection pool initialized successfully!");
             System.out.println("Pool size: " + minConnections + " - " + maxConnections + " connections");
-            
+
         } catch (Exception e) {
             System.err.println("ERROR: Failed to initialize connection pool: " + e.getMessage());
             throw new RuntimeException("Cannot initialize connection pool", e);
@@ -163,13 +169,13 @@ public class DatabaseConnection {
         if (dataSource == null) {
             return "Connection pool not initialized";
         }
-        
+
         return "Pool Name: " + dataSource.getPoolName() + "\n" +
-               "Active Connections: " + dataSource.getHikariPoolMXBean().getActiveConnections() + "\n" +
-               "Idle Connections: " + dataSource.getHikariPoolMXBean().getIdleConnections() + "\n" +
-               "Total Connections: " + dataSource.getHikariPoolMXBean().getTotalConnections() + "\n" +
-               "Max Pool Size: " + dataSource.getMaximumPoolSize() + "\n" +
-               "Min Pool Size: " + dataSource.getMinimumIdle();
+                "Active Connections: " + dataSource.getHikariPoolMXBean().getActiveConnections() + "\n" +
+                "Idle Connections: " + dataSource.getHikariPoolMXBean().getIdleConnections() + "\n" +
+                "Total Connections: " + dataSource.getHikariPoolMXBean().getTotalConnections() + "\n" +
+                "Max Pool Size: " + dataSource.getMaximumPoolSize() + "\n" +
+                "Min Pool Size: " + dataSource.getMinimumIdle();
     }
 
     /**
@@ -177,8 +183,9 @@ public class DatabaseConnection {
      */
     public String getDatabaseInfo() {
         return "Database URL: " + url + "\n" +
-               "Username: " + username + "\n" +
-               "Connection Pool Status: " + (dataSource != null && !dataSource.isClosed() ? "Active" : "Inactive") + "\n" +
-               "Test Connection: " + (testConnection() ? "OK" : "Failed");
+                "Username: " + username + "\n" +
+                "Connection Pool Status: " + (dataSource != null && !dataSource.isClosed() ? "Active" : "Inactive")
+                + "\n" +
+                "Test Connection: " + (testConnection() ? "OK" : "Failed");
     }
 }

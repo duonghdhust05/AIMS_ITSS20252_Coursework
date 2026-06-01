@@ -1,7 +1,6 @@
 package com.aimsfx.view;
 
 import com.aimsfx.controller.PayOrderController;
-import com.aimsfx.controller.PlaceOrderController;
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
 import com.aimsfx.model.TransactionInfo;
@@ -209,7 +208,7 @@ public class PaymentUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-success-view.fxml"));
             Parent root = loader.load();
 
-            PlaceOrderController controller = loader.getController();
+            com.aimsfx.controller.OrderSuccessController controller = loader.getController();
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();

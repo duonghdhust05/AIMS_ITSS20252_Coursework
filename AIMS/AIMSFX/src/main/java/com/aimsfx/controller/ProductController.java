@@ -303,9 +303,8 @@ public class ProductController implements IProductDataProvider {
         
         for (FieldSpec spec : specs) {
             String rawValue = raw.get(spec.getKey());
-            boolean isBlank = (rawValue == null || rawValue.trim().isEmpty());
             
-            if (isBlank) {
+            if (rawValue == null || rawValue.trim().isEmpty()) {
                 // Missing or blank value
                 if (spec.isRequired()) {
                     throw new IllegalArgumentException(spec.getLabel() + " is required!");
