@@ -123,8 +123,6 @@
                 <Insets top="20" />
             </padding>
             
-            <Button fx:id="addToCartButton" styleClass="btn-primary" text="Add to Cart" />
-            
             <Button fx:id="closeButton" prefHeight="39.0" prefWidth="76.0" styleClass="btn-secondary" text="Close" />
         </HBox>
     </bottom>
