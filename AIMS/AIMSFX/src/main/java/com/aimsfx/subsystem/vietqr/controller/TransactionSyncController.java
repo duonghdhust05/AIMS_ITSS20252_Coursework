@@ -15,7 +15,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 @RestController
-@RequestMapping("/bank/api/test")
+@RequestMapping("/bank/api")
 public class TransactionSyncController {
 
     @Value("${app.jwt.secret}")

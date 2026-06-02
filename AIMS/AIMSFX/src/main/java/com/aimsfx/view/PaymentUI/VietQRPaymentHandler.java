@@ -200,8 +200,11 @@ public class VietQRPaymentHandler implements IPaymentMethodHandler {
                 String contentStr = json.has("content") ? json.get("content").getAsString() : "";
                 String encodedContent = URLEncoder.encode(contentStr, StandardCharsets.UTF_8);
 
-                String imageUrl = String.format("https://img.vietqr.io/image/%s-%s-compact.jpg?amount=%s&addInfo=%s",
-                        bankCode, account, amountStr, encodedContent);
+                String accountNameStr = json.has("accountName") ? json.get("accountName").getAsString() : "";
+                String encodedAccountName = URLEncoder.encode(accountNameStr, StandardCharsets.UTF_8);
+
+                String imageUrl = String.format("https://img.vietqr.io/image/%s-%s-compact.png?amount=%s&addInfo=%s&accountName=%s",
+                        bankCode, account, amountStr, encodedContent, encodedAccountName);
 
                 qrCodeImageView.setImage(new Image(imageUrl, true));
             }

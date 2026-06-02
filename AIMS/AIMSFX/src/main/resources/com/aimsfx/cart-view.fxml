@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900" prefWidth="1600" style="-fx-background-color: white;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.CartController">
+<BorderPane prefHeight="900" prefWidth="1600" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.CartController">
    <top>
       <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1920.0" BorderPane.alignment="CENTER">
          <children>
@@ -65,7 +65,7 @@
                 <HBox alignment="CENTER_LEFT" prefHeight="78.0" prefWidth="1920.0" spacing="20">
                     <Button onAction="#onContinueShopping" styleClass="btn-secondary" text="← Back to Shop">
                   <HBox.margin>
-                     <Insets left="40.0" />
+                     <Insets left="40.0" top="20.0" />
                   </HBox.margin></Button>
                 </HBox>
               <HBox prefHeight="791.0" prefWidth="1920.0" spacing="30" style="-fx-padding: 20 40;">

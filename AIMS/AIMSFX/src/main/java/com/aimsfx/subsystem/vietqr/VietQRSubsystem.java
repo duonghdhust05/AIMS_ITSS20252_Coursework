@@ -4,6 +4,7 @@ import com.aimsfx.exception.*;
 import com.aimsfx.subsystem.vietqr.model.VietQRRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * VietQRSubsystem Class
@@ -82,7 +83,14 @@ public class VietQRSubsystem implements IPaymentQRCode {
                 throw mapToSemanticException(qrResponse.code(), qrResponse.desc(), null);
             }
 
-            return gson.toJson(qrResponse);
+            JsonObject jsonResponse = gson.toJsonTree(qrResponse).getAsJsonObject();
+            jsonResponse.addProperty("bankCode", config.getBankCode());
+            jsonResponse.addProperty("bankAccount", config.getBankAccount());
+            jsonResponse.addProperty("accountName", config.getAccountName());
+            jsonResponse.addProperty("amount", String.valueOf(amount));
+            jsonResponse.addProperty("content", content);
+
+            return gson.toJson(jsonResponse);
 
         } catch (PaymentException e) {
             throw e;
