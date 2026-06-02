@@ -99,9 +99,7 @@ public class VietQRSubsystem implements IPaymentQRCode {
                     "TRANSFER", amount, content,
                     config.getBankCode(),
                     config.getBankAccount(),
-                    token,
-                    orderId,
-                    "SIM_" + System.currentTimeMillis());
+                    token);
         } catch (PaymentException e) {
             throw e;
         } catch (Exception e) {

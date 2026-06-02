@@ -75,7 +75,7 @@ public class VietQRInteraction {
     }
 
     public void postSimulationRequest(String transType, long amount, String content,
-            String bankCode, String bankAccount, String token, String orderId, String transactionId) throws Exception {
+            String bankCode, String bankAccount, String token) throws Exception {
 
         String jsonBody = String.format("""
                 {
@@ -83,12 +83,9 @@ public class VietQRInteraction {
                     "content": "%s",
                     "amount": %d,
                     "transType": "%s",
-                    "bankCode": "%s",
-                    "orderId": "%s",
-                    "transactionid": "%s"
-
+                    "bankCode": "%s"
                 }
-                """, bankAccount, content, amount, transType, bankCode, orderId, transactionId);
+                """, bankAccount, content, amount, transType, bankCode);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(config.getSimulateUrl()))
