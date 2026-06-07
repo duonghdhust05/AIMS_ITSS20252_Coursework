@@ -37,10 +37,7 @@
                         <VBox fx:id="vietqrBox" spacing="15" style="-fx-cursor: hand;" styleClass="aims-panel-card">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <!-- VietQR has no radio button - it's the default payment method -->
-                                <RadioButton fx:id="vietqrRadio" managed="false" selected="true" visible="false">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="paymentMethodGroup" />
-                           </toggleGroup></RadioButton>
+                                <RadioButton fx:id="vietqrRadio" managed="false" selected="true" visible="false" toggleGroup="$paymentMethodGroup" />
                                 <Label styleClass="label-section-title" text="VietQR" />
                                 <Label style="-fx-background-color: #e3f2fd; -fx-text-fill: #0d47a1; -fx-padding: 3 10; -fx-background-radius: 3; -fx-font-size: 11px; -fx-font-weight: bold;" text="Recommended" />
                                 <Region HBox.hgrow="ALWAYS" />
@@ -75,7 +72,7 @@
                         <Region prefHeight="50" />
                     </VBox>
 
-                    <VBox prefHeight="709.0" prefWidth="320" spacing="20" styleClass="aims-panel-card">
+                    <VBox prefWidth="320" spacing="20" styleClass="aims-panel-card">
                         <Label style="-fx-font-size: 18px;" styleClass="label-header" text="Order Summary" />
 
                         <VBox spacing="12">
@@ -97,9 +94,9 @@
         </ScrollPane>
     </center>
    <top>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1920.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
                <children>
                   <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
                      <children>

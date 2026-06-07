@@ -77,7 +77,11 @@ public class UIUtils {
         try {
             FXMLLoader loader = new FXMLLoader(UIUtils.class.getResource(fxmlPath));
             Parent view = loader.load();
-            currentStage.setScene(new Scene(view));
+            if (currentStage.getScene() != null) {
+                currentStage.getScene().setRoot(view);
+            } else {
+                currentStage.setScene(new Scene(view));
+            }
             currentStage.setTitle(title);
         } catch (IOException e) {
             showError("Navigation Error", "Could not load " + fxmlPath + ": " + e.getMessage());

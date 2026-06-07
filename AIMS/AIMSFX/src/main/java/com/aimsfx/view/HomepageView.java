@@ -210,8 +210,11 @@ public class HomepageView {
             Parent view = loader.load();
 
             Stage stage = (Stage) searchField.getScene().getWindow();
-            Scene scene = new Scene(view);
-            stage.setScene(scene);
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(view);
+            } else {
+                stage.setScene(new Scene(view));
+            }
             stage.setTitle("AIMS - Shopping Cart");
 
         } catch (IOException e) {

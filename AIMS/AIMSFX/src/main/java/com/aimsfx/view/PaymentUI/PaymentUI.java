@@ -193,7 +193,11 @@ public class PaymentUI {
             Parent root = loader.load();
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(root);
+            } else {
+                stage.setScene(new Scene(root));
+            }
             stage.setTitle("AIMS - Place Order");
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,9 +214,12 @@ public class PaymentUI {
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(root);
+            } else {
+                stage.setScene(new Scene(root));
+            }
             stage.setTitle("AIMS - Order Success");
-            stage.centerOnScreen();
 
         } catch (IOException e) {
             e.printStackTrace();

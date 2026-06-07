@@ -18,7 +18,9 @@ public class VietQRInteraction {
 
     public VietQRInteraction(VietQRConfig config) {
         this.config = config;
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(java.time.Duration.ofSeconds(10))
+                .build();
         this.objectMapper = new ObjectMapper();
     }
 

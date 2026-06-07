@@ -15,9 +15,9 @@
 
 <BorderPane prefHeight="900" prefWidth="1600" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.CartController">
    <top>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1920.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
                <children>
                   <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
                      <children>
@@ -58,17 +58,17 @@
       </VBox>
    </top>
    <center>
-      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #f5f5f5;" stylesheets="@styles2.0.css" BorderPane.alignment="TOP_LEFT">
+      <VBox alignment="TOP_CENTER" style="-fx-background-color: #f5f5f5;" stylesheets="@styles2.0.css" BorderPane.alignment="TOP_LEFT">
          <children>
                 
                 <!-- Icons -->
-                <HBox alignment="CENTER_LEFT" prefHeight="78.0" prefWidth="1920.0" spacing="20">
+                <HBox alignment="CENTER_LEFT" prefHeight="78.0" spacing="20">
                     <Button onAction="#onContinueShopping" styleClass="btn-secondary" text="← Back to Shop">
                   <HBox.margin>
                      <Insets left="40.0" top="20.0" />
                   </HBox.margin></Button>
                 </HBox>
-              <HBox prefHeight="791.0" prefWidth="1920.0" spacing="30" style="-fx-padding: 20 40;">
+              <HBox spacing="30" style="-fx-padding: 20 40;" VBox.vgrow="ALWAYS">
                   <!-- Cart Items Section -->
                   <VBox spacing="20" styleClass="aims-panel-card" HBox.hgrow="ALWAYS">
                       <Label fx:id="cartCountLabel" style="-fx-font-size: 20px;" styleClass="label-section-title" text="Cart (0)" />
