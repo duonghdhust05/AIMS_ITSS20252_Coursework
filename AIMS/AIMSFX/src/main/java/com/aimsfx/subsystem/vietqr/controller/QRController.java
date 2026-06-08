@@ -2,24 +2,23 @@ package com.aimsfx.subsystem.vietqr.controller;
 
 import com.aimsfx.subsystem.vietqr.model.VietQRRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import com.aimsfx.subsystem.vietqr.util.JwtUtil;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/qr")
 public class QRController {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final JwtUtil jwtUtil;
+
+    public QRController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/generate-customer")
     public ResponseEntity<VietQRResponse> generateQR(
@@ -35,7 +34,7 @@ public class QRController {
         String token = authHeader.substring(7).trim();
 
         // 2. Validate JWT Token
-        if (!isTokenValid(token)) {
+        if (!jwtUtil.isTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(VietQRResponse.createTokenError("401", "Unauthorized: Token is invalid or expired"));
         }
@@ -58,23 +57,6 @@ public class QRController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(VietQRResponse.createTokenError("500", "Internal Server Error during QR generation"));
-        }
-    }
-
-    // --- JWT Validation Logic ---
-    private boolean isTokenValid(String token) {
-        try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
-
-            return true;
-        } catch (Exception e) {
-            System.err.println("JWT Validation Failed in QRController: " + e.getMessage());
-            return false;
         }
     }
 }

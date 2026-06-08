@@ -1,17 +1,15 @@
 package com.aimsfx.subsystem.vietqr.controller;
 
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.aimsfx.subsystem.vietqr.util.JwtUtil;
+
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Base64;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api")
@@ -24,8 +22,11 @@ public class TokenController {
     @Value("${vietqr.client.password}")
     private String validPassword;
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final JwtUtil jwtUtil;
+
+    public TokenController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/token_generate")
     public ResponseEntity<VietQRResponse> generateToken(@RequestHeader("Authorization") String authHeader) {
@@ -39,7 +40,7 @@ public class TokenController {
 
         // 2. Generate Real JWT Token
         try {
-            String token = generateJwtToken();
+            String token = jwtUtil.generateJwtToken();
 
             // FIX: Use the static factory method for a clean success return
             VietQRResponse success = VietQRResponse.createTokenSuccess(token, 300);
@@ -68,19 +69,5 @@ public class TokenController {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    private String generateJwtToken() {
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        Date exp = new Date(nowMillis + 300000); // 5 minutes expiry
-        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-        return Jwts.builder()
-                .subject("VietQR-Partner")
-                .issuedAt(now)
-                .expiration(exp)
-                .signWith(key)
-                .compact();
     }
 }

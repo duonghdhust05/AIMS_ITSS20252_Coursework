@@ -1,5 +1,8 @@
 package com.aimsfx.subsystem.vietqr;
 
+import com.aimsfx.subsystem.vietqr.exception.VietQRApiException;
+import com.aimsfx.subsystem.vietqr.exception.VietQRAuthException;
+import com.aimsfx.subsystem.vietqr.exception.VietQRNetworkException;
 import com.aimsfx.subsystem.vietqr.model.VietQRRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,12 +27,12 @@ public class VietQRInteraction {
         this.objectMapper = new ObjectMapper();
     }
 
-    public VietQRResponse postTokenRequest() throws Exception {
+    public VietQRResponse postTokenRequest() throws VietQRApiException {
         String username = config.getClientUsername();
         String password = config.getClientPassword();
 
         if (username == null || password == null) {
-            throw new RuntimeException("VietQR Credentials not found in application.properties");
+            throw new VietQRAuthException("VietQR Credentials not found in application.properties");
         }
 
         String authString = username + ":" + password;
@@ -41,43 +44,60 @@ public class VietQRInteraction {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            throw new VietQRNetworkException("Network error while requesting token: " + e.getMessage(), e);
+        }
 
         if (response.statusCode() == 401) {
-            throw new RuntimeException("E74: Invalid VietQR credentials");
+            throw new VietQRAuthException("E74: Invalid VietQR credentials");
         }
 
         if (response.statusCode() != 200) {
-            throw new RuntimeException("VietQR API Error: HTTP " + response.statusCode());
+            throw new VietQRApiException("VietQR API Error: HTTP " + response.statusCode());
         }
 
-        VietQRResponse vietQRResponse = objectMapper.readValue(response.body(), VietQRResponse.class);
+        try {
+            VietQRResponse vietQRResponse = objectMapper.readValue(response.body(), VietQRResponse.class);
 
-        if ("FAILED".equalsIgnoreCase(vietQRResponse.status())) {
-            throw new RuntimeException(
-                    "E74: " + (vietQRResponse.message() != null ? vietQRResponse.message() : "Authentication failed"));
+            if ("FAILED".equalsIgnoreCase(vietQRResponse.status())) {
+                throw new VietQRAuthException(
+                        "E74: " + (vietQRResponse.message() != null ? vietQRResponse.message() : "Authentication failed"));
+            }
+
+            return vietQRResponse;
+        } catch (VietQRApiException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new VietQRApiException("Error parsing token response", e);
         }
-
-        return vietQRResponse;
     }
 
-    public VietQRResponse postQrRequest(VietQRRequest request, String accessToken) throws Exception {
-        String jsonBody = objectMapper.writeValueAsString(request);
+    public VietQRResponse postQrRequest(VietQRRequest request, String accessToken) throws VietQRApiException {
+        try {
+            String jsonBody = objectMapper.writeValueAsString(request);
 
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(config.getQrUrl()))
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .build();
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(config.getQrUrl()))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
-        return objectMapper.readValue(response.body(), VietQRResponse.class);
+            return objectMapper.readValue(response.body(), VietQRResponse.class);
+        } catch (java.io.IOException | InterruptedException e) {
+            throw new VietQRNetworkException("Network error while generating QR code: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new VietQRApiException("Error processing QR request", e);
+        }
     }
 
     public void postSimulationRequest(String transType, long amount, String content,
-            String bankCode, String bankAccount, String token) throws Exception {
+            String bankCode, String bankAccount, String token) throws VietQRApiException {
 
         String jsonBody = String.format("""
                 {
@@ -96,10 +116,15 @@ public class VietQRInteraction {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            throw new VietQRNetworkException("Network error during payment simulation: " + e.getMessage(), e);
+        }
 
         if (response.statusCode() != 200 || response.body().contains("FAILED")) {
-            throw new RuntimeException("Simulation Failed: " + response.body());
+            throw new VietQRApiException("Simulation Failed: " + response.body());
         }
     }
 }

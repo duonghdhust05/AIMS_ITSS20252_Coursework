@@ -9,7 +9,6 @@ import com.aimsfx.repository.ProductRepository;
 import com.aimsfx.repository.TransactionRepository;
 
 // Spring imports for @Transactional
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.concurrent.Executors;

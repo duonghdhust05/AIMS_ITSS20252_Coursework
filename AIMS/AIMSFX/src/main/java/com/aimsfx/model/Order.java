@@ -295,8 +295,6 @@ public class Order {
             this.invoiceId = invoice.getInvoiceId();
 
             // Step 2: Call repository/DAO to persist
-            // TODO: Implement persistence logic
-            // orderRepository.save(this);
 
             System.out.println("Order saved successfully with invoice ID: " + invoiceId);
 

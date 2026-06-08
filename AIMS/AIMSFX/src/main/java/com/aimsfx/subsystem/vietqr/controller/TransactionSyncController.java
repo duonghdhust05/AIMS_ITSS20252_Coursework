@@ -2,24 +2,23 @@ package com.aimsfx.subsystem.vietqr.controller;
 
 import com.aimsfx.subsystem.vietqr.model.VietQRCallbackRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRCallbackResponse;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import com.aimsfx.subsystem.vietqr.util.JwtUtil;
 
 @RestController
 @RequestMapping("/bank/api")
 public class TransactionSyncController {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final JwtUtil jwtUtil;
+
+    public TransactionSyncController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping(value = "/transaction-callback", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VietQRCallbackResponse> transactionSync(
@@ -35,7 +34,7 @@ public class TransactionSyncController {
         String token = authHeader.substring(7).trim();
 
         // 2. Validate JWT
-        if (!isTokenValid(token)) {
+        if (!jwtUtil.isTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(VietQRCallbackResponse.error("INVALID_TOKEN", "Token is invalid or expired"));
         }
@@ -58,20 +57,4 @@ public class TransactionSyncController {
         }
     }
 
-    // --- JWT Validation Logic ---
-    private boolean isTokenValid(String token) {
-        try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
-
-            return true;
-        } catch (Exception e) {
-            System.err.println("JWT Validation Failed: " + e.getMessage());
-            return false;
-        }
-    }
 }
