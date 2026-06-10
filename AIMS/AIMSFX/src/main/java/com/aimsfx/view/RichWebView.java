@@ -23,6 +23,7 @@ public class RichWebView {
 
     public void show() {
         Stage stage = new Stage();
+        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(parentStage);
         stage.setTitle("Rich UI WebView Bridge");

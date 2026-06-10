@@ -245,6 +245,7 @@ public class ProductListView implements Initializable {
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
             stage.setTitle("Add Product");
             stage.initModality(Modality.WINDOW_MODAL);
 
@@ -279,6 +280,7 @@ public class ProductListView implements Initializable {
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
             stage.setTitle("Update Product");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(productTableView.getScene().getWindow());
@@ -374,6 +376,7 @@ public class ProductListView implements Initializable {
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -382,6 +385,7 @@ public class ProductListView implements Initializable {
 
     private void showWarning(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -390,6 +394,7 @@ public class ProductListView implements Initializable {
 
     private void showSuccess(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

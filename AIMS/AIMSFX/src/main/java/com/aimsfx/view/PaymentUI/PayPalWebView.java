@@ -55,6 +55,7 @@ public class PayPalWebView implements IPayPalView {
         CookieHandler.setDefault(cookieManager);
 
         Stage stage = new Stage();
+        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("PayPal Checkout");
 

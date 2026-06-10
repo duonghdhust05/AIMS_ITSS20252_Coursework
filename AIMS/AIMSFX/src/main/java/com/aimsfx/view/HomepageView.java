@@ -271,6 +271,7 @@ public class HomepageView {
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
             stage.setTitle("Product Management Panel");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
@@ -344,6 +345,7 @@ public class HomepageView {
             Parent root = loader.load();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("User Management");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
@@ -367,6 +369,7 @@ public class HomepageView {
             LoginView loginView = loader.getController();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("Login");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
@@ -396,6 +399,7 @@ public class HomepageView {
             com.aimsfx.view.AdministratorView.ChangePasswordView controller = loader.getController();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("Change Password");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval

@@ -208,6 +208,7 @@ public class UserManagementView implements Initializable {
             controller.setUser(user);
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle(user == null ? "Add New User" : "Edit User");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(userTableView.getScene().getWindow());
@@ -225,6 +226,7 @@ public class UserManagementView implements Initializable {
 
     private void openResetPasswordDialog(User user) {
         TextInputDialog dialog = new TextInputDialog();
+        com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
         dialog.setTitle("Reset Password");
         dialog.setHeaderText("Reset password for: " + user.getUsername());
         dialog.setContentText("New Password:");
@@ -311,6 +313,7 @@ public class UserManagementView implements Initializable {
 
     private void showSuccessAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -319,6 +322,7 @@ public class UserManagementView implements Initializable {
 
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -327,6 +331,7 @@ public class UserManagementView implements Initializable {
 
     private boolean showConfirmDialog(String title, String header, String content) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        com.aimsfx.utils.UIUtils.applyAppIcon(confirm);
         confirm.setTitle(title);
         confirm.setHeaderText(header);
         confirm.setContentText(content);

@@ -292,7 +292,7 @@ public class TransactionInfo {
             this.updatedAt = LocalDateTime.now();
             
             // TODO: Implement persistence logic
-            // transactionRepository.save(this);
+            com.aimsfx.repository.TransactionRepository.getInstance().save(this);
             
             System.out.println("Transaction saved: " + this.transactionId);
             

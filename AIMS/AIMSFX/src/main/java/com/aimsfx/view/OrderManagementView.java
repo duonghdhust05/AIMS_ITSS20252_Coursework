@@ -22,6 +22,7 @@ public class OrderManagementView {
         Parent root = loader.load();
 
         Stage stage = new Stage();
+        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
         stage.setTitle("Order Management");
         stage.initModality(Modality.WINDOW_MODAL);
         if (owner != null) {
@@ -48,6 +49,7 @@ public class OrderManagementView {
             controller.setOrderDetail(detail);
 
             Dialog<Void> dialog = new Dialog<>();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
             dialog.setTitle("Order Detail");
             dialog.getDialogPane().setContent(scrollPane);
             dialog.showAndWait();
@@ -59,6 +61,7 @@ public class OrderManagementView {
 
     public void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -67,6 +70,7 @@ public class OrderManagementView {
 
     public boolean confirmAction(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
         alert.setTitle(title);
         alert.setHeaderText("Warning: This action cannot be undone.");
         alert.setContentText(message);
@@ -81,6 +85,7 @@ public class OrderManagementView {
             com.aimsfx.controller.ProductManagerController.OrderRejectDialogController controller = loader.getController();
 
             Dialog<Void> dialog = new Dialog<>();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
             dialog.setTitle("Reject Order");
             dialog.getDialogPane().setContent(vbox);
             

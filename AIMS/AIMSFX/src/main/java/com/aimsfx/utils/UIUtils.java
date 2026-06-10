@@ -5,6 +5,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -24,6 +26,31 @@ public class UIUtils {
     }
 
     /**
+     * Apply the application icon to a Stage
+     */
+    public static void applyAppIcon(Stage stage) {
+        if (stage != null) {
+            try {
+                stage.getIcons().add(new Image(UIUtils.class.getResourceAsStream("/com/aimsfx/aims-logo.png")));
+            } catch (Exception e) {
+                System.err.println("Could not load application icon: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Apply the application icon to a Dialog (or Alert)
+     */
+    public static void applyAppIcon(Dialog<?> dialog) {
+        if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+            javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+            if (window instanceof Stage) {
+                applyAppIcon((Stage) window);
+            }
+        }
+    }
+
+    /**
      * Show information alert dialog
      */
     public static void showAlert(String title, String message) {
@@ -31,6 +58,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        applyAppIcon(alert);
         alert.showAndWait();
     }
 
@@ -42,6 +70,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        applyAppIcon(alert);
         alert.showAndWait();
     }
 
@@ -53,6 +82,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        applyAppIcon(alert);
         alert.show(); // Non-blocking
     }
 
@@ -65,6 +95,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        applyAppIcon(alert);
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;

@@ -45,6 +45,7 @@ public class ProductHistoryView {
 
     public void show(Long productId, Stage ownerStage) {
         dialogStage = new Stage();
+        com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.initOwner(ownerStage);
         dialogStage.setTitle("Product History - ID: " + productId);

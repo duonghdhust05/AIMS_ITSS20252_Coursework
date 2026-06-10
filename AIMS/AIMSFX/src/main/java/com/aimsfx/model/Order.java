@@ -295,10 +295,11 @@ public class Order {
             this.invoiceId = invoice.getInvoiceId();
 
             // Step 2: Call repository/DAO to persist
-            // TODO: Implement persistence logic
-            // orderRepository.save(this);
+            com.aimsfx.repository.OrderRepository orderRepository = new com.aimsfx.repository.OrderRepository();
+            int id = orderRepository.saveOrder(this);
+            this.orderId = id;
 
-            System.out.println("Order saved successfully with invoice ID: " + invoiceId);
+            System.out.println("Order saved successfully with order ID: " + this.orderId + " and invoice ID: " + invoiceId);
 
         } catch (Exception e) {
             // Step 3: Throw OrderSaveFailedException on error

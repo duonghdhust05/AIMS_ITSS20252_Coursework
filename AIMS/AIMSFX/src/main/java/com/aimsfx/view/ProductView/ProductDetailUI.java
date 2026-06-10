@@ -71,6 +71,7 @@ public class ProductDetailUI extends BaseView {
         this.productData = productData;
 
         Stage stage = new Stage();
+        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(parentStage);
         stage.setTitle("Product Details");

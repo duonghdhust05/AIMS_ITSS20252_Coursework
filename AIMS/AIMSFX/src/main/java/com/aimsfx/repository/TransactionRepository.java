@@ -248,7 +248,7 @@ public class TransactionRepository {
                 WHERE external_transaction_id = ?
                 RETURNING transaction_id
                 """;
-
+        
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -257,6 +257,7 @@ public class TransactionRepository {
 
             if (rs.next()) {
                 int transactionId = rs.getInt("transaction_id");
+                // Also update the order's payment_status
                 updateOrderPaymentStatus(transactionId, "Completed");
                 return true;
             }
@@ -266,6 +267,52 @@ public class TransactionRepository {
         }
         return false;
     }
+
+    /**
+     * Save a TransactionInfo object to the database
+     * 
+     * @param tx The TransactionInfo object to save
+     * @return true if successful
+     */
+    public boolean save(com.aimsfx.model.TransactionInfo tx) {
+        String sql = """
+                INSERT INTO transactions (order_id, amount, payment_method, status, currency, external_transaction_id, created_at, completed_at)
+                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+                RETURNING transaction_id
+                """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, tx.getOrderId() != null ? tx.getOrderId() : 0);
+            stmt.setDouble(2, tx.getAmount() != null ? tx.getAmount().doubleValue() : 0.0);
+            stmt.setString(3, tx.getPaymentMethod() != null ? tx.getPaymentMethod().toUpperCase() : "UNKNOWN");
+            stmt.setString(4, tx.getStatusString() != null ? tx.getStatusString() : "PENDING");
+            stmt.setString(5, tx.getCurrency() != null ? tx.getCurrency() : "VND");
+            stmt.setString(6, tx.getTransactionId()); // internal UUID used as external_transaction_id for reference
+            
+            if (tx.getStatus() == com.aimsfx.model.TransactionInfo.TransactionStatus.CAPTURED) {
+                stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            } else {
+                stmt.setNull(7, Types.TIMESTAMP);
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int transactionId = rs.getInt("transaction_id");
+                if (tx.getStatus() == com.aimsfx.model.TransactionInfo.TransactionStatus.CAPTURED) {
+                    updateOrderPaymentStatus(tx.getOrderId(), transactionId, "Completed");
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save TransactionInfo: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 
     /**
      * Mark transaction as failed

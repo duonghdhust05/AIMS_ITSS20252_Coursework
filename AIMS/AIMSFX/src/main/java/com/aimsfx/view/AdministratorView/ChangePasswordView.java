@@ -28,64 +28,69 @@ import java.util.ResourceBundle;
  * - Delegates all business operations to Controller
  */
 public class ChangePasswordView implements Initializable {
-    
-    @FXML private PasswordField oldPasswordField;
-    @FXML private PasswordField newPasswordField;
-    @FXML private PasswordField confirmPasswordField;
-    @FXML private Label errorLabel;
-    @FXML private Label usernameLabel;
-    
+
+    @FXML
+    private PasswordField oldPasswordField;
+    @FXML
+    private PasswordField newPasswordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private Label usernameLabel;
+
     private UserController userController;
     private SessionManager sessionManager;
     private Stage dialogStage;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userController = UserController.getInstance();
         sessionManager = SessionManager.getInstance();
-        
+
         displayCurrentUsername();
         setupInputListeners();
     }
-    
+
     // ==================== SETUP METHODS ====================
-    
+
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
-    
+
     private void displayCurrentUsername() {
         if (usernameLabel != null && sessionManager.isLoggedIn()) {
-            usernameLabel.setText("Changing password for: " + sessionManager.getCurrentUser().getUsername());
+            usernameLabel.setText(" " + sessionManager.getCurrentUser().getUsername());
         }
     }
-    
+
     private void setupInputListeners() {
         oldPasswordField.textProperty().addListener((obs, old, newVal) -> clearError());
         newPasswordField.textProperty().addListener((obs, old, newVal) -> clearError());
         confirmPasswordField.textProperty().addListener((obs, old, newVal) -> clearError());
     }
-    
+
     // ==================== EVENT HANDLERS ====================
-    
+
     @FXML
     private void handleChangePassword() {
         clearError();
-        
+
         // UI-level validation: password confirmation check
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
-        
+
         if (!newPassword.equals(confirmPassword)) {
             showError("New passwords do not match!");
             confirmPasswordField.requestFocus();
             return;
         }
-        
+
         try {
             String oldPassword = oldPasswordField.getText();
             boolean success = userController.changePassword(oldPassword, newPassword);
-            
+
             if (success) {
                 showSuccessAlert("Password changed successfully!");
                 closeDialog();
@@ -100,20 +105,20 @@ public class ChangePasswordView implements Initializable {
             showError("Failed to change password: " + e.getMessage());
         }
     }
-    
+
     @FXML
     private void handleCancel() {
         closeDialog();
     }
-    
+
     private void closeDialog() {
         if (dialogStage != null) {
             dialogStage.close();
         }
     }
-    
+
     // ==================== UI HELPERS ====================
-    
+
     private void focusFieldForError(InvalidPasswordException.Reason reason) {
         switch (reason) {
             case EMPTY:
@@ -127,19 +132,19 @@ public class ChangePasswordView implements Initializable {
                 oldPasswordField.requestFocus();
         }
     }
-    
+
     private void clearError() {
         if (errorLabel != null) {
             errorLabel.setText("");
         }
     }
-    
+
     private void showError(String message) {
         if (errorLabel != null) {
             errorLabel.setText(message);
         }
     }
-    
+
     private void showSuccessAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");

@@ -194,6 +194,7 @@ public class PlaceOrderController implements Initializable {
             }
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             dialogStage.initOwner(nameField.getScene().getWindow());
             dialogStage.setTitle("Delivery Information");
