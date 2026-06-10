@@ -20,7 +20,7 @@ public record VietQRRequest(
                 // --- DYNAMIC QR (qrType=0) MANDATORY FIELDS ---
                 @JsonProperty("amount") Long amount, // Type: Long
                 @JsonProperty("orderId") String orderId, // Type: String
-                @JsonProperty("transType") String transType, // Type: String (Bắt buộc nếu qrType=0, Mặc định 'C')
+                @JsonProperty("transType") String transType, // Type: String (Required if qrType=0, Default 'C')
 
                 // --- OTHER OPTIONAL FIELDS ---
                 @JsonProperty("terminalCode") String terminalCode,

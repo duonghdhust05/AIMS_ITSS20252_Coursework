@@ -85,7 +85,7 @@ public class Order {
     }
 
     public Order(int id, float totalAmount) {
-        this(); // Gọi logic khởi tạo list/date của constructor mặc định
+        this(); // Call list/date initialization logic of the default constructor
         this.orderId = id;
         this.totalAmount = totalAmount;
     }

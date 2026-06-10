@@ -24,17 +24,20 @@ public class OrderReviewService {
 
     private final OrderQueryRepository queryRepository;
     private final OrderRepository commandRepository;
+    private final com.aimsfx.repository.ProductRepository productRepository;
     private final EmailSenderService emailSender;
 
     public OrderReviewService() {
-        this(new OrderQueryRepository(), new OrderRepository(), new EmailSenderService());
+        this(new OrderQueryRepository(), new OrderRepository(), new com.aimsfx.repository.DatabaseProductRepository(), new EmailSenderService());
     }
 
     public OrderReviewService(OrderQueryRepository queryRepository,
                               OrderRepository commandRepository,
+                              com.aimsfx.repository.ProductRepository productRepository,
                               EmailSenderService emailSender) {
         this.queryRepository = queryRepository;
         this.commandRepository = commandRepository;
+        this.productRepository = productRepository;
         this.emailSender = emailSender;
     }
 
@@ -48,38 +51,76 @@ public class OrderReviewService {
         return queryRepository.findByStatus(OrderStatus.PENDING_REVIEW, safePageSize, offset);
     }
 
+    public int countAllOrders() throws SQLException {
+        return queryRepository.countAll();
+    }
+
+    public List<OrderSummary> listAllOrders(int pageIndex, int pageSize) throws SQLException {
+        int safePageSize = pageSize > 0 ? pageSize : DEFAULT_PAGE_SIZE;
+        int offset = Math.max(0, pageIndex) * safePageSize;
+        return queryRepository.findAll(safePageSize, offset);
+    }
+
     public OrderDetail getOrderDetail(int orderId) throws SQLException {
         return queryRepository.findDetailById(orderId);
     }
 
     public void approve(int orderId) throws SQLException {
-        commandRepository.updateOrderStatus(orderId, OrderStatus.APPROVED.toDbValue());
+        boolean success = commandRepository.updateOrderStatusWithCheck(orderId, OrderStatus.APPROVED.toDbValue(), OrderStatus.PENDING_REVIEW.toDbValue(), null);
         
-        Order order = commandRepository.findById(orderId);
-        if (order != null) {
-            logAction(orderId, "APPROVE", "Approved by Product Manager");
-            if (order.getDeliveryInfo() != null) {
-                emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+        if (success) {
+            Order order = commandRepository.findById(orderId);
+            if (order != null) {
+                logAction(orderId, "APPROVE", "Approved by Product Manager");
+                if (order.getDeliveryInfo() != null) {
+                    emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+                }
             }
         }
     }
 
     public void reject(int orderId, String reason) throws SQLException {
-        commandRepository.updateOrderStatus(orderId, OrderStatus.REJECTED.toDbValue(), reason);
+        boolean success = commandRepository.updateOrderStatusWithCheck(orderId, OrderStatus.REJECTED.toDbValue(), OrderStatus.PENDING_REVIEW.toDbValue(), reason);
         
-        Order order = commandRepository.findById(orderId);
-        if (order != null) {
-            logAction(orderId, "REJECT", reason);
-            if (order.getDeliveryInfo() != null) {
-                emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+        if (success) {
+            Order order = commandRepository.findById(orderId);
+            if (order != null) {
+                // Restore stock safely
+                productRepository.restoreStockForOrder(order.getOrderItems());
+                logAction(orderId, "REJECT", reason);
+                if (order.getDeliveryInfo() != null) {
+                    emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
+                }
             }
         }
         // Refund intentionally excluded.
     }
 
     public void cancelByCustomer(int orderId) throws SQLException {
-        commandRepository.updateOrderStatus(orderId, OrderStatus.CANCELLED.toDbValue());
+        boolean success = commandRepository.updateOrderStatusWithCheck(orderId, OrderStatus.CANCELLED.toDbValue(), OrderStatus.PENDING_REVIEW.toDbValue(), "Cancelled by customer");
+        if (success) {
+            Order order = commandRepository.findById(orderId);
+            if (order != null) {
+                // Restore stock safely
+                productRepository.restoreStockForOrder(order.getOrderItems());
+            }
+        }
         // Refund intentionally excluded.
+    }
+
+    public void requestRefund(int orderId) throws SQLException {
+        // Customer request refund from PENDING or PENDING_REVIEW
+        Order tempOrder = commandRepository.findById(orderId);
+        if (tempOrder == null) return;
+        
+        String currentStatus = tempOrder.getStatus();
+        boolean success = commandRepository.updateOrderStatusWithCheck(orderId, OrderStatus.REFUND_REQUEST.toDbValue(), currentStatus, "Customer requested order cancellation/refund");
+        
+        if (success) {
+            // Restore stock safely because order will not be delivered
+            productRepository.restoreStockForOrder(tempOrder.getOrderItems());
+            logAction(orderId, "REFUND_REQUEST", "Customer requested order cancellation/refund");
+        }
     }
     
     private void logAction(int orderId, String action, String reason) {

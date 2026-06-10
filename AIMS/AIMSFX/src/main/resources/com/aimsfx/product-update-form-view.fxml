@@ -16,11 +16,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700" prefWidth="900" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.UpdateProductFormView">
+<BorderPane prefHeight="700" prefWidth="900"  xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.UpdateProductFormView" style="-fx-background-color: #f5f5f5;">
 
     <!-- Content -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@styles2.0.css">
+        <ScrollPane fitToWidth="true"  stylesheets="@styles2.0.css" style="-fx-background-color: transparent;">
             <VBox spacing="20" style="-fx-padding: 20;">
                 
                 <!-- Product ID (Hidden) -->
@@ -31,7 +31,7 @@
 
                 <!-- Common Fields -->
                 <VBox fx:id="commonFieldsContainer" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
-                    <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Basic Information" />
+                    <Label  text="Basic Information" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     
                     <GridPane hgap="15" vgap="12">
                         <columnConstraints>
@@ -40,10 +40,10 @@
                         </columnConstraints>
                         
                         <Label styleClass="label-subtitle" text="Product Type:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <TextField fx:id="productTypeField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <TextField fx:id="productTypeField" editable="false"  GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-opacity: 0.7;"/>
                         
                         <Label styleClass="label-subtitle" text="Barcode*:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <TextField fx:id="barcodeField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="barcodeField" editable="false"  GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-opacity: 0.7;"/>
                         
                         <Label styleClass="label-subtitle" text="Title*:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                         <TextField fx:id="titleField" promptText="Enter title" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -52,7 +52,7 @@
                         <TextField fx:id="categoryField" promptText="Enter category" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         
                         <Label styleClass="label-subtitle" text="Original Price*:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                        <TextField fx:id="originalPriceField" editable="false" style="-fx-opacity: 0.7;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="originalPriceField" editable="false"  GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-opacity: 0.7;"/>
                         
                         <Label styleClass="label-subtitle" text="Current Price*:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                         <TextField fx:id="currentPriceField" promptText="Enter current price" GridPane.columnIndex="1" GridPane.rowIndex="5" />
@@ -69,7 +69,7 @@
                         <Label styleClass="label-subtitle" text="Stock:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
                         <HBox prefHeight="21.0" prefWidth="640.0" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="9">
                             <TextField fx:id="stockField" editable="false" promptText="Stock quantity" HBox.hgrow="ALWAYS" />
-                            <Button fx:id="updateStockButton" prefHeight="15.0" prefWidth="129.0" style="-fx-cursor: hand;" styleClass="btn-primary" text="Update Stock" />
+                            <Button fx:id="updateStockButton" prefHeight="15.0" prefWidth="129.0"  styleClass="btn-primary" text="Update Stock"  style="-fx-cursor: hand;"/>
                         </HBox>
                         
                         <Label styleClass="label-subtitle" text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
@@ -96,7 +96,7 @@
 
                 <!-- Specific Fields (Dynamic) -->
                 <VBox fx:id="specificFieldsSection" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
-                    <Label fx:id="specificFieldsTitle" style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Product Specific Information" />
+                    <Label fx:id="specificFieldsTitle"  text="Product Specific Information" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     <GridPane fx:id="specificFieldsGrid" hgap="15" vgap="12">
                         <columnConstraints>
                             <ColumnConstraints minWidth="150" prefWidth="150" />
@@ -111,15 +111,15 @@
 
     <!-- Footer Buttons -->
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;" stylesheets="@styles2.0.css">
-            <Button onAction="#handleUpdate" style="-fx-cursor: hand;" styleClass="btn-success" text="Update Product" />
-            <Button onAction="#handleCancel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;" styleClass="btn-secondary" text="Cancel" />
+        <HBox alignment="CENTER_RIGHT" spacing="10"  stylesheets="@styles2.0.css" style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+            <Button onAction="#handleUpdate"  styleClass="btn-success" text="Update Product"  style="-fx-cursor: hand;"/>
+            <Button onAction="#handleCancel"  styleClass="btn-secondary" text="Cancel"  style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;"/>
         </HBox>
     </bottom>
    <top>
       <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="900.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1280.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
                <children>
                   <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
                      <children>

@@ -169,11 +169,11 @@ public class PaymentUI {
 
         // Update labels
         if (totalLabel != null)
-            totalLabel.setText(String.format("%,.0f đ", order.getTotalAmount()));
+            totalLabel.setText(String.format("%,.0f VND", order.getTotalAmount()));
         if (transactionIdLabel != null)
             transactionIdLabel.setText("ORDER_" + order.getOrderId());
         if (totalLabelInQR != null)
-            totalLabelInQR.setText(String.format("%,.0f đ", order.getTotalAmount()));
+            totalLabelInQR.setText(String.format("%,.0f VND", order.getTotalAmount()));
 
         // Initialize the active handler with order data
         if (activeHandler != null) {
@@ -193,7 +193,11 @@ public class PaymentUI {
             Parent root = loader.load();
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(root);
+            } else {
+                stage.setScene(new Scene(root));
+            }
             stage.setTitle("AIMS - Place Order");
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,9 +214,12 @@ public class PaymentUI {
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(root);
+            } else {
+                stage.setScene(new Scene(root));
+            }
             stage.setTitle("AIMS - Order Success");
-            stage.centerOnScreen();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -244,10 +251,19 @@ public class PaymentUI {
                 totalAmount,
                 content,
                 () -> {
-                    // SOLID: Delegate to Controller (View → Controller → Service → Repository)
                     payOrderController.completePayment(currentOrder, activeHandler.getMethodName().toUpperCase());
 
                     TransactionInfo info = createTransactionInfo(activeHandler.getMethodName());
+                    
+                    // Send order confirmation email
+                    new Thread(() -> {
+                        try {
+                            new com.aimsfx.service.EmailService().sendOrderConfirmation(currentOrder, currentOrder.getDeliveryInfo(), info);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+
                     navigateToSuccess(info);
                 },
                 this::showLoading,

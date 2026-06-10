@@ -9,7 +9,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * Singleton class để quản lý connection pool database PostgreSQL sử dụng
+ * Singleton class to manage PostgreSQL database connection pool using HikariCP
  * HikariCP
  */
 public class DatabaseConnection {
@@ -141,7 +141,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Đóng connection pool (chỉ nên gọi khi shutdown ứng dụng)
+     * Close connection pool (should only be called during application shutdown)
      */
     public void shutdown() {
         if (dataSource != null && !dataSource.isClosed()) {

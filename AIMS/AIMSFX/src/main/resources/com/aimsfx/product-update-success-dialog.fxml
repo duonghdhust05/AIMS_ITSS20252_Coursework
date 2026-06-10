@@ -10,11 +10,11 @@
       <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
    </padding>
    
-   <Label style="-fx-font-size: 20; -fx-text-fill: #4CAF50;" styleClass="label-header" text="✓ Product Updated Successfully!" />
+   <Label  styleClass="label-header" text="✓ Product Updated Successfully!"  style="-fx-font-size: 20; -fx-text-fill: #4CAF50;"/>
    
    <VBox alignment="CENTER" spacing="10">
-      <Label fx:id="productTitleLabel" style="-fx-font-size: 16;" styleClass="label-section-title" text="Product Title" />
-      <Label fx:id="productDetailsLabel" style="-fx-font-size: 12;" styleClass="label-subtitle" text="Product Details" textAlignment="CENTER" />
+      <Label fx:id="productTitleLabel"  styleClass="label-section-title" text="Product Title"  style="-fx-font-size: 16;"/>
+      <Label fx:id="productDetailsLabel"  styleClass="label-subtitle" text="Product Details" textAlignment="CENTER"  style="-fx-font-size: 12;"/>
    </VBox>
    
    <Button fx:id="closeButton" onAction="#handleClose" styleClass="btn-primary" text="Close" />

@@ -22,6 +22,18 @@
   </properties>
 
   <dependencies>
+    <!-- UI Frameworks & Animations -->
+    <dependency>
+      <groupId>io.github.mkpaz</groupId>
+      <artifactId>atlantafx-base</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.typhon0</groupId>
+      <artifactId>AnimateFX</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -269,7 +281,7 @@
         <version>3.5.3</version>
         <configuration>
           <argLine>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</argLine>
-          <!-- Hiển thị @DisplayName đẹp hơn trong console -->
+          <!-- Display @DisplayName nicely in console -->
           <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
             <usePhrasedTestCaseClassName>true</usePhrasedTestCaseClassName>
             <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>

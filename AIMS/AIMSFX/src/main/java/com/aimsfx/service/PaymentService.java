@@ -115,24 +115,10 @@ public class PaymentService {
             return;
         }
 
-        // STEP 1: Deduct Stock FIRST (Atomic Update to prevent Race Condition)
-        for (OrderItem item : order.getOrderItems()) {
-            Product product = item.getProduct();
-            if (product == null || product.getProductId() == null) {
-                continue;
-            }
-
-            Long productId = product.getProductId();
-            int quantitySold = item.getQuantity();
-
-            // Using atomic update. If it fails, it means out of stock.
-            boolean success = productRepo.deductStockAtomically(productId, quantitySold);
-            if (!success) {
-                // By throwing an exception here, Spring @Transactional will automatically
-                // ROLLBACK
-                // any previously deducted items in this loop.
-                throw new RuntimeException("Out of stock for product: " + product.getTitle());
-            }
+        // STEP 1: Deduct Stock FIRST (Transactional Update to prevent Race Condition and Partial Deduction)
+        boolean success = productRepo.deductStockForOrder(order.getOrderItems());
+        if (!success) {
+            throw new RuntimeException("Out of stock for one or more products in the order. Transaction rolled back.");
         }
 
         // STEP 2: Call External API (Simulated)

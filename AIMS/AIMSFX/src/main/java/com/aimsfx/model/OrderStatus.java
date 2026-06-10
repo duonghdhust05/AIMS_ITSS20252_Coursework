@@ -14,7 +14,8 @@ public enum OrderStatus {
     PENDING_REVIEW("PENDING"),
     APPROVED("APPROVED"),
     REJECTED("REJECTED"),
-    CANCELLED("CANCELLED");
+    CANCELLED("CANCELLED"),
+    REFUND_REQUEST("REFUND_REQUEST");
 
     private final String dbValue;
 

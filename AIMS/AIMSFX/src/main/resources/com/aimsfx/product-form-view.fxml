@@ -13,22 +13,22 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700" prefWidth="900" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.ProductFormView">
+<BorderPane prefHeight="700" prefWidth="900"  xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.ProductFormView" style="-fx-background-color: #f5f5f5;">
 
     <!-- Content -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent;" stylesheets="@styles2.0.css" vbarPolicy="NEVER">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true"  stylesheets="@styles2.0.css" vbarPolicy="NEVER" style="-fx-background-color: transparent;">
             <VBox spacing="20" style="-fx-padding: 20;">
                 
                 <!-- Product Type Selection -->
                 <VBox spacing="10" styleClass="aims-panel-card">
-                    <Label style="-fx-font-size: 14px;" styleClass="label-section-title" text="Product Type*" />
+                    <Label  styleClass="label-section-title" text="Product Type*"  style="-fx-font-size: 14px;"/>
                     <ComboBox fx:id="productTypeComboBox" prefWidth="300" promptText="Select product type" />
                 </VBox>
 
                 <!-- Common Fields -->
                 <VBox fx:id="commonFieldsContainer" spacing="15" styleClass="aims-panel-card">
-                    <Label style="-fx-font-size: 16px;" styleClass="label-section-title" text="Basic Information" />
+                    <Label  styleClass="label-section-title" text="Basic Information"  style="-fx-font-size: 16px;"/>
                     
                     <GridPane hgap="15" vgap="12">
                         <columnConstraints>
@@ -85,8 +85,8 @@
                 </VBox>
 
                 <!-- Specific Fields (Dynamic) -->
-                <VBox fx:id="specificFieldsSection" managed="false" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;" visible="false">
-                    <Label fx:id="specificFieldsTitle" style="-fx-font-weight: bold; -fx-font-size: 16px;" styleClass="label-section-title" text="Product Specific Information" />
+                <VBox fx:id="specificFieldsSection" managed="false" spacing="15"  visible="false" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
+                    <Label fx:id="specificFieldsTitle"  styleClass="label-section-title" text="Product Specific Information"  style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     <GridPane fx:id="specificFieldsGrid" hgap="15" vgap="12">
                         <columnConstraints>
                             <ColumnConstraints minWidth="150" prefWidth="150" />
@@ -96,8 +96,8 @@
                 </VBox>
 
                 <!-- CD Tracks Section (Only for CD products) -->
-                <VBox fx:id="tracksSection" managed="false" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;" visible="false">
-                    <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" styleClass="label-subtitle" text="CD Tracks (Minimum 1 track required)*" />
+                <VBox fx:id="tracksSection" managed="false" spacing="15"  visible="false" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 5;">
+                    <Label  styleClass="label-subtitle" text="CD Tracks (Minimum 1 track required)*"  style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     
                     <!-- Track Input Fields -->
                     <HBox alignment="CENTER_LEFT" spacing="10">
@@ -110,7 +110,7 @@
                     
                     <!-- Tracks List -->
                     <VBox fx:id="tracksListContainer" spacing="5" style="-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #fafafa;">
-                        <Label fx:id="tracksCountLabel" style="-fx-font-weight: bold;" styleClass="label-subtitle" text="Tracks: 0" />
+                        <Label fx:id="tracksCountLabel"  styleClass="label-subtitle" text="Tracks: 0"  style="-fx-font-weight: bold;"/>
                         <ScrollPane fitToWidth="true" prefHeight="150" style="-fx-background-color: transparent;">
                             <VBox fx:id="tracksList" spacing="5" />
                         </ScrollPane>
@@ -124,8 +124,8 @@
     <!-- Footer Buttons -->
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
-            <Button fx:id="addProductButton" onAction="#handleAdd" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;" text="Add Product" />
-            <Button onAction="#handleCancel" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;" text="Cancel" />
+            <Button fx:id="addProductButton" onAction="#handleAdd"  text="Add Product" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;"/>
+            <Button onAction="#handleCancel"  text="Cancel" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 30; -fx-cursor: hand;"/>
         </HBox>
     </bottom>
 

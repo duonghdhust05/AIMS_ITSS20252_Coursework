@@ -568,6 +568,119 @@ public class DatabaseProductRepository implements ProductRepository {
         }
     }
 
+    @Override
+    public boolean deductStockForOrder(List<com.aimsfx.model.OrderItem> items) {
+        if (items == null || items.isEmpty())
+            return true;
+
+        String sql = "UPDATE products SET stock = stock - ? WHERE product_id = ? AND is_current = true AND stock >= ?";
+
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (com.aimsfx.model.OrderItem item : items) {
+                    Product product = item.getProduct();
+                    if (product == null || product.getProductId() == null)
+                        continue;
+
+                    stmt.setInt(1, item.getQuantity());
+                    stmt.setLong(2, product.getProductId());
+                    stmt.setInt(3, item.getQuantity());
+
+                    int rowsAffected = stmt.executeUpdate();
+                    if (rowsAffected == 0) {
+                        // Out of stock or product not found. Rollback all previous deductions.
+                        conn.rollback();
+                        System.err.println(
+                                String.format("Failed to deduct stock for Product ID=%d. Rolling back transaction.",
+                                        product.getProductId()));
+                        return false;
+                    }
+                }
+            }
+
+            conn.commit();
+            System.out.println("All stock deductions completed successfully in a single transaction.");
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("ERROR: Failed to rollback stock deduction: " + ex.getMessage());
+                }
+            }
+            System.err.println("Database error during transactional stock deduction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("ERROR: Failed to close connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean restoreStockForOrder(List<com.aimsfx.model.OrderItem> items) {
+        if (items == null || items.isEmpty())
+            return true;
+
+        String sql = "UPDATE products SET stock = stock + ? WHERE product_id = ? AND is_current = true";
+
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (com.aimsfx.model.OrderItem item : items) {
+                    Product product = item.getProduct();
+                    if (product == null || product.getProductId() == null)
+                        continue;
+
+                    stmt.setInt(1, item.getQuantity());
+                    stmt.setLong(2, product.getProductId());
+
+                    stmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+            System.out.println("All stock restorations completed successfully in a single transaction.");
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("ERROR: Failed to rollback stock restoration: " + ex.getMessage());
+                }
+            }
+            System.err.println("Database error during transactional stock restoration: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("ERROR: Failed to close connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+
     /**
      * Get product details as Map for Update form
      * Returns all common and specific fields with "specific_" prefix

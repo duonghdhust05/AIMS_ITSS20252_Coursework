@@ -122,8 +122,7 @@
             <padding>
                 <Insets top="20" />
             </padding>
-            
-            <Button fx:id="closeButton" prefHeight="39.0" prefWidth="76.0" styleClass="btn-secondary" text="Close" />
+            <Button fx:id="closeButton" prefHeight="39.0" prefWidth="126.0" style="-fx-padding: 10 30; -fx-font-size: 14px;" styleClass="btn-secondary" text="Close" />
         </HBox>
     </bottom>
     

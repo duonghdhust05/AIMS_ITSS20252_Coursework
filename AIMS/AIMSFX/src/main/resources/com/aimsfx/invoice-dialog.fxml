@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" prefHeight="600.0" prefWidth="550.0"
+   style="-fx-background: #f5f5f5; -fx-border-color: transparent;" stylesheets="@styles2.0.css"
+   xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="com.aimsfx.controller.PlaceOrderController.InvoiceDialogController">
+   <content>
+      <VBox prefWidth="550.0" spacing="15.0" style="-fx-background-color: #f5f5f5;">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         <children>
+            <VBox spacing="8.0"
+               style="-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%); -fx-padding: 20; -fx-background-radius: 8 8 0 0;">
+               <children>
+                  <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"
+                     text="ORDER INFORMATION" />
+                  <Label fx:id="headerIdLabel"
+                     style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);" />
+               </children>
+            </VBox>
+            <VBox spacing="10.0"
+               style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+               <children>
+                  <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"
+                     text="PRODUCTS" />
+                  <Separator prefWidth="200.0" />
+                  <VBox fx:id="productsContainer" spacing="10.0" />
+               </children>
+            </VBox>
+            <VBox spacing="8.0"
+               style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+               <children>
+                  <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"
+                     text="PAYMENT" />
+                  <Separator prefWidth="200.0" />
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666;" text="Subtotal:" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="subtotalLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #333; -fx-font-weight: bold;" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666;" text="VAT (10%):" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="vatLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #333; -fx-font-weight: bold;" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666;"
+                           text="Shipping Fee:" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="shippingFeeLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #333; -fx-font-weight: bold;" />
+                     </children>
+                  </HBox>
+                  <HBox fx:id="discountBox" alignment="CENTER_LEFT">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666;" text="Discount:" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="discountLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #27ae60; -fx-font-weight: bold;" />
+                     </children>
+                  </HBox>
+                  <Separator />
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label
+                           style="-fx-font-size: 15px; -fx-text-fill: #333; -fx-font-weight: bold;"
+                           text="TOTAL:" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="totalLabel"
+                           style="-fx-font-size: 16px; -fx-text-fill: #667eea; -fx-font-weight: bold;" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox fx:id="transactionContainer" spacing="8.0"
+               style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+               <children>
+                  <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"
+                     text="TRANSACTION INFORMATION" />
+                  <Separator prefWidth="200.0" />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-min-width: 130;"
+                           text="Transaction Code:" />
+                        <Label fx:id="txnCodeLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #667eea; -fx-font-weight: bold;"
+                           wrapText="true" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-min-width: 130;"
+                           text="Payment Method:" />
+                        <Label fx:id="paymentMethodLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #667eea; -fx-font-weight: bold;"
+                           wrapText="true" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-min-width: 130;"
+                           text="Status:" />
+                        <Label fx:id="statusLabel"
+                           style="-fx-font-size: 13px; -fx-font-weight: bold;" wrapText="true" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-min-width: 130;"
+                           text="Time:" />
+                        <Label fx:id="timeLabel"
+                           style="-fx-font-size: 13px; -fx-text-fill: #667eea; -fx-font-weight: bold;"
+                           wrapText="true" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>

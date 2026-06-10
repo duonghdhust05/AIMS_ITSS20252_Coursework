@@ -33,10 +33,17 @@ public class OrderManagementController {
     @FXML private TableColumn<OrderSummary, Void> actionsColumn;
     @FXML private Pagination pagination;
     @FXML private Label totalPendingLabel;
+    @FXML private Label refreshNotificationLabel;
+    @FXML private Label lastUpdatedLabel;
+    @FXML private Button refreshBtn;
 
     private final OrderReviewService orderReviewService = new OrderReviewService();
     private final OrderManagementView view = new OrderManagementView();
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    private java.util.concurrent.ScheduledExecutorService scheduler;
+    private int lastLoadedCount = -1;
 
     @FXML
     public void initialize() {
@@ -48,6 +55,40 @@ public class OrderManagementController {
         setupColumns();
         setupActions();
         loadFirstPage();
+        startBackgroundPolling();
+    }
+
+    @FXML
+    private void handleRefresh() {
+        if (refreshNotificationLabel != null) {
+            refreshNotificationLabel.setVisible(false);
+            refreshNotificationLabel.setManaged(false);
+        }
+        refreshCurrentPage();
+    }
+
+    private void startBackgroundPolling() {
+        scheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                int currentCount = orderReviewService.countAllOrders();
+                if (lastLoadedCount != -1 && currentCount != lastLoadedCount) {
+                    Platform.runLater(() -> {
+                        if (refreshNotificationLabel != null) {
+                            refreshNotificationLabel.setVisible(true);
+                            refreshNotificationLabel.setManaged(true);
+                        }
+                    });
+                }
+            } catch (SQLException e) {
+                // Ignore background polling errors
+            }
+        }, 15, 15, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     private void setupColumns() {
@@ -89,16 +130,36 @@ public class OrderManagementController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : box);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    OrderSummary row = getTableView().getItems().get(getIndex());
+                    if (row != null) {
+                        String status = row.getOrderStatus() != null ? row.getOrderStatus().name() : "";
+                        boolean canApprove = "PENDING_REVIEW".equals(status) || "PENDING".equals(status);
+                        boolean canReject = "PENDING_REVIEW".equals(status) || "PENDING".equals(status) || "REFUND_REQUEST".equals(status);
+                        
+                        approveBtn.setVisible(canApprove);
+                        approveBtn.setManaged(canApprove);
+                        rejectBtn.setVisible(canReject);
+                        rejectBtn.setManaged(canReject);
+                    }
+                    setGraphic(box);
+                }
             }
         });
     }
 
     private void loadFirstPage() {
         try {
-            int total = orderReviewService.countPendingReviewOrders();
+            int total = orderReviewService.countAllOrders();
+            this.lastLoadedCount = total;
+            
             if (totalPendingLabel != null) {
-                totalPendingLabel.setText("Pending: " + total);
+                totalPendingLabel.setText("Total Orders: " + total);
+            }
+            if (lastUpdatedLabel != null) {
+                lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
             }
 
             int pageSize = OrderReviewService.DEFAULT_PAGE_SIZE;
@@ -117,7 +178,16 @@ public class OrderManagementController {
     private void loadPage(int pageIndex) {
         Platform.runLater(() -> {
             try {
-                List<OrderSummary> page = orderReviewService.listPendingReviewOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
+                int total = orderReviewService.countAllOrders();
+                this.lastLoadedCount = total;
+                if (totalPendingLabel != null) {
+                    totalPendingLabel.setText("Total Orders: " + total);
+                }
+                if (lastUpdatedLabel != null) {
+                    lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
+                }
+
+                List<OrderSummary> page = orderReviewService.listAllOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
                 ordersTable.getItems().setAll(page);
             } catch (SQLException e) {
                 view.showError("Database Error", e.getMessage());

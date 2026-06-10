@@ -122,9 +122,13 @@ public class CartController implements Initializable {
             Parent homepageView = loader.load();
 
             Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
-            Scene homepageScene = new Scene(homepageView);
-            stage.setScene(homepageScene);
-            stage.setTitle("AIMS - Homepage");
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(homepageView);
+            } else {
+                stage.setScene(new Scene(homepageView));
+            }
+            stage.setTitle("AIMS - Product Management System");
+            new animatefx.animation.FadeIn(homepageView).play();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -156,8 +160,11 @@ public class CartController implements Initializable {
             placeOrderController.setCart(currentCart);
 
             Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
-            Scene placeOrderScene = new Scene(placeOrderViewRoot);
-            stage.setScene(placeOrderScene);
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(placeOrderViewRoot);
+            } else {
+                stage.setScene(new Scene(placeOrderViewRoot));
+            }
             stage.setTitle("AIMS - Place Order");
 
         } catch (IOException e) {

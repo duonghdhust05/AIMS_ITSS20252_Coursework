@@ -3,6 +3,7 @@ package com.aimsfx.view.ProductView;
 import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.*;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -30,79 +31,67 @@ public class ProductHistoryView {
 
     private final ProductController controller;
     private Stage dialogStage;
+    @FXML
     private TableView<Product> historyTable;
+    @FXML
+    private Button closeButton;
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final java.time.format.DateTimeFormatter DATE_FORMATTER = java.time.format.DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public ProductHistoryView() {
         this.controller = ProductController.getInstance();
     }
 
-    /**
-     * Show history dialog for a specific product
-     * 
-     * @param productId  Product ID to show history for
-     * @param ownerStage Parent stage for modal dialog
-     */
     public void show(Long productId, Stage ownerStage) {
         dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.initOwner(ownerStage);
         dialogStage.setTitle("Product History - ID: " + productId);
 
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/product-history-view.fxml"));
+            loader.setController(this);
+            VBox root = loader.load();
 
-        // Title label
-        Label titleLabel = new Label("Edit History");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            setupTableColumns();
 
-        // Info label
-        Label infoLabel = new Label("All versions of this product (newest first). Current version is highlighted.");
-        infoLabel.setStyle("-fx-text-fill: #666666;");
+            ObservableList<Product> history = controller.getProductHistory(productId);
+            historyTable.setItems(history);
 
-        // Create history table
-        historyTable = createHistoryTable();
-
-        // Load history data
-        ObservableList<Product> history = controller.getProductHistory(productId);
-        historyTable.setItems(history);
-
-        // Highlight rows based on is_current
-        historyTable.setRowFactory(tv -> new TableRow<Product>() {
-            @Override
-            protected void updateItem(Product product, boolean empty) {
-                super.updateItem(product, empty);
-                if (product == null || empty) {
-                    setStyle("");
-                } else if (product.getIsCurrent() != null && product.getIsCurrent()) {
-                    // Current version - green background
-                    setStyle("-fx-background-color: #d4edda;");
-                } else {
-                    // Expired version - light gray
-                    setStyle("-fx-background-color: #f8f9fa;");
+            historyTable.setRowFactory(tv -> new TableRow<Product>() {
+                @Override
+                protected void updateItem(Product product, boolean empty) {
+                    super.updateItem(product, empty);
+                    if (product == null || empty) {
+                        setStyle("");
+                    } else if (product.getIsCurrent() != null && product.getIsCurrent()) {
+                        setStyle("-fx-background-color: #d4edda;");
+                    } else {
+                        setStyle("-fx-background-color: #f8f9fa;");
+                    }
                 }
-            }
-        });
+            });
 
-        // Close button
-        Button closeButton = new Button("Close");
-        closeButton.setOnAction(e -> dialogStage.close());
-        closeButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 8 20;");
-
-        root.getChildren().addAll(titleLabel, infoLabel, historyTable, closeButton);
-
-        Scene scene = new Scene(root, 1000, 600);
-        dialogStage.setScene(scene);
-        dialogStage.showAndWait();
+            Scene scene = new Scene(root, 1000, 600);
+            dialogStage.setScene(scene);
+            dialogStage.showAndWait();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Create the history table with appropriate columns
-     */
+    @FXML
+    private void handleClose() {
+        if (dialogStage != null) {
+            dialogStage.close();
+        }
+    }
+
     @SuppressWarnings({ "deprecation", "unchecked" })
-    private TableView<Product> createHistoryTable() {
-        TableView<Product> table = new TableView<>();
+    private void setupTableColumns() {
+        TableView<Product> table = historyTable;
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Version Status Column
@@ -154,7 +143,7 @@ public class ProductHistoryView {
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(String.format("%.0f đ", price));
+                    setText(String.format("%,.0f VND", price));
                 }
             }
         });
@@ -170,7 +159,7 @@ public class ProductHistoryView {
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(String.format("%.0f đ", price));
+                    setText(String.format("%,.0f VND", price));
                 }
             }
         });
@@ -315,7 +304,5 @@ public class ProductHistoryView {
                 origPriceCol, priceCol, stockCol, productStatusCol,
                 descCol, weightCol, dimensionsCol, vatCol,
                 createdCol, updatedCol, expiredCol, detailsCol);
-
-        return table;
     }
 }

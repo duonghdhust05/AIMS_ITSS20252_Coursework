@@ -224,4 +224,27 @@ public class OrderRepository {
             stmt.executeUpdate();
         }
     }
+
+    /**
+     * Atomically update order_status only if it matches expectedOldStatus.
+     * Used for Idempotency and preventing Race Conditions (e.g. double reject).
+     * @return true if updated, false if the status did not match expectedOldStatus.
+     */
+    public boolean updateOrderStatusWithCheck(int orderId, String newStatus, String expectedOldStatus, String cancelReason) throws SQLException {
+        String sql = """
+            UPDATE orders
+            SET order_status = ?, cancel_reason = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE order_id = ? AND order_status = ?
+            """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newStatus);
+            stmt.setString(2, cancelReason);
+            stmt.setInt(3, orderId);
+            stmt.setString(4, expectedOldStatus);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 }

@@ -6,9 +6,10 @@ import javafx.stage.Stage;
 import com.aimsfx.utils.DatabaseManager;
 import java.io.IOException;
 
+import javafx.application.Application;
 import java.util.TimeZone;
 
-public class HelloApplication extends javafx.application.Application {
+public class HelloApplication extends Application {
     
     @Override
     public void init() throws Exception {
@@ -23,6 +24,8 @@ public class HelloApplication extends javafx.application.Application {
     
     @Override
     public void start(Stage stage) throws IOException {
+        Application.setUserAgentStylesheet(new atlantafx.base.theme.PrimerLight().getUserAgentStylesheet());
+        
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("homepage-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
         stage.setTitle("AIMS - Product Management System");

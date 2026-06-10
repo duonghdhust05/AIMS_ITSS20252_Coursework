@@ -35,7 +35,7 @@ class SessionManagerTest {
     void testSetAndGetDeliveryInfo() {
         DeliveryInfo deliveryInfo = new DeliveryInfo();
         deliveryInfo.setRecipientName("Test User");
-        deliveryInfo.setProvince("Hà Nội");
+        deliveryInfo.setProvince("Hanoi");
 
         SessionManager.getInstance().setDeliveryInfo(deliveryInfo);
 
@@ -43,7 +43,7 @@ class SessionManagerTest {
 
         assertNotNull(retrieved, "Should return delivery info");
         assertEquals("Test User", retrieved.getRecipientName(), "Name should match");
-        assertEquals("Hà Nội", retrieved.getProvince(), "Province should match");
+        assertEquals("Hanoi", retrieved.getProvince(), "Province should match");
     }
 
     @Test

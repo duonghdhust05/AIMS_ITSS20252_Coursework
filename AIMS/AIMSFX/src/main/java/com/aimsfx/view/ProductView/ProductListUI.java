@@ -26,109 +26,105 @@ public class ProductListUI extends BaseView {
 
     private final ViewProductController controller;
     private final Stage parentStage;
+    @javafx.fxml.FXML
     private TextField searchField;
+    @javafx.fxml.FXML
     private ComboBox<String> filterComboBox;
-    private VBox productListPanel;
+    @javafx.fxml.FXML
+    private javafx.scene.layout.FlowPane productListPanel;
     private ObservableList<Product> displayedProducts;
+    @javafx.fxml.FXML
     private Label productCountLabel;
+    @javafx.fxml.FXML
+    private Button clearFilterButton;
+    
+    @javafx.fxml.FXML
+    private Label refreshNotificationLabel;
+    @javafx.fxml.FXML
+    private Label lastUpdatedLabel;
+    @javafx.fxml.FXML
+    private Button refreshBtn;
 
-    /* 
-     *   
-     * Creates a ProductListUI with specified controller and parent stage
-     * @param controller ViewProductController instance
-     * @param parentStage Parent stage for modal dialog
-     */
+    private java.util.concurrent.ScheduledExecutorService scheduler;
+    private int lastLoadedCount = -1;
+    private final java.time.format.DateTimeFormatter timeFmt = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+    private List<Product> allProductsCache = new java.util.ArrayList<>();
+
     public ProductListUI(ViewProductController controller, Stage parentStage) {
         this.controller = controller;
         this.parentStage = parentStage;
         this.displayedProducts = FXCollections.observableArrayList();
     }
 
-    /**
-     * Shows the product list window
-     */
     public void show() {
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(parentStage);
         stage.setTitle("Product List");
 
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(15));
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/product-list-ui-view.fxml"));
+            loader.setController(this);
+            BorderPane root = loader.load();
 
-        // Top: Search and filter controls
-        VBox topPanel = createTopPanel();
-        root.setTop(topPanel);
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> filterProducts());
+            filterComboBox.setOnAction(e -> filterProducts());
+            
+            startBackgroundPolling();
+            
+            stage.setOnCloseRequest(e -> {
+                if (scheduler != null && !scheduler.isShutdown()) {
+                    scheduler.shutdownNow();
+                }
+            });
+            if (clearFilterButton != null) {
+                clearFilterButton.setOnAction(e -> clearFilters());
+            }
 
-        // Center: Product list
-        ScrollPane scrollPane = new ScrollPane();
-        productListPanel = new VBox(10);
-        productListPanel.setPadding(new Insets(10));
-        scrollPane.setContent(productListPanel);
-        scrollPane.setFitToWidth(true);
-        root.setCenter(scrollPane);
+            Scene scene = new Scene(root, 1280, 720);
+            stage.setScene(scene);
 
-        // Bottom: Product count
-        HBox bottomPanel = new HBox();
-        bottomPanel.setPadding(new Insets(10, 0, 0, 0));
-        productCountLabel = new Label("Products: 0");
-        productCountLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        bottomPanel.getChildren().add(productCountLabel);
-        root.setBottom(bottomPanel);
-
-        Scene scene = new Scene(root, 800, 600);
-        stage.setScene(scene);
-
-        refreshProductList();
-        
-        stage.show();
+            refreshProductList();
+            
+            stage.show();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            displayError("Failed to load product list UI.");
+        }
     }
 
-    /* 
-     * 
-     * Creates the top panel with search and filter controls
-     * @return VBox containing search and filter UI
-     */
-    private VBox createTopPanel() {
-        VBox topPanel = new VBox(10);
-        topPanel.setPadding(new Insets(0, 0, 15, 0));
+    @javafx.fxml.FXML
+    private void handleRefresh() {
+        if (refreshNotificationLabel != null) {
+            refreshNotificationLabel.setVisible(false);
+            refreshNotificationLabel.setManaged(false);
+        }
+        refreshProductList();
+    }
 
-        // Title
-        Label titleLabel = new Label("Browse Products");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    private void startBackgroundPolling() {
+        scheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
 
-        // Search bar
-        HBox searchBox = new HBox(10);
-        searchBox.setAlignment(Pos.CENTER_LEFT);
-        
-        Label searchLabel = new Label("Search:");
-        searchField = new TextField();
-        searchField.setPromptText("Enter product title or barcode...");
-        searchField.setPrefWidth(300);
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> filterProducts());
-
-        Button searchButton = new Button("Search");
-        searchButton.setOnAction(e -> filterProducts());
-
-        searchBox.getChildren().addAll(searchLabel, searchField, searchButton);
-
-        // Filter controls
-        HBox filterBox = new HBox(10);
-        filterBox.setAlignment(Pos.CENTER_LEFT);
-        
-        Label filterLabel = new Label("Filter by Type:");
-        filterComboBox = new ComboBox<>();
-        filterComboBox.getItems().addAll("All", "Book", "CD", "DVD", "Newspaper");
-        filterComboBox.setValue("All");
-        filterComboBox.setOnAction(e -> filterProducts());
-
-        Button clearButton = new Button("Clear Filters");
-        clearButton.setOnAction(e -> clearFilters());
-
-        filterBox.getChildren().addAll(filterLabel, filterComboBox, clearButton);
-
-        topPanel.getChildren().addAll(titleLabel, searchBox, filterBox, new Separator());
-        return topPanel;
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                // Here we just check the count of products in DB
+                int currentCount = com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts().size(); // Or a specific count method if available
+                if (lastLoadedCount != -1 && currentCount != lastLoadedCount) {
+                    javafx.application.Platform.runLater(() -> {
+                        if (refreshNotificationLabel != null) {
+                            refreshNotificationLabel.setVisible(true);
+                            refreshNotificationLabel.setManaged(true);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                // Ignore background polling errors
+            }
+        }, 15, 15, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     /* 
@@ -148,7 +144,7 @@ public class ProductListUI extends BaseView {
         }
 
         for (Map<String, Object> productData : products) {
-            HBox productCard = createProductCard(productData);
+            javafx.scene.Node productCard = createProductCard(productData);
             productListPanel.getChildren().add(productCard);
         }
 
@@ -161,53 +157,32 @@ public class ProductListUI extends BaseView {
      * @param productData Map containing product information
      * @return HBox representing a product card
      */
-    private HBox createProductCard(Map<String, Object> productData) {
-        HBox card = new HBox(15);
-        card.setPadding(new Insets(15));
-        card.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1; " +
-                      "-fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+    private javafx.scene.Node createProductCard(Map<String, Object> productData) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/product-card.fxml"));
+            javafx.scene.layout.VBox card = loader.load();
+            ProductCardComponent cardComponent = loader.getController();
 
-        // Product info section
-        VBox infoBox = new VBox(5);
-        HBox.setHgrow(infoBox, Priority.ALWAYS);
+            cardComponent.setProductData(
+                productData,
+                (pd) -> {
+                    Object productId = pd.get("productId");
+                    if (productId != null) {
+                        handleViewDetailClick(productId.toString());
+                    }
+                },
+                (pd) -> {
+                    // Logic to add to cart from list (if needed)
+                    // Currently ProductListUI doesn't implement add to cart directly, so we can leave it empty or trigger an event
+                }
+            );
 
-        Label titleLabel = new Label((String) productData.get("title"));
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        String productType = (String) productData.getOrDefault("productType", "Unknown");
-        String category = (String) productData.getOrDefault("category", "N/A");
-        Label typeLabel = new Label("Type: " + productType + " | Category: " + category);
-        typeLabel.setStyle("-fx-text-fill: #666666;");
-
-        Double currentPrice = (Double) productData.get("currentPrice");
-        String priceText = currentPrice != null ? String.format("$%.2f", currentPrice) : "N/A";
-        Label priceLabel = new Label("Price: " + priceText);
-        priceLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;");
-
-        Integer stock = (Integer) productData.get("stock");
-        String stockText = stock != null ? "Stock: " + stock : "Stock: N/A";
-        Label stockLabel = new Label(stockText);
-
-        infoBox.getChildren().addAll(titleLabel, typeLabel, priceLabel, stockLabel);
-
-        // Action buttons section
-        VBox buttonBox = new VBox(10);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
-
-        Button viewDetailButton = new Button("View Details");
-        viewDetailButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; " +
-                                  "-fx-padding: 10 20; -fx-font-size: 14px;");
-        viewDetailButton.setOnAction(e -> {
-            Object productId = productData.get("productId");
-            if (productId != null) {
-                handleViewDetailClick(productId.toString());
-            }
-        });
-
-        buttonBox.getChildren().add(viewDetailButton);
-
-        card.getChildren().addAll(infoBox, buttonBox);
-        return card;
+            return card;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            displayError("Failed to load product card");
+            return new VBox();
+        }
     }
 
     /* 
@@ -229,14 +204,22 @@ public class ProductListUI extends BaseView {
     /**
      * Refreshes the product list from the controller
      */
-    private void refreshProductList() { 
+    public void refreshProductList() {
         try {
-            ObservableList<Product> allProducts = 
-                    com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts();
-            displayedProducts.setAll(allProducts);
-            displayProducts(displayedProducts);
+            List<Product> products = com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts();
+            this.lastLoadedCount = products.size();
+            this.allProductsCache = new java.util.ArrayList<>(products);
+            
+            if (lastUpdatedLabel != null) {
+                javafx.application.Platform.runLater(() -> {
+                    lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
+                });
+            }
+            
+            displayedProducts.setAll(products);
+            filterProducts(); // Re-apply existing filters
         } catch (Exception e) {
-            displayError("Failed to load products: " + e.getMessage());
+            displayError("Failed to refresh product list: " + e.getMessage());
         }
     }
 
@@ -244,13 +227,10 @@ public class ProductListUI extends BaseView {
      * Filters products based on search and filter criteria
      */
     private void filterProducts() {
-        ObservableList<Product> allProducts = 
-                com.aimsfx.controller.ProductManagerController.ProductController.getInstance().getProducts();
-        
         String searchText = searchField.getText().toLowerCase().trim();
         String filterType = filterComboBox.getValue();
 
-        List<Product> filtered = allProducts.stream()
+        List<Product> filtered = allProductsCache.stream()
                 .filter(product -> {
                     // Filter by search text
                     boolean matchesSearch = searchText.isEmpty() ||

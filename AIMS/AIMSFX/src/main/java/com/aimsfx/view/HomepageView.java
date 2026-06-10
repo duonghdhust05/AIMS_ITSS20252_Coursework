@@ -201,6 +201,7 @@ public class HomepageView {
                 e.printStackTrace();
             }
         }
+        new animatefx.animation.FadeInUp(productGrid).play();
     }
 
     @FXML
@@ -210,9 +211,13 @@ public class HomepageView {
             Parent view = loader.load();
 
             Stage stage = (Stage) searchField.getScene().getWindow();
-            Scene scene = new Scene(view);
-            stage.setScene(scene);
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(view);
+            } else {
+                stage.setScene(new Scene(view));
+            }
             stage.setTitle("AIMS - Shopping Cart");
+            new animatefx.animation.FadeIn(view).play();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -270,7 +275,7 @@ public class HomepageView {
             stage.setTitle("Product Management Panel");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            stage.setScene(new Scene(root, 1600, 900));
+            stage.setScene(new Scene(root, 1280, 720));
             stage.setResizable(true);
             stage.setMinWidth(900);
             stage.setMinHeight(650);
@@ -343,7 +348,7 @@ public class HomepageView {
             dialogStage.setTitle("User Management");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            dialogStage.setScene(new Scene(root, 1600, 900));
+            dialogStage.setScene(new Scene(root, 1280, 720));
             dialogStage.setResizable(true);
             dialogStage.setMinWidth(900);
             dialogStage.setMinHeight(600);

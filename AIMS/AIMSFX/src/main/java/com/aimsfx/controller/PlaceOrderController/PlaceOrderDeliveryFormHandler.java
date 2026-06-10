@@ -47,9 +47,9 @@ public class PlaceOrderDeliveryFormHandler {
 
     public void initProvinceComboBox() {
         if (provinceComboBox != null) {
-            provinceComboBox.getItems().addAll("Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
-                    "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh", "Bến Tre",
-                    "Bình Định");
+            provinceComboBox.getItems().addAll("Hanoi", "Ho Chi Minh City", "Da Nang", "Hai Phong", "Can Tho",
+                    "An Giang", "Ba Ria - Vung Tau", "Bac Giang", "Bac Kan", "Bac Lieu", "Bac Ninh", "Ben Tre",
+                    "Binh Dinh");
         }
     }
 
@@ -108,7 +108,7 @@ public class PlaceOrderDeliveryFormHandler {
             deliveryFormGrid.setManaged(false);
         }
         if (addDeliveryInfoButton != null) {
-            addDeliveryInfoButton.setText("✏️ Edit Delivery Information");
+            addDeliveryInfoButton.setText("Edit Delivery Information");
         }
     }
 

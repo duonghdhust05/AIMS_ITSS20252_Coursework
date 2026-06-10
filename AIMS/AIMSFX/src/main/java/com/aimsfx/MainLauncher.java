@@ -19,7 +19,7 @@ public class MainLauncher {
 
     private static void killProcessOnPort(int port) {
         try {
-            System.out.println("🔄 [System] Checking and releasing port " + port + "...");
+            System.out.println("[System] Checking and releasing port " + port + "...");
 
             // 1. Use ProcessBuilder instead of Runtime.exec
             // Param 1: Call cmd, Param 2: /c (terminate after execution), Param 3: Command
@@ -43,19 +43,19 @@ public class MainLauncher {
 
             // If a running PID is found, proceed to kill it
             if (pid != null && !pid.isEmpty()) {
-                System.out.println("⚠️ [Detected] Port " + port + " is occupied by process with PID: " + pid);
+                System.out.println("[Detected] Port " + port + " is occupied by process with PID: " + pid);
 
                 // 2. Convert taskkill command to ProcessBuilder standard (Separate arguments)
                 ProcessBuilder killBuilder = new ProcessBuilder("taskkill", "/F", "/PID", pid);
                 killBuilder.start().waitFor();
 
-                System.out.println("✅ [Success] Port " + port + " released safely.");
+                System.out.println("[Success] Port " + port + " released safely.");
             } else {
-                System.out.println("🌱 [Clean] Port " + port + " is currently free. Starting boot process!");
+                System.out.println("[Clean] Port " + port + " is currently free. Starting boot process!");
             }
 
         } catch (Exception e) {
-            System.err.println("❌ [Error] Cannot automatically release port " + port + ": " + e.getMessage());
+            System.err.println("[Error] Cannot automatically release port " + port + ": " + e.getMessage());
         }
     }
 

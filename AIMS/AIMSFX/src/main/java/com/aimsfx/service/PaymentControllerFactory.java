@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * - Centralized payment system initialization
  * - Clean separation of concerns
  * 
- * @author AIMS Team
+ * @author ISD-20252-01
  * @version 1.0
  */
 public class PaymentControllerFactory {

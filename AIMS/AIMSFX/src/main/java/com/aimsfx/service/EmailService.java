@@ -28,7 +28,7 @@ import java.util.Properties;
  * - Gmail SMTP: Mail server (smtp.gmail.com:587)
  * - TLS 1.2: Secure connection
  * 
- * @author AIMS Team
+ * @author ISD-20252-01
  * @version 1.0
  */
 public class EmailService implements IEmailService {
@@ -267,6 +267,10 @@ public class EmailService implements IEmailService {
         html.append("td{border:1px solid #ddd;padding:12px;}");
         html.append("tr:nth-child(even){background:#f9f9f9;}");
         html.append(".total{font-size:20px;font-weight:bold;color:#4CAF50;text-align:right;padding:15px 0;}");
+        html.append(".actions{text-align:center;padding:20px 0;margin-top:20px;border-top:1px solid #eee;}");
+        html.append(".btn{display:inline-block;padding:10px 20px;margin:0 10px;border-radius:5px;text-decoration:none;font-weight:bold;font-size:14px;color:white;}");
+        html.append(".btn-primary{background-color:#4CAF50;}");
+        html.append(".btn-danger{background-color:#f44336;}");
         html.append(".footer{text-align:center;padding:20px;background:#f5f5f5;color:#777;font-size:12px;}");
         html.append(".footer p{margin:5px 0;}");
         html.append("</style></head><body>");
@@ -347,6 +351,14 @@ public class EmailService implements IEmailService {
         html.append("<p>We will process your order shortly and keep you updated on the delivery status.</p>");
         html.append("<p>If you have any questions, please don't hesitate to contact us.</p>");
         
+        // Actions
+        html.append("<div class='actions'>");
+        html.append("<a href='http://localhost:8080/api/orders/").append(order.getOrderId()).append("' class='btn btn-primary'>View Order Detail</a>");
+        html.append("<form method='POST' action='http://localhost:8080/api/orders/").append(order.getOrderId()).append("/cancel' style='display:inline;'>");
+        html.append("<button type='submit' class='btn btn-danger' style='border:none;cursor:pointer;'>Cancel Order</button>");
+        html.append("</form>");
+        html.append("</div>");
+
         html.append("</div>"); // End content
         
         // Footer

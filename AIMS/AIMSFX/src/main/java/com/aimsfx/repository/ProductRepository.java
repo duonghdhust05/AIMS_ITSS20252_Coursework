@@ -63,6 +63,18 @@ public interface ProductRepository {
 
     boolean restoreStock(Long productId, int quantity);
 
+    /**
+     * Atomically deducts stock for an entire order using a single database transaction.
+     * Prevents partial stock deduction if one item is out of stock.
+     */
+    boolean deductStockForOrder(List<com.aimsfx.model.OrderItem> items);
+
+    /**
+     * Atomically restores stock for an entire order using a single database transaction.
+     * Used when an order is cancelled or rejected.
+     */
+    boolean restoreStockForOrder(List<com.aimsfx.model.OrderItem> items);
+
     boolean updateStock(String barcode, Integer newStock, String reason);
 
     List<StockChangeLog> getStockChangeHistory(String barcode);

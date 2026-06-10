@@ -288,9 +288,12 @@ public class PlaceOrderController implements Initializable {
             PaymentUI paymentUI = loader.getController();
             paymentUI.initializeData(currentOrder, currentInvoice);
 
-            stage.setScene(new Scene(root));
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(root);
+            } else {
+                stage.setScene(new Scene(root));
+            }
             stage.setTitle("AIMS - Payment");
-            stage.centerOnScreen();
 
         } catch (Exception e) {
             UIUtils.showAlert("System Error", "Could not process payment: " + e.getMessage());

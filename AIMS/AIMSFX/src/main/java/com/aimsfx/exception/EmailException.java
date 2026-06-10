@@ -9,7 +9,7 @@ package com.aimsfx.exception;
  * - Invalid recipient email
  * - Network timeout
  * 
- * @author AIMS Team
+ * @author ISD-20252-01
  * @version 1.0
  */
 public class EmailException extends Exception {

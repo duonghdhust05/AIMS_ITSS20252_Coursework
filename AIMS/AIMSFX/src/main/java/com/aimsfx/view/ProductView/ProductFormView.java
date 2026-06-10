@@ -421,33 +421,21 @@ public class ProductFormView {
      * Add track to the visual list
      */
     private void addTrackToList(Track track, int index) {
-        HBox trackItem = new HBox(10);
-        trackItem.setAlignment(Pos.CENTER_LEFT);
-        trackItem.setPadding(new Insets(5));
-        trackItem.setStyle(
-                "-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-background-radius: 3;");
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/cd-track-item.fxml"));
+            HBox trackItem = loader.load();
+            com.aimsfx.controller.ProductManagerController.CDTrackItemController controller = loader.getController();
+            
+            controller.setTrackData(track, index, (idx) -> {
+                cdTracks.remove(idx.intValue());
+                refreshTracksList();
+            });
 
-        Label numberLabel = new Label(String.valueOf(index + 1) + ".");
-        numberLabel.setPrefWidth(30);
-        numberLabel.setStyle("-fx-font-weight: bold;");
-
-        Label titleLabel = new Label(track.getTitle());
-        titleLabel.setPrefWidth(300);
-
-        Label durationLabel = new Label(formatDuration(track.getDuration()));
-        durationLabel.setPrefWidth(80);
-        durationLabel.setStyle("-fx-text-fill: #666;");
-
-        Button removeBtn = new Button("Remove");
-        removeBtn.setStyle(
-                "-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 5 10;");
-        removeBtn.setOnAction(e -> {
-            cdTracks.remove(index);
-            refreshTracksList();
-        });
-
-        trackItem.getChildren().addAll(numberLabel, titleLabel, durationLabel, removeBtn);
-        tracksList.getChildren().add(trackItem);
+            tracksList.getChildren().add(trackItem);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Could not load track item UI.");
+        }
     }
 
     /**

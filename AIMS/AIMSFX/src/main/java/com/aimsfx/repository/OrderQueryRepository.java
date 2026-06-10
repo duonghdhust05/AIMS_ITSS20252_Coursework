@@ -34,6 +34,19 @@ public class OrderQueryRepository {
         return 0;
     }
 
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) AS cnt FROM orders";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt");
+                }
+            }
+        }
+        return 0;
+    }
+
     public List<OrderSummary> findByStatus(OrderStatus status, int limit, int offset) throws SQLException {
         String sql = """
                 SELECT
@@ -57,6 +70,36 @@ public class OrderQueryRepository {
             stmt.setString(1, status.toDbValue());
             stmt.setInt(2, limit);
             stmt.setInt(3, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    results.add(mapSummary(rs));
+                }
+            }
+        }
+        return results;
+    }
+
+    public List<OrderSummary> findAll(int limit, int offset) throws SQLException {
+        String sql = """
+                SELECT
+                    order_id,
+                    created_at,
+                    delivery_name,
+                    total_amount,
+                    payment_method,
+                    payment_status,
+                    order_status,
+                    cancel_reason
+                FROM orders
+                ORDER BY created_at DESC
+                LIMIT ? OFFSET ?
+                """;
+
+        List<OrderSummary> results = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            stmt.setInt(2, offset);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     results.add(mapSummary(rs));

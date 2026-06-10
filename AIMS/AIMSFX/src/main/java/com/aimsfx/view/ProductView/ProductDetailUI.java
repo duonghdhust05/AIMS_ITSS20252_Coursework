@@ -25,18 +25,32 @@ public class ProductDetailUI extends BaseView {
     private final Stage parentStage;
     private Map<String, Object> productData;
 
+    @javafx.fxml.FXML
     private Label titleLabel;
+    @javafx.fxml.FXML
     private Label categoryLabel;
+    @javafx.fxml.FXML
     private Label priceLabel;
+    @javafx.fxml.FXML
     private Label weightLabel;
+    @javafx.fxml.FXML
     private Label barcodeLabel;
+    @javafx.fxml.FXML
     private Label statusLabel;
+    @javafx.fxml.FXML
     private Label stockLabel;
+    @javafx.fxml.FXML
     private Label dimensionsLabel;
+    @javafx.fxml.FXML
     private GridPane specificDetailsPanel;
+    @javafx.fxml.FXML
     private Label descriptionLabel;
-
+    @javafx.fxml.FXML
     private Label vatRateLabel;
+    @javafx.fxml.FXML
+    private Button closeButton;
+    @javafx.fxml.FXML
+    private Button addToCartButton;
 
     private ICartManager cartManager = CartManager.getInstance();
 
@@ -46,26 +60,6 @@ public class ProductDetailUI extends BaseView {
 
     public ProductDetailUI(ViewProductController controller, Stage parentStage) {
         this.parentStage = parentStage;
-        initializeComponents();
-    }
-
-    private void initializeComponents() {
-        titleLabel = new Label();
-        categoryLabel = new Label();
-        priceLabel = new Label();
-        weightLabel = new Label();
-        barcodeLabel = new Label();
-        statusLabel = new Label();
-        stockLabel = new Label();
-        descriptionLabel = new Label();
-        dimensionsLabel = new Label();
-
-        vatRateLabel = new Label();
-
-        specificDetailsPanel = new GridPane();
-        specificDetailsPanel.setHgap(15);
-        specificDetailsPanel.setVgap(10);
-        specificDetailsPanel.setPadding(new Insets(10));
     }
 
     public void displayProduct(Map<String, Object> productData) {
@@ -81,127 +75,33 @@ public class ProductDetailUI extends BaseView {
         stage.initOwner(parentStage);
         stage.setTitle("Product Details");
 
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(20));
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/product-detail-ui-view.fxml"));
+            loader.setController(this);
+            BorderPane root = loader.load();
 
-        VBox headerBox = createHeaderSection();
-        root.setTop(headerBox);
+            populateProductData();
 
-        ScrollPane scrollPane = new ScrollPane();
-        VBox contentBox = createContentSection();
-        scrollPane.setContent(contentBox);
-        scrollPane.setFitToWidth(true);
-        root.setCenter(scrollPane);
+            if (closeButton != null) {
+                closeButton.setOnAction(e -> stage.close());
+            }
+            if (addToCartButton != null) {
+                addToCartButton.setOnAction(e -> handleAddToCart());
+            }
 
-        HBox buttonBox = createButtonSection(stage);
-        root.setBottom(buttonBox);
-
-        populateProductData();
-
-        Scene scene = new Scene(root, 800, 700);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private VBox createHeaderSection() {
-        VBox headerBox = new VBox(10);
-        headerBox.setPadding(new Insets(0, 0, 20, 0));
-        headerBox.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 20px;");
-
-        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
-
-        HBox typeAndCategoryBox = new HBox(20);
-        categoryLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #666666;");
-        typeAndCategoryBox.getChildren().addAll(categoryLabel);
-
-        headerBox.getChildren().addAll(titleLabel, typeAndCategoryBox, new Separator());
-        return headerBox;
-    }
-
-    private VBox createContentSection() {
-        VBox contentBox = new VBox(20);
-        contentBox.setPadding(new Insets(20));
-
-        VBox commonSection = new VBox(10);
-
-        Label commonTitle = new Label("Common Specifications");
-        commonTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        GridPane commonGrid = createCommonInfoGrid();
-
-        commonSection.getChildren().addAll(commonTitle, new Separator(), commonGrid);
-
-        VBox specificSection = new VBox(10);
-
-        Label specificTitle = new Label("Specific Specifications");
-        specificTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        specificSection.getChildren().addAll(specificTitle, new Separator(), specificDetailsPanel);
-
-        contentBox.getChildren().addAll(commonSection, specificSection);
-        return contentBox;
-    }
-
-    private GridPane createCommonInfoGrid() {
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10));
-
-        int row = 0;
-
-        grid.add(createFieldLabel("Barcode:"), 0, row);
-        grid.add(barcodeLabel, 1, row++);
-
-        grid.add(createFieldLabel("Price:"), 0, row);
-        priceLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;");
-        grid.add(priceLabel, 1, row++);
-
-        grid.add(createFieldLabel("Stock:"), 0, row);
-        grid.add(stockLabel, 1, row++);
-
-        grid.add(createFieldLabel("Status:"), 0, row);
-        grid.add(statusLabel, 1, row++);
-
-        grid.add(createFieldLabel("Weight:"), 0, row);
-        grid.add(weightLabel, 1, row++);
-
-        grid.add(createFieldLabel("Dimensions:"), 0, row);
-        grid.add(dimensionsLabel, 1, row++);
-
-        grid.add(createFieldLabel("VAT Rate:"), 0, row);
-        grid.add(vatRateLabel, 1, row++);
-
-        grid.add(createFieldLabel("Description:"), 0, row);
-        descriptionLabel.setWrapText(true);
-        descriptionLabel.setMaxWidth(400);
-        grid.add(descriptionLabel, 1, row++);
-
-        return grid;
+            Scene scene = new Scene(root, 800, 700);
+            stage.setScene(scene);
+            stage.show();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            displayError("Failed to load product details UI.");
+        }
     }
 
     private Label createFieldLabel(String text) {
         Label label = new Label(text);
         label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
         return label;
-    }
-
-    private HBox createButtonSection(Stage stage) {
-        HBox buttonBox = new HBox(15);
-        buttonBox.setPadding(new Insets(20, 0, 0, 0));
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
-
-        Button closeButton = new Button("Close");
-        closeButton.setStyle("-fx-padding: 10 30; -fx-font-size: 14px;");
-        closeButton.setOnAction(e -> stage.close());
-
-        Button addToCartButton = new Button("Add to Cart");
-        addToCartButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; " +
-                "-fx-padding: 10 30; -fx-font-size: 14px;");
-        addToCartButton.setOnAction(e -> handleAddToCart());
-
-        buttonBox.getChildren().addAll(addToCartButton, closeButton);
-        return buttonBox;
     }
 
     private void populateProductData() {
@@ -220,7 +120,7 @@ public class ProductDetailUI extends BaseView {
         Double originalPrice = (Double) productData.get("originalPrice");
         String priceText = currentPrice != null ? String.format("%,.0f VND", currentPrice) : "N/A";
         if (originalPrice != null && !originalPrice.equals(currentPrice)) {
-            priceText += String.format(" (Original: %,.0f đ)", originalPrice);
+            priceText += String.format(" (Original: %,.0f VND)", originalPrice);
         }
         priceLabel.setText(priceText);
         Integer stock = (Integer) productData.get("stock");
