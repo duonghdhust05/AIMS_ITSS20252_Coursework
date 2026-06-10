@@ -17,7 +17,7 @@ import java.util.Locale;
 public class CartView {
 
     @SuppressWarnings("deprecation")
-	private static final Locale VN_LOCALE = new Locale("vi", "VN");
+    private static final Locale VN_LOCALE = new Locale("vi", "VN");
     private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance(VN_LOCALE);
 
     public CartView() {
@@ -46,29 +46,31 @@ public class CartView {
     }
 
     public void showEmptyCartMessage(VBox container) {
-        if (container == null) return;
-        
+        if (container == null)
+            return;
+
         container.getChildren().clear();
-        
+
         VBox emptyBox = new VBox(10);
         emptyBox.setAlignment(Pos.CENTER);
         emptyBox.setPadding(new Insets(50));
-        
+
         Label emptyLabel = new Label("Your cart is empty");
         emptyLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #666;");
-        
+
         Label subLabel = new Label("Add some products to get started!");
         subLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
-        
+
         emptyBox.getChildren().addAll(emptyLabel, subLabel);
         container.getChildren().add(emptyBox);
     }
 
     public HBox createCartItemBox(CartItem cartItem, Runnable onQuantityChange, Runnable onRemove) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/cart-item.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/cart-item.fxml"));
             HBox itemBox = loader.load();
-            com.aimsfx.controller.CartItemController controller = loader.getController();
+            com.aimsfx.controller.PlaceOrderController.CartItemController controller = loader.getController();
             controller.setItemData(cartItem, onQuantityChange, onRemove);
             return itemBox;
         } catch (java.io.IOException e) {
@@ -79,7 +81,7 @@ public class CartView {
     }
 
     public void updateTotalLabels(Label subtotalLabel, Label vatLabel, Label totalLabel,
-                                   double subtotal, double vat, double total) {
+            double subtotal, double vat, double total) {
         if (subtotalLabel != null) {
             subtotalLabel.setText(formatPrice(subtotal) + " VND");
         }
@@ -99,7 +101,7 @@ public class CartView {
 
     public String buildInsufficientStockMessage(java.util.List<java.util.Map<String, Object>> insufficientItems) {
         StringBuilder errorMsg = new StringBuilder();
-        errorMsg.append("⚠️ INSUFFICIENT STOCK\n\n");
+        errorMsg.append("INSUFFICIENT STOCK\n\n");
         errorMsg.append("Stock availability has been updated from database.\n");
         errorMsg.append("Some products do not have sufficient stock:\n\n");
 

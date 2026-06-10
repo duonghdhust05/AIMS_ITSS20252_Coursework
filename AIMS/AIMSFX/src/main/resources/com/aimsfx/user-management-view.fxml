@@ -12,67 +12,86 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720" prefWidth="1280"  xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.UserManagementView" style="-fx-background-color: #f5f5f5;">
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25"
+   xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="com.aimsfx.view.AdministratorView.UserManagementView"
+   style="-fx-background-color: #f5f5f5;">
 
-    <!-- Content -->
-    <center>
-        <VBox spacing="15"  stylesheets="@styles2.0.css" style="-fx-padding: 20;">
-            
-            <!-- Toolbar -->
-            <HBox alignment="CENTER_LEFT" spacing="15"  styleClass="aims-panel-card" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
-                <Button fx:id="addUserButton" onAction="#handleAddUser"  styleClass="btn-success" text="➕ Add New User"  style="-fx-background-color: #4CAF50; -fx-cursor: hand;"/>
-                <Button onAction="#handleRefresh"  styleClass="btn-primary" text="🔄 Refresh"  style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-cursor: hand;"/>
-                
-                <Region HBox.hgrow="ALWAYS" />
-                
-                <Label  text="Filter:" style="-fx-font-size: 14px;"/>
-                <ComboBox fx:id="filterComboBox" prefWidth="150"  styleClass="filter-tab-active"  style="-fx-background-color: f5f5f5;"/>
-                
-                <Label fx:id="userCountLabel"  text="0 users" style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-            </HBox>
-            
-            <!-- Users Table -->
-            <VBox spacing="10"  styleClass="aims-panel-card" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
-                <Label  styleClass="label-section-title" text="All Users"  style="-fx-font-size: 16px;"/>
-                
-                <TableView fx:id="userTableView" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="idColumn" prefWidth="60" text="ID" />
-                        <TableColumn fx:id="usernameColumn" prefWidth="120" text="Username" />
-                        <TableColumn fx:id="fullNameColumn" prefWidth="150" text="Full Name" />
-                        <TableColumn fx:id="rolesColumn" prefWidth="180" text="Roles" />
-                        <TableColumn fx:id="statusColumn" prefWidth="80" text="Status" />
-                        <TableColumn fx:id="createdAtColumn" prefWidth="140" text="Created At" />
-                        <TableColumn fx:id="actionsColumn" prefWidth="230" text="Actions" />
-                    </columns>
-                    <placeholder>
-                        <Label text="No users found" />
-                    </placeholder>
-                </TableView>
+   <!-- Content -->
+   <center>
+      <VBox spacing="15" stylesheets="@styles2.0.css" style="-fx-padding: 20;">
+
+         <!-- Toolbar -->
+         <HBox alignment="CENTER_LEFT" spacing="15" styleClass="aims-panel-card"
+            style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
+            <Button fx:id="addUserButton" onAction="#handleAddUser" styleClass="btn-success"
+               text="➕ Add New User" style="-fx-background-color: #4CAF50; -fx-cursor: hand;" />
+            <Button onAction="#handleRefresh" styleClass="btn-primary" text="🔄 Refresh"
+               style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-cursor: hand;" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Label text="Filter:" style="-fx-font-size: 14px;" />
+            <ComboBox fx:id="filterComboBox" prefWidth="150" styleClass="filter-tab-active"
+               style="-fx-background-color: f5f5f5;" />
+
+            <Label fx:id="userCountLabel" text="0 users"
+               style="-fx-font-size: 14px; -fx-text-fill: #666;" />
+         </HBox>
+
+         <!-- Users Table -->
+         <VBox spacing="10" styleClass="aims-panel-card" VBox.vgrow="ALWAYS"
+            style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
+            <Label styleClass="label-section-title" text="All Users" style="-fx-font-size: 16px;" />
+
+            <TableView fx:id="userTableView" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="idColumn" prefWidth="60" text="ID" />
+                  <TableColumn fx:id="usernameColumn" prefWidth="120" text="Username" />
+                  <TableColumn fx:id="fullNameColumn" prefWidth="150" text="Full Name" />
+                  <TableColumn fx:id="rolesColumn" prefWidth="180" text="Roles" />
+                  <TableColumn fx:id="statusColumn" prefWidth="80" text="Status" />
+                  <TableColumn fx:id="createdAtColumn" prefWidth="140" text="Created At" />
+                  <TableColumn fx:id="actionsColumn" prefWidth="230" text="Actions" />
+               </columns>
+               <placeholder>
+                  <Label text="No users found" />
+               </placeholder>
+            </TableView>
+         </VBox>
+
+         <!-- Info Panel -->
+         <HBox spacing="20"
+            style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
+            <VBox spacing="5">
+               <Label styleClass="label-section-title" text="Role Information:"
+                  style="-fx-font-weight: bold;" />
+               <Label styleClass="label-subtitle"
+                  text="• ADMINISTRATOR: Can manage users (create, edit, delete, block/unblock, reset passwords)"
+                  style="-fx-text-fill: #666;" />
+               <Label styleClass="label-subtitle"
+                  text="• PRODUCT_MANAGER: Can manage products (add, update, delete products)"
+                  style="-fx-text-fill: #666;" />
             </VBox>
-            
-            <!-- Info Panel -->
-            <HBox spacing="20" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 5;">
-                <VBox spacing="5">
-                    <Label  styleClass="label-section-title" text="Role Information:"  style="-fx-font-weight: bold;"/>
-                    <Label  styleClass="label-subtitle" text="• ADMINISTRATOR: Can manage users (create, edit, delete, block/unblock, reset passwords)"  style="-fx-text-fill: #666;"/>
-                    <Label  styleClass="label-subtitle" text="• PRODUCT_MANAGER: Can manage products (add, update, delete products)"  style="-fx-text-fill: #666;"/>
-                </VBox>
-            </HBox>
-            
-        </VBox>
-    </center>
+         </HBox>
 
-    <!-- Footer -->
-    <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="10"  stylesheets="@styles2.0.css" style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
-            <Button onAction="#handleClose"  styleClass="btn-secondary" text="Close"  style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 30; -fx-cursor: hand;"/>
-        </HBox>
-    </bottom>
+      </VBox>
+   </center>
+
+   <!-- Footer -->
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" spacing="10" stylesheets="@styles2.0.css"
+         style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+         <Button onAction="#handleClose" styleClass="btn-secondary" text="Close"
+            style="-fx-background-color: #9E9E9E; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 30; -fx-cursor: hand;" />
+      </HBox>
+   </bottom>
    <top>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1280.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+         minWidth="-Infinity" prefWidth="1280.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1280.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1280.0" spacing="30"
+               style="-fx-background-color: white; -fx-padding: 29 40;">
                <children>
                   <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
                      <children>
@@ -95,7 +114,8 @@
                         </Label>
                      </children>
                   </HBox>
-                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0"
+                     HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>

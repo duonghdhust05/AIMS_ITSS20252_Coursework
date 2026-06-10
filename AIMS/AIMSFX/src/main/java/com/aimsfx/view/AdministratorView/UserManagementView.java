@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.AdministratorView;
 
 import com.aimsfx.controller.UserController;
 import com.aimsfx.exception.*;
@@ -41,41 +41,52 @@ import java.util.stream.Collectors;
  * - No business rules (handled by Service)
  */
 public class UserManagementView implements Initializable {
-    
-    @FXML private TableView<User> userTableView;
-    @FXML private TableColumn<User, Long> idColumn;
-    @FXML private TableColumn<User, String> usernameColumn;
-    @FXML private TableColumn<User, String> fullNameColumn;
-    @FXML private TableColumn<User, String> rolesColumn;
-    @FXML private TableColumn<User, String> statusColumn;
-    @FXML private TableColumn<User, String> createdAtColumn;
-    @FXML private TableColumn<User, Void> actionsColumn;
-    @FXML private Button addUserButton;
-    @FXML private Label userCountLabel;
-    @FXML private ComboBox<String> filterComboBox;
-    
+
+    @FXML
+    private TableView<User> userTableView;
+    @FXML
+    private TableColumn<User, Long> idColumn;
+    @FXML
+    private TableColumn<User, String> usernameColumn;
+    @FXML
+    private TableColumn<User, String> fullNameColumn;
+    @FXML
+    private TableColumn<User, String> rolesColumn;
+    @FXML
+    private TableColumn<User, String> statusColumn;
+    @FXML
+    private TableColumn<User, String> createdAtColumn;
+    @FXML
+    private TableColumn<User, Void> actionsColumn;
+    @FXML
+    private Button addUserButton;
+    @FXML
+    private Label userCountLabel;
+    @FXML
+    private ComboBox<String> filterComboBox;
+
     private UserController userController;
     private SessionManager sessionManager;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userController = UserController.getInstance();
         sessionManager = SessionManager.getInstance();
-        
+
         setupTableColumns();
         setupActionsColumn();
         setupFilterComboBox();
         loadUsers();
     }
-    
+
     // ==================== TABLE SETUP (UI) ====================
-    
+
     private void setupTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        
+
         rolesColumn.setCellValueFactory(cellData -> {
             User user = cellData.getValue();
             String roles = user.getRoles().stream()
@@ -83,10 +94,10 @@ public class UserManagementView implements Initializable {
                     .collect(Collectors.joining(", "));
             return new SimpleStringProperty(roles);
         });
-        
-        statusColumn.setCellValueFactory(cellData -> 
-            new SimpleStringProperty(cellData.getValue().getStatus().toString()));
-        
+
+        statusColumn
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus().toString()));
+
         statusColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -96,36 +107,38 @@ public class UserManagementView implements Initializable {
                     setStyle("");
                 } else {
                     setText(item);
-                    setStyle("ACTIVE".equals(item) 
-                        ? "-fx-text-fill: #4CAF50; -fx-font-weight: bold;"
-                        : "-fx-text-fill: #f44336; -fx-font-weight: bold;");
+                    setStyle("ACTIVE".equals(item)
+                            ? "-fx-text-fill: #4CAF50; -fx-font-weight: bold;"
+                            : "-fx-text-fill: #f44336; -fx-font-weight: bold;");
                 }
             }
         });
-        
+
         createdAtColumn.setCellValueFactory(cellData -> {
             User user = cellData.getValue();
-            String dateStr = user.getCreatedAt() != null 
-                    ? user.getCreatedAt().format(DATE_FORMATTER) : "";
+            String dateStr = user.getCreatedAt() != null
+                    ? user.getCreatedAt().format(DATE_FORMATTER)
+                    : "";
             return new SimpleStringProperty(dateStr);
         });
     }
-    
+
     private void setupActionsColumn() {
         actionsColumn.setCellFactory(param -> new ActionButtonCell());
     }
-    
+
     private void setupFilterComboBox() {
         if (filterComboBox != null) {
             filterComboBox.getItems().addAll(
-                "All Users", "Active", "Blocked", "Administrators", "Product Managers");
+                    "All Users", "Active", "Blocked", "Administrators", "Product Managers");
             filterComboBox.setValue("All Users");
             filterComboBox.setOnAction(e -> applyFilter());
         }
     }
-    
-    // ==================== DATA LOADING (delegates to Controller) ====================
-    
+
+    // ==================== DATA LOADING (delegates to Controller)
+    // ====================
+
     private void loadUsers() {
         try {
             ObservableList<User> users = userController.getAllUsers();
@@ -135,20 +148,19 @@ public class UserManagementView implements Initializable {
             showErrorAlert("Access Denied", e.getMessage());
         }
     }
-    
+
     private void applyFilter() {
         String filter = filterComboBox.getValue();
         try {
             ObservableList<User> allUsers = userController.getAllUsers();
-            ObservableList<User> filteredUsers = allUsers.filtered(user -> 
-                matchesFilter(user, filter));
+            ObservableList<User> filteredUsers = allUsers.filtered(user -> matchesFilter(user, filter));
             userTableView.setItems(filteredUsers);
             updateUserCount();
         } catch (UnauthorizedAccessException e) {
             showErrorAlert("Access Denied", e.getMessage());
         }
     }
-    
+
     private boolean matchesFilter(User user, String filter) {
         return switch (filter) {
             case "Active" -> user.isActive();
@@ -158,65 +170,65 @@ public class UserManagementView implements Initializable {
             default -> true;
         };
     }
-    
+
     private void updateUserCount() {
         if (userCountLabel != null) {
             int count = userTableView.getItems().size();
             userCountLabel.setText(count + " user" + (count != 1 ? "s" : ""));
         }
     }
-    
+
     // ==================== EVENT HANDLERS (UI) ====================
-    
+
     @FXML
     private void handleAddUser() {
         openUserFormDialog(null);
     }
-    
+
     @FXML
     private void handleRefresh() {
         loadUsers();
         applyFilter();
     }
-    
+
     @FXML
     private void handleClose() {
         ((Stage) userTableView.getScene().getWindow()).close();
     }
-    
+
     // ==================== DIALOG NAVIGATION (UI) ====================
-    
+
     private void openUserFormDialog(User user) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/aimsfx/user-form-view.fxml"));
+                    getClass().getResource("/com/aimsfx/user-form-view.fxml"));
             Parent root = loader.load();
-            
+
             UserFormView controller = loader.getController();
             controller.setUser(user);
-            
+
             Stage dialogStage = new Stage();
             dialogStage.setTitle(user == null ? "Add New User" : "Edit User");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(userTableView.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
             dialogStage.setResizable(false);
-            
+
             controller.setDialogStage(dialogStage);
             controller.setOnSaveSuccess(this::refreshAfterChange);
-            
+
             dialogStage.showAndWait();
         } catch (IOException e) {
             showErrorAlert("Error", "Failed to open user form: " + e.getMessage());
         }
     }
-    
+
     private void openResetPasswordDialog(User user) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Reset Password");
         dialog.setHeaderText("Reset password for: " + user.getUsername());
         dialog.setContentText("New Password:");
-        
+
         dialog.showAndWait().ifPresent(newPassword -> {
             try {
                 boolean success = userController.resetPassword(user.getUserId(), newPassword);
@@ -234,22 +246,22 @@ public class UserManagementView implements Initializable {
             }
         });
     }
-    
+
     private void confirmAndToggleBlock(User user) {
         String action = user.isBlocked() ? "unblock" : "block";
-        
+
         if (!showConfirmDialog(
                 "Confirm " + (user.isBlocked() ? "Unblock" : "Block"),
                 "Are you sure you want to " + action + " this user?",
                 "User: " + user.getUsername() + " (" + user.getFullName() + ")")) {
             return;
         }
-        
+
         try {
-            boolean success = user.isBlocked() 
-                ? userController.unblockUser(user.getUserId())
-                : userController.blockUser(user.getUserId());
-            
+            boolean success = user.isBlocked()
+                    ? userController.unblockUser(user.getUserId())
+                    : userController.blockUser(user.getUserId());
+
             if (success) {
                 showSuccessAlert("Success", "User " + action + "ed successfully!");
                 refreshAfterChange();
@@ -264,7 +276,7 @@ public class UserManagementView implements Initializable {
             showErrorAlert("Error", e.getMessage());
         }
     }
-    
+
     private void confirmAndDeleteUser(User user) {
         if (!showConfirmDialog(
                 "Confirm Delete",
@@ -272,7 +284,7 @@ public class UserManagementView implements Initializable {
                 "User: " + user.getUsername() + " (" + user.getFullName() + ")\n\nThis action cannot be undone!")) {
             return;
         }
-        
+
         try {
             boolean success = userController.deleteUser(user.getUserId());
             if (success) {
@@ -289,14 +301,14 @@ public class UserManagementView implements Initializable {
             showErrorAlert("Error", e.getMessage());
         }
     }
-    
+
     private void refreshAfterChange() {
         loadUsers();
         applyFilter();
     }
-    
+
     // ==================== ALERT HELPERS (UI) ====================
-    
+
     private void showSuccessAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -304,7 +316,7 @@ public class UserManagementView implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -312,7 +324,7 @@ public class UserManagementView implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private boolean showConfirmDialog(String title, String header, String content) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle(title);
@@ -321,40 +333,40 @@ public class UserManagementView implements Initializable {
         Optional<ButtonType> result = confirm.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
     }
-    
+
     // ==================== INNER CLASS: Action Button Cell ====================
-    
+
     private class ActionButtonCell extends TableCell<User, Void> {
         private final Button editBtn = new Button("Edit");
         private final Button resetPwdBtn = new Button("Reset Pwd");
         private final Button blockBtn = new Button("Block");
         private final Button deleteBtn = new Button("Delete");
         private final HBox buttonBox = new HBox(5);
-        
+
         ActionButtonCell() {
             styleButtons();
             setupButtonActions();
             buttonBox.getChildren().addAll(editBtn, resetPwdBtn, blockBtn, deleteBtn);
         }
-        
+
         private void styleButtons() {
             editBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 11;");
             resetPwdBtn.setStyle("-fx-background-color: #ff9800; -fx-text-fill: white; -fx-font-size: 11;");
             blockBtn.setStyle("-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-size: 11;");
             deleteBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 11;");
         }
-        
+
         private void setupButtonActions() {
             editBtn.setOnAction(e -> openUserFormDialog(getCurrentUser()));
             resetPwdBtn.setOnAction(e -> openResetPasswordDialog(getCurrentUser()));
             blockBtn.setOnAction(e -> confirmAndToggleBlock(getCurrentUser()));
             deleteBtn.setOnAction(e -> confirmAndDeleteUser(getCurrentUser()));
         }
-        
+
         private User getCurrentUser() {
             return getTableView().getItems().get(getIndex());
         }
-        
+
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
@@ -367,7 +379,7 @@ public class UserManagementView implements Initializable {
                 setGraphic(buttonBox);
             }
         }
-        
+
         private void updateBlockButton(User user) {
             if (user.isBlocked()) {
                 blockBtn.setText("Unblock");
@@ -377,10 +389,10 @@ public class UserManagementView implements Initializable {
                 blockBtn.setStyle("-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-size: 11;");
             }
         }
-        
+
         private void updateButtonStates(User user) {
             boolean isCurrentUser = user.getUserId().equals(
-                sessionManager.getCurrentUser().getUserId());
+                    sessionManager.getCurrentUser().getUserId());
             blockBtn.setDisable(isCurrentUser);
             deleteBtn.setDisable(isCurrentUser);
         }

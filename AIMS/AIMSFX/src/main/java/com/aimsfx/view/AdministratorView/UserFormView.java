@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.AdministratorView;
 
 import com.aimsfx.controller.UserController;
 import com.aimsfx.exception.*;

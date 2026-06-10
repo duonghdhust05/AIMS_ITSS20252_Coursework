@@ -7,7 +7,6 @@ import com.aimsfx.model.UserMenuAction;
 import com.aimsfx.view.ProductView.ProductCardComponent;
 import com.aimsfx.view.ProductView.ProductDetailUI;
 import com.aimsfx.view.ProductView.ProductListView;
-import com.aimsfx.view.UserView.LoginView;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -394,7 +393,7 @@ public class HomepageView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/change-password-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.view.UserView.ChangePasswordView controller = loader.getController();
+            com.aimsfx.view.AdministratorView.ChangePasswordView controller = loader.getController();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Change Password");

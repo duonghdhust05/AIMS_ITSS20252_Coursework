@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.PlaceOrderController;
 
 import com.aimsfx.model.CartItem;
 import com.aimsfx.model.Product;
@@ -71,7 +71,8 @@ public class CartItemController {
     private void handleMinus() {
         if (cartItem.getQuantity() > 1) {
             cartItem.setQuantity(cartItem.getQuantity() - 1);
-            if (onQuantityChange != null) onQuantityChange.run();
+            if (onQuantityChange != null)
+                onQuantityChange.run();
         }
     }
 
@@ -80,7 +81,8 @@ public class CartItemController {
         Product product = cartItem.getProduct();
         if (cartItem.getQuantity() < product.getStock()) {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
-            if (onQuantityChange != null) onQuantityChange.run();
+            if (onQuantityChange != null)
+                onQuantityChange.run();
         } else {
             showAlert("Out of Stock", "Maximum available quantity: " + product.getStock());
         }
@@ -88,7 +90,8 @@ public class CartItemController {
 
     @FXML
     private void handleRemove() {
-        if (onRemove != null) onRemove.run();
+        if (onRemove != null)
+            onRemove.run();
     }
 
     private String formatPrice(double price) {

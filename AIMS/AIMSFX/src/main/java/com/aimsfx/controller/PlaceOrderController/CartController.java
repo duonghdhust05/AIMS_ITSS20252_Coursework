@@ -1,6 +1,5 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.PlaceOrderController;
 
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderController;
 import com.aimsfx.model.*;
 import com.aimsfx.service.ICartService;
 import com.aimsfx.service.CartService;
@@ -38,7 +37,7 @@ public class CartController implements Initializable {
 
     @FXML
     private Label totalLabel;
-    
+
     @FXML
     private Label cartCountLabel;
 
@@ -56,11 +55,11 @@ public class CartController implements Initializable {
     public void setCartManager(ICartManager cartManager) {
         this.cartManager = cartManager;
     }
-    
+
     public void setCartService(ICartService cartService) {
         this.cartService = cartService;
     }
-    
+
     public void setCartView(CartView cartView) {
         this.cartView = cartView;
     }
@@ -79,29 +78,28 @@ public class CartController implements Initializable {
             cartView.updateCartCountLabel(cartCountLabel, 0);
             return;
         }
-        
+
         int updatedCount = cartManager.refreshCartProducts();
         if (updatedCount > 0) {
             System.out.println("✅ Cart synced with database: " + updatedCount + " item(s) updated");
         }
-        
+
         cartView.updateCartCountLabel(cartCountLabel, currentCart.getItems().size());
 
         cartItemsContainer.getChildren().clear();
 
         for (CartItem cartItem : currentCart.getItems()) {
             HBox itemBox = cartView.createCartItemBox(
-                cartItem,
-                () -> {
-                    CartEvents.notifyCartUpdated();
-                    loadCartData();
-                },
-                () -> {
-                    cartManager.removeProduct(cartItem.getProductId());
-                    CartEvents.notifyCartUpdated();
-                    loadCartData();
-                }
-            );
+                    cartItem,
+                    () -> {
+                        CartEvents.notifyCartUpdated();
+                        loadCartData();
+                    },
+                    () -> {
+                        cartManager.removeProduct(cartItem.getProductId());
+                        CartEvents.notifyCartUpdated();
+                        loadCartData();
+                    });
             cartItemsContainer.getChildren().add(itemBox);
         }
 
