@@ -45,6 +45,26 @@ public class HelloApplication extends Application {
         System.out.println("\n" + DatabaseManager.getStatus());
     }
 
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Closing application, shutting down Spring Boot and connection pools...");
+        
+        // 1. Close Spring Boot context to terminate Tomcat server and its non-daemon threads
+        if (MainLauncher.getSpringContext() != null) {
+            try {
+                MainLauncher.getSpringContext().close();
+                System.out.println("Spring Boot context closed successfully.");
+            } catch (Exception e) {
+                System.err.println("Error closing Spring Boot context: " + e.getMessage());
+            }
+        }
+        
+        super.stop();
+        
+        // 2. Shut down JVM which automatically triggers DatabaseManager shutdown hook
+        System.exit(0);
+    }
+
     public static void main(String[] args) {
         launch();
     }
