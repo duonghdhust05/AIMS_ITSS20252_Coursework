@@ -80,4 +80,18 @@ public interface ProductRepository {
     List<StockChangeLog> getStockChangeHistory(String barcode);
 
     Map<String, Object> getProductDetails(Long productId);
+
+    /**
+     * Search products by title, category, or barcode with a limit.
+     * Used for autocomplete suggestions and filtered search.
+     * 
+     * CHANGELOG: Added minPrice and maxPrice parameters for DB-level price filtering.
+     */
+    List<Product> searchProducts(String query, Double minPrice, Double maxPrice, int limit);
+
+    /**
+     * Get a random list of products with a limit.
+     * Used for Homepage display to avoid loading all products into memory.
+     */
+    List<Product> getRandomProducts(int limit);
 }

@@ -400,6 +400,26 @@ public class ProductController implements IProductDataProvider {
         return productService.getSupportedTypes();
     }
 
+    /**
+     * Search products by title, category, or barcode with a limit.
+     * Used for autocomplete suggestions and filtered search.
+     * 
+     * CHANGELOG: Added minPrice and maxPrice parameters for DB-level price filtering.
+     */
+    public ObservableList<Product> searchProducts(String query, Double minPrice, Double maxPrice, int limit) {
+        return FXCollections.observableArrayList(productService.searchProducts(query, minPrice, maxPrice, limit));
+    }
+
+    /**
+     * Get a random list of products with a limit.
+     * Used for Homepage display to avoid loading all products into memory.
+     * 
+     * CHANGELOG: Added for memory-optimization in main homepage display.
+     */
+    public ObservableList<Product> getRandomProducts(int limit) {
+        return FXCollections.observableArrayList(productService.getRandomProducts(limit));
+    }
+
     public String[] getAttributeLabels(String type) throws UnsupportedProductTypeException {
         return productService.getAttributeLabels(type);
     }

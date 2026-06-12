@@ -848,4 +848,96 @@ public class DatabaseProductRepository implements ProductRepository {
 
         return logs;
     }
+
+    /**
+     * Search products by title, category, or barcode with a limit.
+     * Used for autocomplete suggestions and filtered search.
+     * 
+     * CHANGELOG: Added minPrice and maxPrice parameters for DB-level price filtering.
+     */
+    @Override
+    public List<Product> searchProducts(String query, Double minPrice, Double maxPrice, int limit) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE is_current = true");
+        
+        // Add query condition if present
+        boolean hasQuery = query != null && !query.trim().isEmpty();
+        if (hasQuery) {
+            sql.append(" AND (LOWER(title) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?) OR LOWER(barcode) LIKE LOWER(?))");
+        }
+        
+        // Add price conditions if present
+        if (minPrice != null) {
+            sql.append(" AND current_price >= ?");
+        }
+        if (maxPrice != null) {
+            sql.append(" AND current_price < ?");
+        }
+        
+        sql.append(" LIMIT ?");
+        
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+            
+            if (hasQuery) {
+                String searchPattern = "%" + query.trim() + "%";
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+            }
+            
+            if (minPrice != null) {
+                stmt.setDouble(paramIndex++, minPrice);
+            }
+            if (maxPrice != null) {
+                stmt.setDouble(paramIndex++, maxPrice);
+            }
+            
+            stmt.setInt(paramIndex, limit);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = createProductFromResultSet(rs);
+                products.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to search products with filters: " + e.getMessage());
+        }
+
+        return products;
+    }
+
+    /**
+     * Get a random list of products with a limit.
+     * Used for Homepage display to avoid loading all products into memory.
+     * 
+     * CHANGELOG: Added for memory-optimization in main homepage display.
+     */
+    @Override
+    public List<Product> getRandomProducts(int limit) {
+        String sql = "SELECT * FROM products WHERE is_current = true ORDER BY RANDOM() LIMIT ?";
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = createProductFromResultSet(rs);
+                products.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to fetch random products: " + e.getMessage());
+        }
+
+        return products;
+    }
 }
