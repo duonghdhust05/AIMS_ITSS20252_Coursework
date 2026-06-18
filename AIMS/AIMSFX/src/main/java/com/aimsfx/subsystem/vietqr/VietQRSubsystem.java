@@ -1,10 +1,13 @@
 package com.aimsfx.subsystem.vietqr;
 
 import com.aimsfx.exception.*;
+import com.aimsfx.subsystem.vietqr.exception.VietQRApiException;
+import com.aimsfx.subsystem.vietqr.exception.VietQRAuthException;
+import com.aimsfx.subsystem.vietqr.exception.VietQRNetworkException;
 import com.aimsfx.subsystem.vietqr.model.VietQRRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * VietQRSubsystem Class
@@ -26,7 +29,7 @@ public class VietQRSubsystem implements IPaymentQRCode {
 
     private final VietQRInteraction interaction;
     private final VietQRConfig config;
-    private final Gson gson;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private String cachedToken;
     private long tokenExpiryTime = 0;
@@ -34,7 +37,6 @@ public class VietQRSubsystem implements IPaymentQRCode {
     public VietQRSubsystem(VietQRInteraction interaction, VietQRConfig config) {
         this.interaction = interaction;
         this.config = config;
-        this.gson = new Gson();
     }
 
     private String getAccessToken() throws PaymentException {
@@ -56,8 +58,14 @@ public class VietQRSubsystem implements IPaymentQRCode {
 
         } catch (PaymentException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (VietQRNetworkException e) {
+            throw new PaymentTimeoutException("E222", "VIETQR", e);
+        } catch (VietQRAuthException e) {
             throw new PaymentAuthenticationException("E74", "VIETQR", e);
+        } catch (VietQRApiException e) {
+            throw new PaymentProcessingException("E05", "VIETQR", e);
+        } catch (Exception e) {
+            throw new PaymentProcessingException("UNKNOWN_ERROR", "VIETQR", e);
         }
     }
 
@@ -83,17 +91,21 @@ public class VietQRSubsystem implements IPaymentQRCode {
                 throw mapToSemanticException(qrResponse.code(), qrResponse.desc(), null);
             }
 
-            JsonObject jsonResponse = gson.toJsonTree(qrResponse).getAsJsonObject();
-            jsonResponse.addProperty("bankCode", config.getBankCode());
-            jsonResponse.addProperty("bankAccount", config.getBankAccount());
-            jsonResponse.addProperty("accountName", config.getAccountName());
-            jsonResponse.addProperty("amount", String.valueOf(amount));
-            jsonResponse.addProperty("content", content);
+            ObjectNode jsonResponse = objectMapper.valueToTree(qrResponse);
+            jsonResponse.put("bankCode", config.getBankCode());
+            jsonResponse.put("bankAccount", config.getBankAccount());
+            jsonResponse.put("accountName", config.getAccountName());
+            jsonResponse.put("amount", String.valueOf(amount));
+            jsonResponse.put("content", content);
 
-            return gson.toJson(jsonResponse);
+            return objectMapper.writeValueAsString(jsonResponse);
 
         } catch (PaymentException e) {
             throw e;
+        } catch (VietQRNetworkException e) {
+            throw new PaymentTimeoutException("E222", "VIETQR", e);
+        } catch (VietQRApiException e) {
+            throw new PaymentProcessingException("QR_GENERATION_FAILED", "VIETQR", e);
         } catch (Exception e) {
             throw new PaymentProcessingException("QR_GENERATION_FAILED", "VIETQR", e);
         }
@@ -110,13 +122,11 @@ public class VietQRSubsystem implements IPaymentQRCode {
                     token);
         } catch (PaymentException e) {
             throw e;
+        } catch (VietQRNetworkException e) {
+            throw new PaymentTimeoutException(
+                    "Payment callback server is offline or unreachable. Please check your connection.",
+                    "E222", "VIETQR");
         } catch (Exception e) {
-            String rawError = e.getMessage();
-            if (rawError != null && (rawError.contains("ngrok") || rawError.contains("offline"))) {
-                throw new PaymentTimeoutException(
-                        "Payment callback server is offline. Please start ngrok and try again.",
-                        "E222", "VIETQR");
-            }
             throw new PaymentProcessingException("SIMULATION_FAILED", "VIETQR", e);
         }
     }
