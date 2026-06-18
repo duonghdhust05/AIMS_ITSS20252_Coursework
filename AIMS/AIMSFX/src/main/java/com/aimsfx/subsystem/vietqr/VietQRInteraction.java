@@ -13,7 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 
-public class VietQRInteraction {
+public class VietQRInteraction {// khởi tạo và cấu hình
 
     private final VietQRConfig config;
     private final HttpClient httpClient;
@@ -27,7 +27,7 @@ public class VietQRInteraction {
         this.objectMapper = new ObjectMapper();
     }
 
-    public VietQRResponse postTokenRequest() throws VietQRApiException {
+    public VietQRResponse postTokenRequest() throws VietQRApiException {// lấy token xác thực
         String username = config.getClientUsername();
         String password = config.getClientPassword();
 
@@ -64,7 +64,8 @@ public class VietQRInteraction {
 
             if ("FAILED".equalsIgnoreCase(vietQRResponse.status())) {
                 throw new VietQRAuthException(
-                        "E74: " + (vietQRResponse.message() != null ? vietQRResponse.message() : "Authentication failed"));
+                        "E74: " + (vietQRResponse.message() != null ? vietQRResponse.message()
+                                : "Authentication failed"));
             }
 
             return vietQRResponse;
@@ -75,7 +76,8 @@ public class VietQRInteraction {
         }
     }
 
-    public VietQRResponse postQrRequest(VietQRRequest request, String accessToken) throws VietQRApiException {
+    public VietQRResponse postQrRequest(VietQRRequest request, String accessToken) throws VietQRApiException {// tạo mã
+                                                                                                              // QR code
         try {
             String jsonBody = objectMapper.writeValueAsString(request);
 
