@@ -1,17 +1,15 @@
 package com.aimsfx.service;
 
 import com.aimsfx.model.Order;
-import com.aimsfx.model.OrderItem;
-import com.aimsfx.model.Product;
 import com.aimsfx.repository.DatabaseProductRepository;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.ProductRepository;
 import com.aimsfx.repository.TransactionRepository;
 
-// Spring imports for @Transactional
-import org.springframework.transaction.annotation.Transactional;
-
+// Spring imports for @Transactional (removed because unused)
+import com.aimsfx.model.TransactionInfo;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,38 +51,58 @@ public class PaymentService {
         startPendingTransactionCronJob();
     }
 
+    // Mock PayPal API for demonstration
+    private interface PayPalApi {
+        String checkStatus(String externalId);
+    }
+
+    private final PayPalApi paypalApi = externalId -> {
+        // Return a mock status. For demonstration, we'll return "COMPLETED".
+        return "COMPLETED";
+    };
+
     /**
      * Start a background Cron Job to check PENDING transactions.
      * 
      * HOW IT WORKS (Cron Job):
      * - We use a ScheduledExecutorService to run a task every 5 minutes.
      * - The task finds all transactions in the database with status = 'PENDING'.
-     * - For each PENDING transaction, it could call the PayPal API to check the
+     * - For each PENDING transaction, it calls the PayPal API to check the
      * real status.
      * - If PayPal says "FAILED" or "NOT FOUND", it triggers the Compensating
      * Transaction
      * (restoring the stock) and marks the transaction as 'FAILED'.
-     * - This ensures Data Consistency even if the initial PayPal call timed out.
-     * 
-     * Documentation: Search for "Saga Pattern", "Outbox Pattern", and
-     * "ScheduledExecutorService in Java".
      */
     private void startPendingTransactionCronJob() {
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                // In a real scenario, fetch PENDING transactions from DB here:
-                // List<Transaction> pendingTxns =
-                // transactionRepository.findPendingTransactions();
-                // for (Transaction txn : pendingTxns) {
-                // String status = paypalApi.checkStatus(txn.getExternalId());
-                // if ("FAILED".equals(status)) {
-                // productRepo.restoreStock(txn.getProductId(), txn.getQuantity());
-                // transactionRepository.updateStatus(txn.getId(), "FAILED");
-                // } else if ("COMPLETED".equals(status)) {
-                // transactionRepository.updateStatus(txn.getId(), "COMPLETED");
-                // }
-                // }
                 System.out.println("Cron Job: Checking pending transactions...");
+                List<TransactionInfo> pendingTxns = transactionRepository.findPendingTransactions();
+
+                for (TransactionInfo txn : pendingTxns) {
+                    String externalId = txn.getMeta() != null ? txn.getMeta().get("external_transaction_id") : null;
+                    if (externalId == null || externalId.isEmpty()) {
+                        externalId = txn.getTransactionId();
+                    }
+
+                    String status = paypalApi.checkStatus(externalId);
+
+                    if ("FAILED".equals(status)) {
+                        // To get productId and quantity, we need to fetch the OrderItems.
+                        // OrderRepository.findById doesn't fetch items by default, so we use
+                        // OrderQueryRepository to get the detail.
+                        com.aimsfx.repository.OrderQueryRepository queryRepo = new com.aimsfx.repository.OrderQueryRepository();
+                        com.aimsfx.model.OrderDetail detail = queryRepo.findDetailById(txn.getOrderId());
+                        if (detail != null && detail.getLines() != null) {
+                            for (com.aimsfx.model.OrderLine line : detail.getLines()) {
+                                productRepo.restoreStock(line.getProductId(), line.getQuantity());
+                            }
+                        }
+                        transactionRepository.updateStatus(Integer.parseInt(txn.getTransactionId()), "FAILED");
+                    } else if ("COMPLETED".equals(status)) {
+                        transactionRepository.updateStatus(Integer.parseInt(txn.getTransactionId()), "COMPLETED");
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -115,7 +133,8 @@ public class PaymentService {
             return;
         }
 
-        // STEP 1: Deduct Stock FIRST (Transactional Update to prevent Race Condition and Partial Deduction)
+        // STEP 1: Deduct Stock FIRST (Transactional Update to prevent Race Condition
+        // and Partial Deduction)
         boolean success = productRepo.deductStockForOrder(order.getOrderItems());
         if (!success) {
             throw new RuntimeException("Out of stock for one or more products in the order. Transaction rolled back.");

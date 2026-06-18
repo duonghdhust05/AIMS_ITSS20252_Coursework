@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController;
+package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
 
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
@@ -97,7 +97,9 @@ public class InvoiceDialogController {
                 statusLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #e74c3c; -fx-font-weight: bold;");
             }
 
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                    
+                    .ofPattern("dd/MM/yyyy HH:mm:ss");
             timeLabel.setText(txn.getCreatedAt().format(formatter));
         } else {
             transactionContainer.setVisible(false);

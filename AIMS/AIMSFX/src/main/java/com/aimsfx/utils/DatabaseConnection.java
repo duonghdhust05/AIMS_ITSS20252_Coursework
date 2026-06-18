@@ -65,13 +65,13 @@ public class DatabaseConnection {
     }
 
     /**
-     * Khởi tạo HikariCP connection pool
+     * Initialize HikariCP connection pool
      */
     private void initializeConnectionPool() {
         try {
             HikariConfig config = new HikariConfig();
 
-            // Cấu hình database
+            // Configure database
             config.setJdbcUrl(url);
             config.setUsername(username);
             config.setPassword(password);
@@ -79,7 +79,7 @@ public class DatabaseConnection {
             config.addDataSourceProperty("prepareThreshold", "0");
             config.addDataSourceProperty("preparedStatementCacheQueries", "0");
 
-            // Cấu hình connection pool
+            // Configure connection pool
             config.setMaximumPoolSize(maxConnections);
             config.setMinimumIdle(minConnections);
             config.setConnectionTimeout(connectionTimeout);
@@ -87,7 +87,7 @@ public class DatabaseConnection {
             config.setMaxLifetime(1800000); // 30 phút
             config.setLeakDetectionThreshold(60000); // 1 phút
 
-            // Cấu hình connection validation
+            // Configure connection validation
             config.setConnectionTestQuery("SELECT 1");
             config.setValidationTimeout(5000);
 
@@ -105,7 +105,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Lấy instance của DatabaseConnection (Singleton)
+     * Get instance of DatabaseConnection (Singleton)
      */
     public static DatabaseConnection getInstance() {
         if (instance == null) {
@@ -119,7 +119,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Lấy kết nối từ connection pool
+     * Get connection from connection pool
      */
     public Connection getConnection() throws SQLException {
         if (dataSource == null) {
@@ -129,7 +129,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Test kết nối database
+     * Test database connection
      */
     public boolean testConnection() {
         try (Connection testConn = getConnection()) {
@@ -151,7 +151,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Lấy thông tin về connection pool
+     * Get connection pool info
      */
     public String getPoolInfo() {
         if (dataSource == null) {
@@ -167,7 +167,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Lấy thông tin cấu hình database
+     * Get database config info
      */
     public String getDatabaseInfo() {
         return "Database URL: " + url + "\n" +

@@ -882,7 +882,7 @@ public class DatabaseProductRepository implements ProductRepository {
 
             int paramIndex = 1;
             
-            if (hasQuery) {
+            if (hasQuery && query != null) {
                 String searchPattern = "%" + query.trim() + "%";
                 stmt.setString(paramIndex++, searchPattern);
                 stmt.setString(paramIndex++, searchPattern);

@@ -1,21 +1,17 @@
 package com.aimsfx.controller.PlaceOrderController;
 
+import com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.InvoiceDialogController;
 import com.aimsfx.model.CartManager;
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
-import com.aimsfx.model.OrderItem;
 import com.aimsfx.model.TransactionInfo;
 import com.aimsfx.utils.UIUtils;
 
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 public class OrderSuccessController {
@@ -117,7 +113,8 @@ public class OrderSuccessController {
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
 
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
             InvoiceDialogController controller = loader.getController();
             controller.setInvoiceData(order, invoice, txn);

@@ -473,4 +473,57 @@ public class TransactionRepository {
         }
         return null;
     }
+
+    /**
+     * Find all transactions with status 'PENDING'
+     */
+    public java.util.List<com.aimsfx.model.TransactionInfo> findPendingTransactions() {
+        java.util.List<com.aimsfx.model.TransactionInfo> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM transactions WHERE status = 'PENDING'";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                com.aimsfx.model.TransactionInfo info = new com.aimsfx.model.TransactionInfo();
+                info.setTransactionId(String.valueOf(rs.getInt("transaction_id")));
+                info.setOrderId(rs.getInt("order_id"));
+                info.setAmount(new java.math.BigDecimal(rs.getDouble("amount")));
+                info.setPaymentMethod(rs.getString("payment_method"));
+                info.setStatus(rs.getString("status"));
+                info.setCurrency(rs.getString("currency"));
+                info.addMeta("external_transaction_id", rs.getString("external_transaction_id"));
+                list.add(info);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to find pending transactions: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Update transaction status
+     */
+    public void updateStatus(int transactionId, String status) {
+        if ("COMPLETED".equals(status)) {
+            markCompleted(transactionId);
+        } else if ("FAILED".equals(status)) {
+            markFailed(transactionId, "Failed pending transaction check");
+        } else if ("CANCELLED".equals(status)) {
+            markCancelled(transactionId);
+        } else {
+            String sql = "UPDATE transactions SET status = ? WHERE transaction_id = ?";
+            try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, status);
+                stmt.setInt(2, transactionId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to update transaction status: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 }

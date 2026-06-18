@@ -474,16 +474,7 @@ public class ProductFormView {
         }
     }
 
-    /**
-     * Format duration from seconds to MM:SS
-     */
-    private String formatDuration(Integer seconds) {
-        if (seconds == null)
-            return "00:00";
-        int minutes = seconds / 60;
-        int secs = seconds % 60;
-        return String.format("%02d:%02d", minutes, secs);
-    }
+
 
     /**
      * Handle cancel button
