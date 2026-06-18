@@ -6,7 +6,7 @@
 /* ==================== ROOT & GENERAL ==================== */
 .root {
     -fx-font-family: "Roboto";
-    
+
 }
 
 /* ==================== BUTTON BASE STYLES ==================== */
@@ -34,7 +34,7 @@
     -fx-padding: 8 20;
     -fx-background-radius: 5;
     -fx-cursor: hand;
-    -fx-font-weight:bold;
+    -fx-font-weight: bold;
 }
 
 .btn-secondary:hover {
@@ -214,7 +214,7 @@
     -fx-background-color: white;
     -fx-padding: 20;
     -fx-background-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 6, 0, 0, 2);
 }
 
 /* Summary panel with light background */
@@ -260,11 +260,15 @@
     -fx-border-width: 1;
     -fx-padding: 15;
     -fx-cursor: hand;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .product-card:hover {
     -fx-border-color: #1976d2;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 10, 0.3, 0, 4);
 }
 
 /* Product title in card */
@@ -286,13 +290,15 @@
 .separator-light {
     -fx-background-color: #e0e0e0;
 }
+
 .aims-panel-card {
     -fx-background-color: white;
     -fx-background-radius: 15;
     -fx-border-radius: 15;
     -fx-padding: 30;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 15, 0, 0, 5);
 }
+
 .aims-panel-info {
     -fx-background-color: #fafafa;
     -fx-background-radius: 10;
@@ -301,6 +307,7 @@
     -fx-border-width: 1.5;
     -fx-padding: 20;
 }
+
 .combo-box {
     -fx-background-color: white;
     -fx-border-color: #E0E0E0;
@@ -308,77 +315,101 @@
     -fx-background-radius: 5;
     -fx-padding: 2;
 }
+
 .combo-box:hover {
-    -fx-border-color: #2196F3; /* Màu xanh khi hover để tạo tương tác */
+    -fx-border-color: #2196F3;
+    /* Blue color on hover for interaction */
 }
+
 .combo-box .arrow-button {
-    -fx-background-color: transparent; /* Bỏ màu nền của nút mũi tên */
+    -fx-background-color: transparent;
+    /* Remove background color of arrow buttons */
 }
+
 .table-view .column-header {
     -fx-background-color: #F8F9FA;
-    -fx-border-color: transparent transparent #E0E0E0 transparent; /* Chỉ giữ viền dưới */
-    -fx-size: 45; /* Tăng độ cao cho thoáng */
+    -fx-border-color: transparent transparent #E0E0E0 transparent;
+    /* Only keep bottom border */
+    -fx-size: 45;
+    /* Increase height for spaciousness */
 }
+
 .table-view .column-header .label {
     -fx-text-fill: #757575;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
 }
+
 .table-row-cell:hover {
-    -fx-background-color: #F1F8FF; /* Xanh cực nhạt khi lướt qua */
+    -fx-background-color: #F1F8FF;
+    /* Very light blue on hover */
 }
+
 .table-row-cell:selected {
-    -fx-background-color: #E3F2FD; /* Màu chọn tinh tế hơn */
+    -fx-background-color: #E3F2FD;
+    /* More subtle selected color */
     -fx-text-fill: #1976D2;
 }
+
 .table-row-cell {
-    -fx-cell-size: 40; /* Tăng khoảng cách dòng để dễ đọc */
+    -fx-cell-size: 40;
+    /* Increase line height for readability */
     -fx-border-color: transparent transparent #F5F5F5 transparent;
 }
-/* Áp dụng cho HBox bao ngoài Search */
+
+/* Apply to HBox wrapping the Search */
 .search-container {
     -fx-border-color: transparent;
     -fx-transition: 0.3s;
 }
+
 .search-container:focused-within {
     -fx-background-color: white;
     -fx-border-color: #2196F3;
-    -fx-effect: dropshadow(three-pass-box, rgba(33,150,243,0.2), 8, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(33, 150, 243, 0.2), 8, 0, 0, 0);
 }
+
 .info-box {
-    -fx-background-color: #E3F2FD; /* Xanh dương nhẹ đặc trưng của Info */
+    -fx-background-color: #E3F2FD;
+    /* Light blue characteristic of Info */
     -fx-border-color: #2196F3;
-    -fx-border-width: 0 0 0 4; /* Chỉ có thanh màu bên trái để tạo điểm nhấn */
+    -fx-border-width: 0 0 0 4;
+    /* Only left color bar to create accent */
     -fx-padding: 15;
 }
+
 .table-view .scroll-bar:vertical .thumb {
     -fx-background-color: #DADCE0;
     -fx-background-radius: 10;
 }
+
 .table-view .scroll-bar:vertical .track {
     -fx-background-color: transparent;
 }
+
 /* ==================== PAGINATION (MODERN REDESIGN) ==================== */
 
-/* Bỏ nền xám và đường viền mặc định của toàn bộ thanh điều khiển bên dưới */
+/* Remove default gray background and border of the bottom control bar */
 .pagination .pagination-control {
     -fx-background-color: transparent;
-     
+
 }
 
-/* Căn giữa và tạo khoảng cách giãn đều giữa các nút số */
+/* Center and space evenly between number buttons */
 .pagination .control-box {
     -fx-spacing: 8;
     -fx-alignment: center;
 }
 
-/* 1. Thiết kế cho các Nút Số (Page Numbers) */
+/* 1. Design for Page Numbers */
 .pagination .number-button {
     -fx-background-color: white;
-    -fx-text-fill: #757575; /* Chữ xám nhạt */
+    -fx-text-fill: #757575;
+    /* Light gray text */
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-border-color: #E0E0E0; /* Viền mỏng thanh lịch */
+    -fx-border-color: #E0E0E0;
+    /* Elegant thin border */
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-min-width: 36;
@@ -386,21 +417,23 @@
     -fx-cursor: hand;
 }
 
-/* Hiệu ứng khi lướt chuột qua nút số (Chưa chọn) */
+/* Hover effect for unselected number buttons */
 .pagination .number-button:hover {
-    -fx-background-color: #F1F8FF; /* Xanh cực nhạt (lấy từ hover table của bạn) */
+    -fx-background-color: #F1F8FF;
+    /* Very light blue */
     -fx-border-color: #2196F3;
     -fx-text-fill: #1976d2;
 }
 
-/* 2. Thiết kế cho Trang Đang Được Chọn (Active Page) */
+/* 2. Design for Active Page */
 .pagination .number-button:selected {
-    -fx-background-color: #1976d2; /* Màu xanh Primary */
+    -fx-background-color: #1976d2;
+    /* Primary blue color */
     -fx-border-color: #1976d2;
     -fx-text-fill: white;
 }
 
-/* 3. Thiết kế cho nút Mũi tên (Prev / Next) */
+/* 3. Design for Arrow Buttons (Prev / Next) */
 .pagination .left-arrow-button,
 .pagination .right-arrow-button {
     -fx-background-color: white;
@@ -418,29 +451,47 @@
     -fx-border-color: #2196F3;
 }
 
-/* 4. Custom Icon mũi tên bên trong cho sắc nét hơn */
+/* 4. Custom inner arrow icon for sharpness */
 .pagination .left-arrow,
 .pagination .right-arrow {
-    -fx-background-color: #757575; /* Đổi icon thành màu xám đồng bộ */
+    -fx-background-color: #757575;
+    /* Change icon to matching gray */
 }
 
-/* Đổi icon thành màu xanh khi lướt chuột vào nút mũi tên */
+/* Change icon to blue when hovering on arrow button */
 .pagination .left-arrow-button:hover .left-arrow,
 .pagination .right-arrow-button:hover .right-arrow {
-    -fx-background-color: #1976d2; 
+    -fx-background-color: #1976d2;
 }
 
-/* Vô hiệu hóa mũi tên khi ở trang đầu/cuối (Opacity giảm) */
+/* Disable arrow on first/last page (reduced opacity) */
 .pagination .left-arrow-button:disabled,
 .pagination .right-arrow-button:disabled {
     -fx-opacity: 0.4;
     -fx-cursor: default;
 }
 
-/* 5. Căn chỉnh cụm text "Page 1 of 10" (Nếu bạn để hiển thị) */
+/* 5. Align text "Page 1 of 10" (If displayed) */
 .pagination .page-information {
     -fx-text-fill: #757575;
     -fx-font-size: 13px;
     -fx-font-weight: normal;
     -fx-padding: 0 15;
+}
+
+.hover-button {
+    -fx-background-color: #3498db;
+    /* màu nền mặc định */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 2, 2);
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+}
+
+.hover-button:hover {
+    -fx-background-color: #5dade2;
+    /* đổi màu highlight khi hover */
+    -fx-scale-x: 1.05;
+    /* phóng to nhẹ để cảm giác nổi lên */
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0.7, 3, 3);
 }

@@ -12,17 +12,15 @@ import java.util.Base64;
 
 public class VietQRInteraction {
 
-    private static final String TOKEN_URL = "https://172.21.128.157/vqr/api/token_generate";
-    private static final String QR_URL = "https://172.21.128.157/vqr/api/qr/generate-customer";
-    private static final String SIMULATE_URL = "https://172.21.128.157/vqr/bank/api/test/transaction-callback";
-
     private final VietQRConfig config;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
     public VietQRInteraction(VietQRConfig config) {
         this.config = config;
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(java.time.Duration.ofSeconds(10))
+                .build();
         this.objectMapper = new ObjectMapper();
     }
 
@@ -38,7 +36,7 @@ public class VietQRInteraction {
         String encodedAuth = Base64.getEncoder().encodeToString(authString.getBytes());
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(TOKEN_URL))
+                .uri(URI.create(config.getTokenUrl()))
                 .header("Authorization", "Basic " + encodedAuth)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
@@ -67,7 +65,7 @@ public class VietQRInteraction {
         String jsonBody = objectMapper.writeValueAsString(request);
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(QR_URL))
+                .uri(URI.create(config.getQrUrl()))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
@@ -78,23 +76,21 @@ public class VietQRInteraction {
         return objectMapper.readValue(response.body(), VietQRResponse.class);
     }
 
-    public void postSimulationRequest(String orderId, long amount, String content,
-            String bankCode, String bankAccount,
-            String token) throws Exception {
+    public void postSimulationRequest(String transType, long amount, String content,
+            String bankCode, String bankAccount, String token) throws Exception {
 
         String jsonBody = String.format("""
                 {
                     "bankAccount": "%s",
                     "content": "%s",
                     "amount": %d,
-                    "transType": "C",
-                    "bankCode": "%s",
-                    "orderId": "%s"
+                    "transType": "%s",
+                    "bankCode": "%s"
                 }
-                """, bankAccount, content, amount, bankCode, orderId);
+                """, bankAccount, content, amount, transType, bankCode);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SIMULATE_URL))
+                .uri(URI.create(config.getSimulateUrl()))
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))

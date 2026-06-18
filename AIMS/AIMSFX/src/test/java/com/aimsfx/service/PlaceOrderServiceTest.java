@@ -37,12 +37,18 @@ import static org.mockito.Mockito.*;
 class PlaceOrderServiceTest {
 
     // ==================== MOCKS ====================
-    @Mock private IOrderStorage mockStorage;
-    @Mock private IEmailSender mockEmailSender;
-    @Mock private IPriceHelper mockPriceHelper;
-    @Mock private IDeliveryFeeCalculator mockFeeCalculator;
-    @Mock private ICartService mockCartService;
-    @Mock private ProductRepository mockProductRepository;
+    @Mock
+    private IOrderStorage mockStorage;
+    @Mock
+    private IEmailSender mockEmailSender;
+    @Mock
+    private IPriceHelper mockPriceHelper;
+    @Mock
+    private IDeliveryFeeCalculator mockFeeCalculator;
+    @Mock
+    private ICartService mockCartService;
+    @Mock
+    private ProductRepository mockProductRepository;
 
     // ==================== SYSTEM UNDER TEST ====================
     private PlaceOrderService placeOrderService;
@@ -57,8 +63,8 @@ class PlaceOrderServiceTest {
     void setUp() {
         // Initialize service with mocked dependencies
         placeOrderService = new PlaceOrderService(
-            mockStorage, mockEmailSender, mockPriceHelper, 
-            mockFeeCalculator, mockCartService);
+                mockStorage, mockEmailSender, mockPriceHelper,
+                mockFeeCalculator, mockCartService);
 
         // Setup test cart
         testCart = new Cart(1, 1);
@@ -86,24 +92,25 @@ class PlaceOrderServiceTest {
         validDeliveryInfo.setRecipientName("Nguyen Van A");
         validDeliveryInfo.setPhoneNumber("0912345678");
         validDeliveryInfo.setEmail("test@email.com");
-        validDeliveryInfo.setProvince("Hà Nội");
+        validDeliveryInfo.setProvince("Hanoi");
         validDeliveryInfo.setAddress("123 ABC Street, Cau Giay District");
     }
 
-    // ==================== NHÓM 1: DELIVERY FORM VALIDATION (4 Tests) ====================
-    
+    // ==================== GROUP 1: DELIVERY FORM VALIDATION (4 Tests)
+    // ====================
+
     @Nested
-    @DisplayName("[NHOM 1] Delivery Form Validation - Kiem tra form giao hang")
+    @DisplayName("[GROUP 1] Delivery Form Validation")
     class DeliveryFormValidationTests {
 
         @Test
-        @DisplayName("[FAIL] TC1.1: Thieu so dien thoai -> Tra ve loi validation")
+        @DisplayName("[FAIL] TC1.1: Missing phone number -> Return validation error")
         void testValidateDeliveryInfo_MissingPhone_ShouldReturnError() {
             // Arrange
             String name = "Nguyen Van A";
-            String phone = null;  // Missing phone
+            String phone = null; // Missing phone
             String email = "test@email.com";
-            String province = "Hà Nội";
+            String province = "Hanoi";
             String address = "123 ABC Street, Cau Giay District";
 
             // Act
@@ -116,13 +123,13 @@ class PlaceOrderServiceTest {
         }
 
         @Test
-        @DisplayName("[FAIL] TC1.2: Email format khong hop le -> Tra ve loi email")
+        @DisplayName("[FAIL] TC1.2: Invalid email format -> Return email error")
         void testValidateDeliveryInfo_InvalidEmail_ShouldReturnError() {
             // Arrange
             String name = "Nguyen Van A";
             String phone = "0912345678";
-            String email = "invalid-email-format";  // Invalid email
-            String province = "Hà Nội";
+            String email = "invalid-email-format"; // Invalid email
+            String province = "Hanoi";
             String address = "123 ABC Street, Cau Giay District";
 
             // Act
@@ -135,13 +142,13 @@ class PlaceOrderServiceTest {
         }
 
         @Test
-        @DisplayName("[PASS] TC1.3: Tat ca fields hop le -> Tra ve danh sach rong (khong loi)")
+        @DisplayName("[PASS] TC1.3: All fields valid -> Return empty list (no errors)")
         void testValidateDeliveryInfo_AllFieldsValid_ShouldReturnEmptyList() {
             // Arrange
             String name = "Nguyen Van A";
             String phone = "0912345678";
             String email = "test@email.com";
-            String province = "Hà Nội";
+            String province = "Hanoi";
             String address = "123 ABC Street, Cau Giay District";
 
             // Act
@@ -152,7 +159,7 @@ class PlaceOrderServiceTest {
         }
 
         @Test
-        @DisplayName("[FAIL] TC1.4: Thieu nhieu fields -> Tra ve tat ca loi")
+        @DisplayName("[FAIL] TC1.4: Missing multiple fields -> Return all errors")
         void testValidateDeliveryInfo_MissingMultipleFields_ShouldReturnAllErrors() {
             // Arrange - all fields are null/empty
             String name = null;
@@ -177,26 +184,26 @@ class PlaceOrderServiceTest {
         }
     }
 
-    // ==================== NHÓM 2: DELIVERY LOGIC (4 Tests) ====================
-    
+    // ==================== GROUP 2: DELIVERY LOGIC (4 Tests) ====================
+
     @Nested
-    @DisplayName("[NHOM 2] Delivery Logic - Phi van chuyen, VAT, Khuyen mai")
+    @DisplayName("[GROUP 2] Delivery Logic - Delivery Fee, VAT, Discount")
     class DeliveryLogicTests {
 
         @Test
-        @DisplayName("[CALC] TC2.1: Tinh phi van chuyen cho Ha Noi = 22,000 VND")
+        @DisplayName("[CALC] TC2.1: Calculate delivery fee for Hanoi = 22,000 VND")
         void testCalculateDeliveryFee_HanoiLocation_ShouldReturnCorrectFee() {
             // Arrange
             DeliveryInfo hanoiDelivery = new DeliveryInfo();
-            hanoiDelivery.setProvince("Hà Nội");
-            
-            testCart.addProduct(testBook, 2);  // 2 books = 1.0kg
+            hanoiDelivery.setProvince("Hanoi");
+
+            testCart.addProduct(testBook, 2); // 2 books = 1.0kg
             float totalWeight = 1.0f;
-            
+
             // Mock fee calculator to return expected fee
             when(mockCartService.calculateTotalWeight(testCart)).thenReturn(totalWeight);
             when(mockFeeCalculator.calculateFee(any(DeliveryInfo.class), eq(totalWeight)))
-                .thenReturn(22000.0);
+                    .thenReturn(22000.0);
 
             // Act
             double fee = placeOrderService.calculateDeliveryFee(hanoiDelivery, testCart);
@@ -210,17 +217,17 @@ class PlaceOrderServiceTest {
         @DisplayName("[PROMO] TC2.2: Mien phi ship (toi da 25K) khi subtotal > 100,000 VND")
         void testProcessDeliveryFeeWithDiscount_SubtotalOver100K_ShouldApplyFreeShip() {
             // Arrange
-            double subtotal = 150000.0;  // > 100,000 VND
+            double subtotal = 150000.0; // > 100,000 VND
             float totalWeight = 1.5f;
             float originalFee = 50000f;
-            
+
             when(mockCartService.calculateTotalWeight(testCart)).thenReturn(totalWeight);
             when(mockFeeCalculator.calculateFee(any(DeliveryInfo.class), eq(totalWeight)))
-                .thenReturn((double) originalFee);
+                    .thenReturn((double) originalFee);
 
             // Act
             Map<String, Object> result = placeOrderService.processDeliveryFeeWithDiscount(
-                validDeliveryInfo, testCart, subtotal);
+                    validDeliveryInfo, testCart, subtotal);
 
             // Assert
             assertEquals(originalFee, ((Number) result.get("originalFee")).floatValue(), 0.01,
@@ -235,17 +242,17 @@ class PlaceOrderServiceTest {
         @DisplayName("[WARN] TC2.3: KHONG mien phi ship khi subtotal <= 100,000 VND")
         void testProcessDeliveryFeeWithDiscount_SubtotalUnder100K_ShouldNotApplyFreeShip() {
             // Arrange
-            double subtotal = 80000.0;  // <= 100,000 VND
+            double subtotal = 80000.0; // <= 100,000 VND
             float totalWeight = 1.0f;
             float originalFee = 50000f;
-            
+
             when(mockCartService.calculateTotalWeight(testCart)).thenReturn(totalWeight);
             when(mockFeeCalculator.calculateFee(any(DeliveryInfo.class), eq(totalWeight)))
-                .thenReturn((double) originalFee);
+                    .thenReturn((double) originalFee);
 
             // Act
             Map<String, Object> result = placeOrderService.processDeliveryFeeWithDiscount(
-                validDeliveryInfo, testCart, subtotal);
+                    validDeliveryInfo, testCart, subtotal);
 
             // Assert
             assertEquals(originalFee, ((Number) result.get("originalFee")).floatValue(), 0.01,
@@ -257,12 +264,12 @@ class PlaceOrderServiceTest {
         }
 
         @Test
-        @DisplayName("[CALC] TC2.4: VAT = 10% cua subtotal (thue GTGT)")
+        @DisplayName("[CALC] TC2.4: VAT = 10% of subtotal")
         void testCalculateVAT_ShouldReturn10Percent() {
             // Arrange
             double subtotal = 200000.0;
-            double expectedVAT = 20000.0;  // 10% of 200,000
-            
+            double expectedVAT = 20000.0; // 10% of 200,000
+
             when(mockCartService.calculateVAT(subtotal)).thenReturn(expectedVAT);
 
             // Act
@@ -274,10 +281,11 @@ class PlaceOrderServiceTest {
         }
     }
 
-    // ==================== NHÓM 3: STOCK/INVENTORY VALIDATION (4 Tests) ====================
-    
+    // ==================== GROUP 3: STOCK/INVENTORY VALIDATION (4 Tests)
+    // ====================
+
     @Nested
-    @DisplayName("[NHOM 3] Stock/Inventory Validation - Kiem tra ton kho")
+    @DisplayName("[GROUP 3] Stock/Inventory Validation")
     class StockValidationTests {
 
         @Test
@@ -288,27 +296,27 @@ class PlaceOrderServiceTest {
             // Cart has no items
 
             // Act & Assert
-            assertThrows(EmptyCartException.class, 
-                () -> placeOrderService.createOrderFromCart(emptyCart),
-                "Should throw EmptyCartException for empty cart");
+            assertThrows(EmptyCartException.class,
+                    () -> placeOrderService.createOrderFromCart(emptyCart),
+                    "Should throw EmptyCartException for empty cart");
         }
 
         @Test
         @DisplayName("[FAIL] TC3.2: Gio hang null -> Nem EmptyCartException")
         void testCreateOrderFromCart_NullCart_ShouldThrowEmptyCartException() {
             // Act & Assert
-            assertThrows(EmptyCartException.class, 
-                () -> placeOrderService.createOrderFromCart(null),
-                "Should throw EmptyCartException for null cart");
+            assertThrows(EmptyCartException.class,
+                    () -> placeOrderService.createOrderFromCart(null),
+                    "Should throw EmptyCartException for null cart");
         }
 
         @Test
         @DisplayName("[PASS] TC3.3: Tat ca items du stock -> Tra ve Order thanh cong")
         void testCreateOrderFromCart_SufficientStock_ShouldReturnOrder() throws Exception {
             // Arrange
-            testBook.setStock(10);  // Plenty of stock
-            testCart.addProduct(testBook, 2);  // Request 2, stock = 10
-            
+            testBook.setStock(10); // Plenty of stock
+            testCart.addProduct(testBook, 2); // Request 2, stock = 10
+
             when(mockStorage.save(any(Order.class))).thenReturn(123);
 
             // Act
@@ -325,23 +333,24 @@ class PlaceOrderServiceTest {
         @DisplayName("[WARN] TC3.4: Item thieu stock -> Nem OutOfStockException")
         void testCreateOrderFromCart_InsufficientStock_ShouldThrowOutOfStockException() {
             // Arrange
-            testBook.setStock(1);  // Only 1 in stock
-            testCart.addProduct(testBook, 5);  // Request 5, stock = 1
+            testBook.setStock(1); // Only 1 in stock
+            testCart.addProduct(testBook, 5); // Request 5, stock = 1
 
             // Act & Assert
-            OutOfStockException exception = assertThrows(OutOfStockException.class, 
-                () -> placeOrderService.createOrderFromCart(testCart),
-                "Should throw OutOfStockException when stock insufficient");
-            
+            OutOfStockException exception = assertThrows(OutOfStockException.class,
+                    () -> placeOrderService.createOrderFromCart(testCart),
+                    "Should throw OutOfStockException when stock insufficient");
+
             assertTrue(exception.getMessage().contains(testBook.getTitle()),
                     "Exception message should contain product name");
         }
     }
 
-    // ==================== NHÓM 4: ORDER CREATION & POST-ACTIONS (4 Tests) ====================
-    
+    // ==================== GROUP 4: ORDER CREATION & POST-ACTIONS (4 Tests)
+    // ====================
+
     @Nested
-    @DisplayName("[NHOM 4] Order Creation & Post-actions - Tao don & xu ly sau don")
+    @DisplayName("[GROUP 4] Order Creation & Post-actions")
     class OrderCreationTests {
 
         @Test
@@ -379,7 +388,7 @@ class PlaceOrderServiceTest {
             testCart.addProduct(testBook, 1);
             Order order = placeOrderService.createOrder(testCart);
             int expectedId = 456;
-            
+
             when(mockStorage.save(order)).thenReturn(expectedId);
 
             // Act
@@ -398,11 +407,11 @@ class PlaceOrderServiceTest {
             testCart.addProduct(testBook, 1);
             Order order = placeOrderService.createOrder(testCart);
             TransactionInfo transactionInfo = new TransactionInfo(
-                1, 1, "VietQR", java.math.BigDecimal.valueOf(100000), "VND");
-            
+                    1, 1, "VietQR", java.math.BigDecimal.valueOf(100000), "VND");
+
             // Mock email sender to throw exception
             doThrow(new RuntimeException("Email service unavailable"))
-                .when(mockEmailSender).sendConfirmation(any(Order.class), anyString());
+                    .when(mockEmailSender).sendConfirmation(any(Order.class), anyString());
 
             // Act & Assert - should NOT throw exception
             assertDoesNotThrow(() -> {
@@ -414,9 +423,9 @@ class PlaceOrderServiceTest {
     }
 
     // ==================== ADDITIONAL EDGE CASE TESTS ====================
-    
+
     @Nested
-    @DisplayName("[NHOM 5] Edge Cases - Cac truong hop bien")
+    @DisplayName("[GROUP 5] Edge Cases")
     class EdgeCaseTests {
 
         @Test
@@ -443,20 +452,20 @@ class PlaceOrderServiceTest {
 
         @Test
         @DisplayName("[PASS] TC5.3: Tao DeliveryInfo tu form voi du lieu hop le")
-        void testCreateDeliveryInfoFromForm_ValidData_ShouldReturnDeliveryInfo() 
+        void testCreateDeliveryInfoFromForm_ValidData_ShouldReturnDeliveryInfo()
                 throws InvalidDeliveryInfoException {
             // Arrange
             String name = "Nguyen Van A";
             String phone = "0912345678";
             String email = "test@email.com";
-            String province = "Hà Nội";
+            String province = "Hanoi";
             String ward = "Cau Giay";
             String address = "123 ABC Street, Cau Giay District";
             String instructions = "Call before delivery";
 
             // Act
             DeliveryInfo info = placeOrderService.createDeliveryInfoFromForm(
-                name, phone, email, province, ward, address, instructions);
+                    name, phone, email, province, ward, address, instructions);
 
             // Assert
             assertNotNull(info, "DeliveryInfo should be created");
@@ -481,9 +490,9 @@ class PlaceOrderServiceTest {
 
             // Act & Assert
             assertThrows(InvalidDeliveryInfoException.class,
-                () -> placeOrderService.createDeliveryInfoFromForm(
-                    name, phone, email, province, ward, address, instructions),
-                "Should throw exception for invalid delivery info");
+                    () -> placeOrderService.createDeliveryInfoFromForm(
+                            name, phone, email, province, ward, address, instructions),
+                    "Should throw exception for invalid delivery info");
         }
     }
 }

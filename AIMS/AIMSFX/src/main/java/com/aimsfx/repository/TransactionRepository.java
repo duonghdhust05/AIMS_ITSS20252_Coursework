@@ -248,7 +248,7 @@ public class TransactionRepository {
                 WHERE external_transaction_id = ?
                 RETURNING transaction_id
                 """;
-
+        
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -257,6 +257,7 @@ public class TransactionRepository {
 
             if (rs.next()) {
                 int transactionId = rs.getInt("transaction_id");
+                // Also update the order's payment_status
                 updateOrderPaymentStatus(transactionId, "Completed");
                 return true;
             }
@@ -266,6 +267,52 @@ public class TransactionRepository {
         }
         return false;
     }
+
+    /**
+     * Save a TransactionInfo object to the database
+     * 
+     * @param tx The TransactionInfo object to save
+     * @return true if successful
+     */
+    public boolean save(com.aimsfx.model.TransactionInfo tx) {
+        String sql = """
+                INSERT INTO transactions (order_id, amount, payment_method, status, currency, external_transaction_id, created_at, completed_at)
+                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+                RETURNING transaction_id
+                """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, tx.getOrderId() != null ? tx.getOrderId() : 0);
+            stmt.setDouble(2, tx.getAmount() != null ? tx.getAmount().doubleValue() : 0.0);
+            stmt.setString(3, tx.getPaymentMethod() != null ? tx.getPaymentMethod().toUpperCase() : "UNKNOWN");
+            stmt.setString(4, tx.getStatusString() != null ? tx.getStatusString() : "PENDING");
+            stmt.setString(5, tx.getCurrency() != null ? tx.getCurrency() : "VND");
+            stmt.setString(6, tx.getTransactionId()); // internal UUID used as external_transaction_id for reference
+            
+            if (tx.getStatus() == com.aimsfx.model.TransactionInfo.TransactionStatus.CAPTURED) {
+                stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            } else {
+                stmt.setNull(7, Types.TIMESTAMP);
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int transactionId = rs.getInt("transaction_id");
+                if (tx.getStatus() == com.aimsfx.model.TransactionInfo.TransactionStatus.CAPTURED) {
+                    updateOrderPaymentStatus(tx.getOrderId(), transactionId, "Completed");
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to save TransactionInfo: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 
     /**
      * Mark transaction as failed
@@ -403,6 +450,31 @@ public class TransactionRepository {
     }
 
     /**
+     * Get external transaction ID by order ID
+     *
+     * @param orderId The order ID
+     * @return External transaction ID (e.g. PayPal Order ID) or null if not found
+     */
+    public String getExternalTransactionIdByOrderId(int orderId) {
+        String sql = "SELECT external_transaction_id FROM transactions WHERE order_id = ? ORDER BY created_at DESC LIMIT 1";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("external_transaction_id");
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to find external transaction ID by order ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Get transaction status
      * 
      * @param transactionId Transaction ID
@@ -425,5 +497,90 @@ public class TransactionRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Find all transactions with status 'PENDING'
+     */
+    public java.util.List<com.aimsfx.model.TransactionInfo> findPendingTransactions() {
+        java.util.List<com.aimsfx.model.TransactionInfo> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM transactions WHERE status = 'PENDING'";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                com.aimsfx.model.TransactionInfo info = new com.aimsfx.model.TransactionInfo();
+                info.setTransactionId(String.valueOf(rs.getInt("transaction_id")));
+                info.setOrderId(rs.getInt("order_id"));
+                info.setAmount(new java.math.BigDecimal(rs.getDouble("amount")));
+                info.setPaymentMethod(rs.getString("payment_method"));
+                info.setStatus(rs.getString("status"));
+                info.setCurrency(rs.getString("currency"));
+                info.addMeta("external_transaction_id", rs.getString("external_transaction_id"));
+                list.add(info);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to find pending transactions: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Mark transaction as refunded
+     * 
+     * @param transactionId Internal transaction ID
+     * @return true if successful
+     */
+    public boolean markRefunded(int transactionId) {
+        String sql = """
+                UPDATE transactions
+                SET status = 'REFUNDED', completed_at = CURRENT_TIMESTAMP
+                WHERE transaction_id = ?
+                """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, transactionId);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                updateOrderPaymentStatus(transactionId, "REFUNDED");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to mark transaction refunded: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Update transaction status
+     */
+    public void updateStatus(int transactionId, String status) {
+        if ("COMPLETED".equals(status)) {
+            markCompleted(transactionId);
+        } else if ("FAILED".equals(status)) {
+            markFailed(transactionId, "Failed pending transaction check");
+        } else if ("CANCELLED".equals(status)) {
+            markCancelled(transactionId);
+        } else if ("REFUNDED".equals(status)) {
+            markRefunded(transactionId);
+        } else {
+            String sql = "UPDATE transactions SET status = ? WHERE transaction_id = ?";
+            try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, status);
+                stmt.setInt(2, transactionId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("ERROR: Failed to update transaction status: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 }

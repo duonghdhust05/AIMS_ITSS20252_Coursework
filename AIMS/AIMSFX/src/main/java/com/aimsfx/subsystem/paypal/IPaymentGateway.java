@@ -45,4 +45,12 @@ public interface IPaymentGateway {
      * @throws PaymentException if capture operation fails
      */
     boolean captureOrder(String gatewayOrderId) throws PaymentException;
+    /**
+     * Refund a previously captured order
+     *
+     * @param gatewayOrderId The gateway's order ID
+     * @return true if refund successful, false otherwise
+     * @throws PaymentException if refund operation fails
+     */
+    boolean refundOrder(String gatewayOrderId) throws PaymentException;
 }

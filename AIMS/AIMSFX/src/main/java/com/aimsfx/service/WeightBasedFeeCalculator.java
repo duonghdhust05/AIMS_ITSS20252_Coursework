@@ -9,8 +9,8 @@ import com.aimsfx.model.DeliveryInfo;
  * FORMULA: weight (kg) × rate per kg (VND)
  * 
  * RATES (Based on current business rules):
- * - Tier 1 cities (Hà Nội, TP.HCM): 10,000 VND/kg
- * - Tier 2 cities (Đà Nẵng, Cần Thơ): 15,000 VND/kg
+ * - Tier 1 cities (Hanoi, Ho Chi Minh City): 10,000 VND/kg
+ * - Tier 2 cities (Da Nang, Can Tho): 15,000 VND/kg
  * - Other provinces: 20,000 VND/kg
  * 
  * NOTE: This is the default and currently only implementation.
@@ -57,12 +57,12 @@ public class WeightBasedFeeCalculator implements IDeliveryFeeCalculator {
         }
         
         // Tier 1 cities
-        if (province.equals("Hà Nội") || province.equals("TP.HCM")) {
+        if (province.equals("Hanoi") || province.equals("Ho Chi Minh City")) {
             return TIER_1_RATE;
         }
         
         // Tier 2 cities
-        if (province.equals("Đà Nẵng") || province.equals("Cần Thơ")) {
+        if (province.equals("Da Nang") || province.equals("Can Tho")) {
             return TIER_2_RATE;
         }
         

@@ -63,6 +63,7 @@ public class Order {
     private float deliveryFee; // #9: Delivery fee from delivery info (2.2.3)
     private float totalAmount; // #10: Final amount = subtotal + vat + deliveryFee
     private String paymentTransactionId; // #11: Reference to payment transaction (UUID String)
+    private String cancelReason;
 
     // Additional relationships
     private Invoice invoice;
@@ -84,7 +85,7 @@ public class Order {
     }
 
     public Order(int id, float totalAmount) {
-        this(); // Gọi logic khởi tạo list/date của constructor mặc định
+        this(); // Call list/date initialization logic of the default constructor
         this.orderId = id;
         this.totalAmount = totalAmount;
     }
@@ -232,6 +233,14 @@ public class Order {
         }
     }
 
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
     // ==================== Business Methods (Table 2) ====================
 
     /**
@@ -286,10 +295,11 @@ public class Order {
             this.invoiceId = invoice.getInvoiceId();
 
             // Step 2: Call repository/DAO to persist
-            // TODO: Implement persistence logic
-            // orderRepository.save(this);
+            com.aimsfx.repository.OrderRepository orderRepository = new com.aimsfx.repository.OrderRepository();
+            int id = orderRepository.saveOrder(this);
+            this.orderId = id;
 
-            System.out.println("Order saved successfully with invoice ID: " + invoiceId);
+            System.out.println("Order saved successfully with order ID: " + this.orderId + " and invoice ID: " + invoiceId);
 
         } catch (Exception e) {
             // Step 3: Throw OrderSaveFailedException on error
