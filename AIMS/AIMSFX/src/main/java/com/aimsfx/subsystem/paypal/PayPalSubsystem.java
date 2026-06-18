@@ -3,6 +3,7 @@ package com.aimsfx.subsystem.paypal;
 import com.aimsfx.exception.*;
 import com.paypal.sdk.PaypalServerSdkClient;
 import com.paypal.sdk.controllers.OrdersController;
+import com.paypal.sdk.controllers.PaymentsController;
 import com.paypal.sdk.models.*;
 
 import java.util.Arrays;
@@ -28,10 +29,12 @@ import java.util.Map;
 public class PayPalSubsystem implements IPaymentGateway {
 
     private final OrdersController ordersController;
+    private final PaymentsController paymentsController;
     private final CurrencyConverter converter;
 
     public PayPalSubsystem(PaypalServerSdkClient client, CurrencyConverter converter) {
         this.ordersController = client.getOrdersController();
+        this.paymentsController = client.getPaymentsController();
         this.converter = converter;
     }
 
@@ -53,7 +56,7 @@ public class PayPalSubsystem implements IPaymentGateway {
                     .applicationContext(new OrderApplicationContext.Builder()
                             .returnUrl("https://www.google.com/search?q=success")
                             .cancelUrl("https://www.google.com/search?q=cancel")
-                            .brandName("DELETED_CODE")
+                            .brandName("AIMS Store")
                             .landingPage(OrderApplicationContextLandingPage.LOGIN)
                             .userAction(OrderApplicationContextUserAction.PAY_NOW)
                             .build())
@@ -90,6 +93,39 @@ public class PayPalSubsystem implements IPaymentGateway {
             return "COMPLETED".equals(result.getStatus().value());
         } catch (Exception e) {
             throw mapToSemanticException(e, "CAPTURE");
+        }
+    }
+
+    @Override
+    public boolean refundOrder(String gatewayOrderId) throws PaymentException {
+        try {
+            GetOrderInput getOrderInput = new GetOrderInput.Builder(gatewayOrderId).build();
+            Order order = ordersController.getOrder(getOrderInput).getResult();
+            
+            if (order.getPurchaseUnits() == null || order.getPurchaseUnits().isEmpty() ||
+                order.getPurchaseUnits().get(0).getPayments() == null ||
+                order.getPurchaseUnits().get(0).getPayments().getCaptures() == null ||
+                order.getPurchaseUnits().get(0).getPayments().getCaptures().isEmpty()) {
+                throw new PaymentProcessingException("NO_CAPTURE_FOUND", "PAYPAL");
+            }
+            
+            String captureId = order.getPurchaseUnits().get(0).getPayments().getCaptures().get(0).getId();
+            
+            RefundRequest refundRequest = new RefundRequest.Builder().build();
+            RefundCapturedPaymentInput refundInput = new RefundCapturedPaymentInput.Builder()
+                    .captureId(captureId)
+                    .body(refundRequest)
+                    .build();
+            
+            Refund result = paymentsController.refundCapturedPayment(refundInput).getResult();
+            
+            String status = result.getStatus() != null ? result.getStatus().value() : "";
+            return "COMPLETED".equals(status) || "PENDING".equals(status);
+            
+        } catch (PaymentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw mapToSemanticException(e, "REFUND");
         }
     }
 

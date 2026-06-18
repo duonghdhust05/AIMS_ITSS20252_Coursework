@@ -18,10 +18,10 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping("/bank/api")
 public class TransactionSyncController {
 
-    @Value("${app.jwt.secret:e9584d17b9116f1a8d9398b30ae62828}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @PostMapping(value = "/transaction-sync", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/transaction-callback", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VietQRCallbackResponse> transactionSync(
             @RequestBody VietQRCallbackRequest payload,
             HttpServletRequest request) {
@@ -46,10 +46,10 @@ public class TransactionSyncController {
 
             // Log the callback for debugging
             System.out.println(
-                    "[TransactionSyncController] Received VietQR callback for transaction: " + payload.transactionId());
+                    "[TransactionSyncController] Received VietQR callback for transaction: " + payload.transactionid());
 
             // Return Success Response
-            return ResponseEntity.ok(VietQRCallbackResponse.success(payload.transactionId()));
+            return ResponseEntity.ok(VietQRCallbackResponse.success(payload.transactionid()));
 
         } catch (Exception ex) {
             ex.printStackTrace();

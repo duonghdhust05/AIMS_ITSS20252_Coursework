@@ -1,14 +1,14 @@
 package com.aimsfx.utils;
 
 /**
- * Utility class để quản lý lifecycle của database connection pool
+ * Utility class to manage the lifecycle of the database connection pool
  */
 public class DatabaseManager {
-    
+
     private static boolean shutdownHookRegistered = false;
-    
+
     /**
-     * Đăng ký shutdown hook để đóng connection pool khi ứng dụng tắt
+     * Register shutdown hook to close connection pool when application shuts down
      */
     public static void registerShutdownHook() {
         if (!shutdownHookRegistered) {
@@ -20,9 +20,9 @@ public class DatabaseManager {
             System.out.println("SUCCESS: Registered shutdown hook for database");
         }
     }
-    
+
     /**
-     * Khởi tạo database connection pool và đăng ký shutdown hook
+     * Initialize database connection pool and register shutdown hook
      */
     public static void initialize() {
         // Khởi tạo connection pool thông qua getInstance()
@@ -30,15 +30,15 @@ public class DatabaseManager {
         registerShutdownHook();
         System.out.println("SUCCESS: Database Manager initialized successfully");
     }
-    
+
     /**
-     * Lấy thông tin trạng thái của database
+     * Get database status
      */
     public static String getStatus() {
         DatabaseConnection db = DatabaseConnection.getInstance();
-        return "=== DATABASE STATUS ===\n" + 
-               db.getDatabaseInfo() + "\n\n" +
-               "=== CONNECTION POOL STATUS ===\n" + 
-               db.getPoolInfo();
+        return "=== DATABASE STATUS ===\n" +
+                db.getDatabaseInfo() + "\n\n" +
+                "=== CONNECTION POOL STATUS ===\n" +
+                db.getPoolInfo();
     }
 }

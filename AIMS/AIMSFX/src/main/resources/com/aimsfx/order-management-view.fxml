@@ -12,34 +12,45 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900" prefWidth="1600" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.OrderManagementController">
-    <center>
-        <VBox spacing="10" stylesheets="@styles2.0.css">
-            <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
-            </padding>
-            <HBox spacing="10">
-                <Label style="-fx-font-size: 18;" styleClass="label-section-title" text="Order Management (Pending Review)" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="totalPendingLabel" styleClass="label-subtitle" text="Pending: 0" />
-            </HBox>
-            <TableView fx:id="ordersTable" prefHeight="520.0">
-                <columns>
-                    <TableColumn fx:id="orderIdColumn" prefWidth="90.0" text="Order ID" />
-                    <TableColumn fx:id="createdAtColumn" prefWidth="160.0" text="Created At" />
-                    <TableColumn fx:id="customerColumn" prefWidth="240.0" text="Customer" />
-                    <TableColumn fx:id="totalColumn" prefWidth="140.0" text="Total" />
-                    <TableColumn fx:id="statusColumn" prefWidth="140.0" text="Status" />
-                    <TableColumn fx:id="actionsColumn" prefWidth="260.0" text="Actions" />
-                </columns>
-            </TableView>
-            <Pagination fx:id="pagination" />
-        </VBox>
-    </center>
+<BorderPane prefHeight="720" prefWidth="1280" xmlns="http://javafx.com/javafx/25"
+   xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="com.aimsfx.controller.ProductManagerController.OrderManagementController">
+   <center>
+      <VBox spacing="10" stylesheets="@styles2.0.css">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+         <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label style="-fx-font-size: 18;" styleClass="label-section-title"
+               text="Order Management" />
+            <Label fx:id="refreshNotificationLabel"
+               text="New data available. Please refresh the page !" textFill="RED" visible="false"
+               managed="false" style="-fx-font-weight: bold;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lastUpdatedLabel" text="Last updated: " textFill="GRAY" />
+            <javafx.scene.control.Button fx:id="refreshBtn" text="🔄 Refresh"
+               onAction="#handleRefresh" style="-fx-cursor: hand;" />
+            <Label fx:id="totalPendingLabel" styleClass="label-subtitle" text="Total: 0" />
+         </HBox>
+         <TableView fx:id="ordersTable" prefHeight="520.0">
+            <columns>
+               <TableColumn fx:id="orderIdColumn" prefWidth="90.0" text="Order ID" />
+               <TableColumn fx:id="createdAtColumn" prefWidth="160.0" text="Created At" />
+               <TableColumn fx:id="customerColumn" prefWidth="240.0" text="Customer" />
+               <TableColumn fx:id="totalColumn" prefWidth="140.0" text="Total" />
+               <TableColumn fx:id="statusColumn" prefWidth="140.0" text="Status" />
+               <TableColumn fx:id="actionsColumn" prefWidth="260.0" text="Actions" />
+            </columns>
+         </TableView>
+         <Pagination fx:id="pagination" />
+      </VBox>
+   </center>
    <top>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="1600.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+         minWidth="-Infinity" prefWidth="1600.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30" style="-fx-background-color: white; -fx-padding: 29 40;">
+            <HBox alignment="CENTER_LEFT" prefHeight="95.0" prefWidth="1440.0" spacing="30"
+               style="-fx-background-color: white; -fx-padding: 29 40;">
                <children>
                   <HBox alignment="CENTER" prefHeight="44.0" prefWidth="120.0">
                      <children>
@@ -62,7 +73,8 @@
                         </Label>
                      </children>
                   </HBox>
-                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <Region maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0"
+                     HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>

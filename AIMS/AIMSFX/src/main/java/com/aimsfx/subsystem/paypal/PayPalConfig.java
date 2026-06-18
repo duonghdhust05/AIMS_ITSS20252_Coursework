@@ -45,7 +45,7 @@ public class PayPalConfig {
         // MANUAL PROPERTY LOADING (Your logic is perfect here)
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             if (input == null) {
-                System.err.println("❌ Sorry, unable to find application.properties");
+                System.err.println("Sorry, unable to find application.properties");
                 return;
             }
 

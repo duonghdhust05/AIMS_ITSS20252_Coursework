@@ -49,6 +49,9 @@ Thumbs.db
 .env.*
 secret.properties
 AIMSFX/src/main/resources/application.properties
+AIMSFX/src/main/resources/database.properties
 
 # Docker ignore (if any)
 docker-compose.override.yml
+#implement plan
+implementPlan/

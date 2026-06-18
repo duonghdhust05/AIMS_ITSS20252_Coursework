@@ -1,8 +1,6 @@
 package com.aimsfx.view;
 
 import com.aimsfx.model.CartItem;
-import com.aimsfx.model.Product;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -17,7 +15,7 @@ import java.util.Locale;
 public class CartView {
 
     @SuppressWarnings("deprecation")
-	private static final Locale VN_LOCALE = new Locale("vi", "VN");
+    private static final Locale VN_LOCALE = new Locale("vi", "VN");
     private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance(VN_LOCALE);
 
     public CartView() {
@@ -46,111 +44,51 @@ public class CartView {
     }
 
     public void showEmptyCartMessage(VBox container) {
-        if (container == null) return;
-        
+        if (container == null)
+            return;
+
         container.getChildren().clear();
-        
+
         VBox emptyBox = new VBox(10);
         emptyBox.setAlignment(Pos.CENTER);
         emptyBox.setPadding(new Insets(50));
-        
-        Label emptyIcon = new Label("🛒");
-        emptyIcon.setStyle("-fx-font-size: 48px;");
-        
+
         Label emptyLabel = new Label("Your cart is empty");
         emptyLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #666;");
-        
+
         Label subLabel = new Label("Add some products to get started!");
         subLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #999;");
-        
-        emptyBox.getChildren().addAll(emptyIcon, emptyLabel, subLabel);
+
+        emptyBox.getChildren().addAll(emptyLabel, subLabel);
         container.getChildren().add(emptyBox);
     }
 
     public HBox createCartItemBox(CartItem cartItem, Runnable onQuantityChange, Runnable onRemove) {
-        HBox itemBox = new HBox(15);
-        itemBox.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5;");
-
-        Product product = cartItem.getProduct();
-
-        Label imageLabel = new Label("📦");
-        imageLabel.setStyle("-fx-font-size: 40px; -fx-pref-width: 80; -fx-pref-height: 80; -fx-alignment: center; -fx-background-color: #f5f5f5; -fx-background-radius: 5;");
-
-        VBox infoBox = new VBox(5);
-        infoBox.setPrefWidth(300);
-
-        String title = product.getTitle();
-        if (title == null || title.trim().isEmpty()) {
-            title = "Product #" + product.getProductId();
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/cart-item.fxml"));
+            HBox itemBox = loader.load();
+            com.aimsfx.controller.PlaceOrderController.CartViewController.CartItemController controller = loader
+                    .getController();
+            controller.setItemData(cartItem, onQuantityChange, onRemove);
+            return itemBox;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            showError("Error", "Could not load cart item UI.");
+            return new HBox();
         }
-        Label nameLabel = new Label(title);
-        nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
-
-        Label priceLabel = new Label(formatPrice(product.getCurrentPrice()) + " đ");
-        priceLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
-
-        Label stockLabel = new Label("Available: " + product.getStock());
-        stockLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
-
-        HBox quantityBox = new HBox(5);
-        quantityBox.setAlignment(Pos.CENTER_LEFT);
-
-        Button minusBtn = new Button("-");
-        minusBtn.setStyle("-fx-background-color: #f5f5f5; -fx-cursor: hand; -fx-font-size: 14px; -fx-padding: 2 8;");
-        minusBtn.setOnAction(e -> {
-            if (cartItem.getQuantity() > 1) {
-                cartItem.setQuantity(cartItem.getQuantity() - 1);
-                onQuantityChange.run();
-            }
-        });
-
-        Label quantityLabel = new Label(String.valueOf(cartItem.getQuantity()));
-        quantityLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 2 10; -fx-text-fill: #333;");
-
-        Button plusBtn = new Button("+");
-        plusBtn.setStyle("-fx-background-color: #f5f5f5; -fx-cursor: hand; -fx-font-size: 14px; -fx-padding: 2 8;");
-        plusBtn.setOnAction(e -> {
-            if (cartItem.getQuantity() < product.getStock()) {
-                cartItem.setQuantity(cartItem.getQuantity() + 1);
-                onQuantityChange.run();
-            } else {
-                showAlert("Out of Stock", "Maximum available quantity: " + product.getStock());
-            }
-        });
-
-        quantityBox.getChildren().addAll(minusBtn, quantityLabel, plusBtn);
-        infoBox.getChildren().addAll(nameLabel, priceLabel, stockLabel, quantityBox);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        VBox rightBox = new VBox(10);
-        rightBox.setAlignment(Pos.CENTER_RIGHT);
-
-        double subtotal = cartItem.getLineTotal();
-        Label subtotalLabel = new Label(formatPrice(subtotal) + " đ");
-        subtotalLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ff5722;");
-
-        Button removeBtn = new Button("🗑 Remove");
-        removeBtn.setStyle("-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-cursor: hand; -fx-background-radius: 3; -fx-font-size: 12px;");
-        removeBtn.setOnAction(e -> onRemove.run());
-
-        rightBox.getChildren().addAll(subtotalLabel, removeBtn);
-
-        itemBox.getChildren().addAll(imageLabel, infoBox, spacer, rightBox);
-        return itemBox;
     }
 
     public void updateTotalLabels(Label subtotalLabel, Label vatLabel, Label totalLabel,
-                                   double subtotal, double vat, double total) {
+            double subtotal, double vat, double total) {
         if (subtotalLabel != null) {
-            subtotalLabel.setText(formatPrice(subtotal) + " đ");
+            subtotalLabel.setText(formatPrice(subtotal) + " VND");
         }
         if (vatLabel != null) {
-            vatLabel.setText(formatPrice(vat) + " đ");
+            vatLabel.setText(formatPrice(vat) + " VND");
         }
         if (totalLabel != null) {
-            totalLabel.setText(formatPrice(total) + " đ");
+            totalLabel.setText(formatPrice(total) + " VND");
         }
     }
 
@@ -162,7 +100,7 @@ public class CartView {
 
     public String buildInsufficientStockMessage(java.util.List<java.util.Map<String, Object>> insufficientItems) {
         StringBuilder errorMsg = new StringBuilder();
-        errorMsg.append("⚠️ INSUFFICIENT STOCK\n\n");
+        errorMsg.append("INSUFFICIENT STOCK\n\n");
         errorMsg.append("Stock availability has been updated from database.\n");
         errorMsg.append("Some products do not have sufficient stock:\n\n");
 

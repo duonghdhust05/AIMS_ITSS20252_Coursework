@@ -290,12 +290,13 @@ public class TransactionInfo {
         try {
             // Update timestamp
             this.updatedAt = LocalDateTime.now();
+            boolean success = com.aimsfx.repository.TransactionRepository.getInstance().save(this);
             
-            // TODO: Implement persistence logic
-            // transactionRepository.save(this);
+            if (!success) {
+                throw new RuntimeException("TransactionRepository failed to save the transaction to the database.");
+            }
             
             System.out.println("Transaction saved: " + this.transactionId);
-            
         } catch (Exception e) {
             throw new RuntimeException("Failed to save transaction: " + e.getMessage(), e);
         }

@@ -25,22 +25,25 @@ import java.util.Optional;
 public class DatabaseProductRepository implements ProductRepository {
 
     private final DatabaseConnection dbConnection;
-    
-    private static final String INSERT_SQL = 
-        "INSERT INTO products (" +
-        "barcode, title, category, original_price, current_price, description, " +
-        "weight, dimensions, stock, status, vat_rate, product_type, " +
-        "is_current, expired_date, " +
-        // Book columns
-        "author, publisher, publication_date, pages, language, cover_type, genre, " +
-        // CD columns (artist, record_label, genre already in Book, track_count, release_date)
-        "artist, record_label, track_count, release_date, " +
-        // DVD columns (director, studio, subtitle, disc_type, duration, genre, release_date already added)
-        "director, studio, subtitle, disc_type, duration, " +
-        // Newspaper columns (issue_number, frequency, editor_in_chief, publisher/publication_date/language already added, section)
-        "issue_number, frequency, editor_in_chief, section" +
-        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-        "RETURNING product_id";
+
+    private static final String INSERT_SQL = "INSERT INTO products (" +
+            "barcode, title, category, original_price, current_price, description, " +
+            "weight, dimensions, stock, status, vat_rate, product_type, " +
+            "is_current, expired_date, " +
+            // Book columns
+            "author, publisher, publication_date, pages, language, cover_type, genre, " +
+            // CD columns (artist, record_label, genre already in Book, track_count,
+            // release_date)
+            "artist, record_label, track_count, release_date, " +
+            // DVD columns (director, studio, subtitle, disc_type, duration, genre,
+            // release_date already added)
+            "director, studio, subtitle, disc_type, duration, " +
+            // Newspaper columns (issn, frequency, editor_in_chief,
+            // publisher/publication_date/language already added, section)
+            "issn, frequency, editor_in_chief, section" +
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            +
+            "RETURNING product_id";
 
     public DatabaseProductRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
@@ -62,10 +65,10 @@ public class DatabaseProductRepository implements ProductRepository {
      */
     private Product insert(Product product) {
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
+                PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
 
             int idx = 1;
-            
+
             // Common columns (14 columns)
             stmt.setString(idx++, product.getBarcode());
             stmt.setString(idx++, product.getTitle());
@@ -79,17 +82,17 @@ public class DatabaseProductRepository implements ProductRepository {
             } else {
                 stmt.setNull(idx++, Types.DOUBLE);
             }
-            stmt.setString(idx++, product.getDimensions());  // setString handles null
+            stmt.setString(idx++, product.getDimensions()); // setString handles null
             stmt.setInt(idx++, product.getStock());
             stmt.setString(idx++, product.getStatus());
             stmt.setDouble(idx++, product.getVatRate());
             stmt.setString(idx++, getProductTypeString(product));
-            stmt.setBoolean(idx++, true);  // is_current
-            stmt.setNull(idx++, Types.TIMESTAMP);  // expired_date
+            stmt.setBoolean(idx++, true); // is_current
+            stmt.setNull(idx++, Types.TIMESTAMP); // expired_date
 
             // Type-specific columns using helper method
             idx = setTypeSpecificColumns(stmt, idx, product);
-            
+
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Long productId = rs.getLong("product_id");
@@ -107,7 +110,8 @@ public class DatabaseProductRepository implements ProductRepository {
     }
 
     /**
-     * Update existing product in database (creates new version with history tracking)
+     * Update existing product in database (creates new version with history
+     * tracking)
      * 0. Check if product has actually changed - if not, skip update
      * 1. Expire the current version (set is_current=false, expired_date=NOW())
      * 2. Insert a new version with the updated data (is_current=true)
@@ -115,7 +119,7 @@ public class DatabaseProductRepository implements ProductRepository {
     private Product update(Product product) {
         try (Connection conn = dbConnection.getConnection()) {
             conn.setAutoCommit(false);
-            
+
             try {
                 // Step 0: Check if product has actually changed
                 Product existingProduct = findById(product.getProductId()).orElse(null);
@@ -124,25 +128,25 @@ public class DatabaseProductRepository implements ProductRepository {
                     conn.rollback();
                     return existingProduct;
                 }
-                
+
                 // Step 1: Expire the current version
                 String expireSql = "UPDATE products SET is_current = false, expired_date = NOW() " +
-                                 "WHERE product_id = ? AND is_current = true";
-                
+                        "WHERE product_id = ? AND is_current = true";
+
                 try (PreparedStatement expireStmt = conn.prepareStatement(expireSql)) {
                     expireStmt.setLong(1, product.getProductId());
                     int rowsAffected = expireStmt.executeUpdate();
-                    
+
                     if (rowsAffected == 0) {
                         throw new SQLException("Product not found or already expired: " + product.getProductId());
                     }
                 }
-                
+
                 product.setProductId(null);
-                
+
                 try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
                     int idx = 1;
-                    
+
                     // Common columns (14 columns)
                     stmt.setString(idx++, product.getBarcode());
                     stmt.setString(idx++, product.getTitle());
@@ -156,17 +160,17 @@ public class DatabaseProductRepository implements ProductRepository {
                     } else {
                         stmt.setNull(idx++, Types.DOUBLE);
                     }
-                    stmt.setString(idx++, product.getDimensions());  // setString handles null
+                    stmt.setString(idx++, product.getDimensions()); // setString handles null
                     stmt.setInt(idx++, product.getStock());
                     stmt.setString(idx++, product.getStatus());
                     stmt.setDouble(idx++, product.getVatRate());
                     stmt.setString(idx++, getProductTypeString(product));
-                    stmt.setBoolean(idx++, true);  // is_current
-                    stmt.setNull(idx++, Types.TIMESTAMP);  // expired_date
+                    stmt.setBoolean(idx++, true); // is_current
+                    stmt.setNull(idx++, Types.TIMESTAMP); // expired_date
 
                     // Type-specific columns based on product type
                     idx = setTypeSpecificColumns(stmt, idx, product);
-                    
+
                     ResultSet rs = stmt.executeQuery();
                     if (rs.next()) {
                         Long newProductId = rs.getLong("product_id");
@@ -175,24 +179,24 @@ public class DatabaseProductRepository implements ProductRepository {
                         throw new SQLException("Failed to insert new version: No ID returned");
                     }
                 }
-                
+
                 conn.commit();
                 return product;
-                
+
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
             } finally {
                 conn.setAutoCommit(true);
             }
-            
+
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to update product: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to update product", e);
         }
     }
-    
+
     /**
      * Helper method to set type-specific columns for PreparedStatement
      * Returns the next parameter index after setting all columns
@@ -208,8 +212,10 @@ public class DatabaseProductRepository implements ProductRepository {
     private int setTypeSpecificColumns(PreparedStatement stmt, int startIdx, Product product) throws SQLException {
         // TRUE STRATEGY PATTERN: Delegate entirely to the mapper
         // No if-else chains, no switch statements
-        // OCP: To add new product type, just create new mapper - this method stays unchanged!
-        ProductJdbcMapper<Product> mapper = (ProductJdbcMapper<Product>) ProductMapperRegistry.getMapperForProduct(product);
+        // OCP: To add new product type, just create new mapper - this method stays
+        // unchanged!
+        ProductJdbcMapper<Product> mapper = (ProductJdbcMapper<Product>) ProductMapperRegistry
+                .getMapperForProduct(product);
         return mapper.setAllTypeSpecificColumns(stmt, startIdx, product);
     }
 
@@ -218,7 +224,7 @@ public class DatabaseProductRepository implements ProductRepository {
         String sql = "SELECT * FROM products WHERE product_id = ? AND is_current = true";
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -234,17 +240,17 @@ public class DatabaseProductRepository implements ProductRepository {
 
         return Optional.empty();
     }
-    
+
     @Override
     public Optional<Product> findCurrentByBarcode(String barcode) {
         if (barcode == null || barcode.trim().isEmpty()) {
             return Optional.empty();
         }
-        
+
         String sql = "SELECT * FROM products WHERE barcode = ? AND is_current = true";
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
@@ -267,8 +273,8 @@ public class DatabaseProductRepository implements ProductRepository {
         String sql = "SELECT * FROM products WHERE is_current = true ORDER BY product_id";
 
         try (Connection conn = dbConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Product product = createProductFromResultSet(rs);
@@ -289,7 +295,7 @@ public class DatabaseProductRepository implements ProductRepository {
         String sql = "UPDATE products SET is_current = false, expired_date = NOW() WHERE product_id = ? AND is_current = true";
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
             int rowsAffected = stmt.executeUpdate();
@@ -306,7 +312,7 @@ public class DatabaseProductRepository implements ProductRepository {
         String sql = "SELECT COUNT(*) FROM products WHERE product_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -321,7 +327,7 @@ public class DatabaseProductRepository implements ProductRepository {
 
         return false;
     }
-    
+
     /**
      * Compare two products to check if they are equal (ignoring ID and timestamps)
      * Used to avoid creating unnecessary versions when nothing has changed
@@ -332,24 +338,26 @@ public class DatabaseProductRepository implements ProductRepository {
      * - No instanceof chains needed - just call p1.equals(p2)
      */
     private boolean areProductsEqual(Product p1, Product p2) {
-        if (p1 == null || p2 == null) return false;
+        if (p1 == null || p2 == null)
+            return false;
         return p1.equals(p2);
     }
-    
+
     @Override
     public List<Product> findHistoryByProductId(Long productId) {
         List<Product> history = new ArrayList<>();
-        
-        // First, get the barcode of the product (to find all versions with same barcode)
+
+        // First, get the barcode of the product (to find all versions with same
+        // barcode)
         String barcode = null;
         String getBarcodeSql = "SELECT barcode FROM products WHERE product_id = ?";
-        
+
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getBarcodeSql)) {
-            
+                PreparedStatement stmt = conn.prepareStatement(getBarcodeSql)) {
+
             stmt.setLong(1, productId);
             ResultSet rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 barcode = rs.getString("barcode");
             }
@@ -357,34 +365,36 @@ public class DatabaseProductRepository implements ProductRepository {
             System.err.println("ERROR: Failed to get barcode: " + e.getMessage());
             return history;
         }
-        
+
         if (barcode == null) {
-            return history;  // Product not found
+            return history; // Product not found
         }
-        
-        // Now get all versions with this barcode, ordered by created_at DESC (newest first)
+
+        // Now get all versions with this barcode, ordered by created_at DESC (newest
+        // first)
         String historySql = "SELECT * FROM products WHERE barcode = ? ORDER BY created_at DESC";
-        
+
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(historySql)) {
-            
+                PreparedStatement stmt = conn.prepareStatement(historySql)) {
+
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
-            
+
             while (rs.next()) {
                 Product product = createProductFromResultSet(rs);
                 history.add(product);
             }
-            
+
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to fetch product history: " + e.getMessage());
         }
-        
+
         return history;
     }
 
     /**
-     * OCP SOLUTION: Uses Factory + Mapper pattern to reconstruct Product from ResultSet
+     * OCP SOLUTION: Uses Factory + Mapper pattern to reconstruct Product from
+     * ResultSet
      * 
      * HOW IT WORKS:
      * 1. Get product type from DB (e.g., "BOOK")
@@ -399,18 +409,18 @@ public class DatabaseProductRepository implements ProductRepository {
      */
     private Product createProductFromResultSet(ResultSet rs) throws SQLException {
         String productTypeStr = rs.getString("product_type");
-        
+
         // Use Factory to create empty product instance
         ProductFactory factory = ProductFactoryRegistry.getFactory(productTypeStr);
         Product product = factory.createEmptyProduct();
-        
+
         // Use Mapper to populate type-specific fields from ResultSet
         ProductJdbcMapper<Product> mapper = ProductMapperRegistry.getMapper(productTypeStr);
         mapper.populateFromResultSet(rs, product);
-        
+
         // Set common attributes
         setCommonAttributes(product, rs);
-        
+
         return product;
     }
 
@@ -433,12 +443,14 @@ public class DatabaseProductRepository implements ProductRepository {
         product.setVatRate(rs.getDouble("vat_rate"));
 
         Timestamp createdAt = rs.getTimestamp("created_at");
-        if (createdAt != null) product.setCreatedAt(createdAt.toLocalDateTime());
-        
+        if (createdAt != null)
+            product.setCreatedAt(createdAt.toLocalDateTime());
+
         // History tracking fields
         product.setIsCurrent(rs.getBoolean("is_current"));
         Timestamp expiredDate = rs.getTimestamp("expired_date");
-        if (expiredDate != null) product.setExpiredDate(expiredDate.toLocalDateTime());
+        if (expiredDate != null)
+            product.setExpiredDate(expiredDate.toLocalDateTime());
     }
 
     /**
@@ -449,41 +461,223 @@ public class DatabaseProductRepository implements ProductRepository {
     private String getProductTypeString(Product product) {
         return product.getProductType().toString();
     }
-    
+
     /**
      * Update product stock after order is paid
      * Updates only the current version of the product (is_current = true)
      * 
      * @param productId Product ID
-     * @param newStock New stock quantity
+     * @param newStock  New stock quantity
      * @return true if update successful, false otherwise
      */
     @Override
     public boolean updateStock(Long productId, Integer newStock) {
         String sql = "UPDATE products SET stock = ? " +
-                    "WHERE product_id = ? AND is_current = true";
-        
+                "WHERE product_id = ? AND is_current = true";
+
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, newStock);
             stmt.setLong(2, productId);
-            
+
             int rowsAffected = stmt.executeUpdate();
-            
+
             if (rowsAffected > 0) {
-                System.out.println(String.format("✅ Stock updated in database: Product ID=%d, New Stock=%d", 
+                System.out.println(String.format("✅ Stock updated in database: Product ID=%d, New Stock=%d",
                         productId, newStock));
                 return true;
             } else {
                 System.err.println(String.format("⚠️ No product found to update: Product ID=%d", productId));
                 return false;
             }
-            
+
         } catch (SQLException e) {
             System.err.println("❌ Failed to update stock in database: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Atomically deducts stock from the database (solves Race Condition).
+     * The condition 'stock >= ?' ensures stock never goes negative.
+     */
+    @Override
+    public boolean deductStockAtomically(Long productId, int quantity) {
+        String sql = "UPDATE products SET stock = stock - ? " +
+                "WHERE product_id = ? AND is_current = true AND stock >= ?";
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, quantity);
+            stmt.setLong(2, productId);
+            stmt.setInt(3, quantity);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println(String.format("✅ Stock atomically deducted: Product ID=%d, Quantity=%d",
+                        productId, quantity));
+                return true;
+            } else {
+                System.err.println(String.format(
+                        "⚠️ Failed to deduct stock (Out of stock or product not found): Product ID=%d", productId));
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database error during atomic stock deduction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Atomically restores stock to the database (used for Compensating
+     * Transactions).
+     */
+    @Override
+    public boolean restoreStock(Long productId, int quantity) {
+        String sql = "UPDATE products SET stock = stock + ? " +
+                "WHERE product_id = ? AND is_current = true";
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, quantity);
+            stmt.setLong(2, productId);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println(String.format("✅ Stock atomically restored: Product ID=%d, Quantity=%d",
+                        productId, quantity));
+                return true;
+            } else {
+                System.err.println(
+                        String.format("⚠️ Failed to restore stock (product not found): Product ID=%d", productId));
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Database error during stock restoration: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deductStockForOrder(List<com.aimsfx.model.OrderItem> items) {
+        if (items == null || items.isEmpty())
+            return true;
+
+        String sql = "UPDATE products SET stock = stock - ? WHERE product_id = ? AND is_current = true AND stock >= ?";
+
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (com.aimsfx.model.OrderItem item : items) {
+                    Product product = item.getProduct();
+                    if (product == null || product.getProductId() == null)
+                        continue;
+
+                    stmt.setInt(1, item.getQuantity());
+                    stmt.setLong(2, product.getProductId());
+                    stmt.setInt(3, item.getQuantity());
+
+                    int rowsAffected = stmt.executeUpdate();
+                    if (rowsAffected == 0) {
+                        // Out of stock or product not found. Rollback all previous deductions.
+                        conn.rollback();
+                        System.err.println(
+                                String.format("Failed to deduct stock for Product ID=%d. Rolling back transaction.",
+                                        product.getProductId()));
+                        return false;
+                    }
+                }
+            }
+
+            conn.commit();
+            System.out.println("All stock deductions completed successfully in a single transaction.");
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("ERROR: Failed to rollback stock deduction: " + ex.getMessage());
+                }
+            }
+            System.err.println("Database error during transactional stock deduction: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("ERROR: Failed to close connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean restoreStockForOrder(List<com.aimsfx.model.OrderItem> items) {
+        if (items == null || items.isEmpty())
+            return true;
+
+        String sql = "UPDATE products SET stock = stock + ? WHERE product_id = ? AND is_current = true";
+
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                for (com.aimsfx.model.OrderItem item : items) {
+                    Product product = item.getProduct();
+                    if (product == null || product.getProductId() == null)
+                        continue;
+
+                    stmt.setInt(1, item.getQuantity());
+                    stmt.setLong(2, product.getProductId());
+
+                    stmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+            System.out.println("All stock restorations completed successfully in a single transaction.");
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.err.println("ERROR: Failed to rollback stock restoration: " + ex.getMessage());
+                }
+            }
+            System.err.println("Database error during transactional stock restoration: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("ERROR: Failed to close connection: " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -498,19 +692,19 @@ public class DatabaseProductRepository implements ProductRepository {
     @Override
     public java.util.Map<String, Object> getProductDetails(Long productId) {
         String sql = "SELECT * FROM products WHERE product_id = ? AND is_current = true";
-        
+
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setLong(1, productId);
             ResultSet rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 // Create product using OCP-compliant method
                 Product product = createProductFromResultSet(rs);
-                
+
                 java.util.Map<String, Object> details = new java.util.HashMap<>();
-                
+
                 // Common fields
                 details.put("product_id", product.getProductId());
                 details.put("barcode", product.getBarcode());
@@ -525,29 +719,30 @@ public class DatabaseProductRepository implements ProductRepository {
                 details.put("status", product.getStatus());
                 details.put("vat_rate", product.getVatRate());
                 details.put("product_type", product.getProductType().toString());
-                
+
                 // Specific fields from polymorphic method with "specific_" prefix
                 java.util.Map<String, Object> specificDetails = product.getSpecificDetail();
                 for (java.util.Map.Entry<String, Object> entry : specificDetails.entrySet()) {
                     details.put("specific_" + entry.getKey(), entry.getValue());
                 }
-                
+
                 return details;
             }
-            
+
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to get product details: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return null;
     }
-    
+
     /**
      * Update product stock and log the change
-     * @param barcode Product barcode
+     * 
+     * @param barcode  Product barcode
      * @param newStock New stock value
-     * @param reason Reason for stock change
+     * @param reason   Reason for stock change
      * @return true if updated successfully
      */
     @Override
@@ -555,12 +750,12 @@ public class DatabaseProductRepository implements ProductRepository {
         String getStockSql = "SELECT stock FROM products WHERE barcode = ? AND is_current = true";
         String updateStockSql = "UPDATE products SET stock = ? WHERE barcode = ? AND is_current = true";
         String insertLogSql = "INSERT INTO stock_change_log (barcode, from_stock, to_stock, change_reason) VALUES (?, ?, ?, ?)";
-        
+
         Connection conn = null;
         try {
             conn = dbConnection.getConnection();
             conn.setAutoCommit(false); // Start transaction
-            
+
             // Get current stock
             Integer currentStock;
             try (PreparedStatement stmt = conn.prepareStatement(getStockSql)) {
@@ -573,7 +768,7 @@ public class DatabaseProductRepository implements ProductRepository {
                     return false;
                 }
             }
-            
+
             // Update stock
             try (PreparedStatement stmt = conn.prepareStatement(updateStockSql)) {
                 stmt.setInt(1, newStock);
@@ -584,7 +779,7 @@ public class DatabaseProductRepository implements ProductRepository {
                     return false;
                 }
             }
-            
+
             // Log the change
             try (PreparedStatement stmt = conn.prepareStatement(insertLogSql)) {
                 stmt.setString(1, barcode);
@@ -593,10 +788,10 @@ public class DatabaseProductRepository implements ProductRepository {
                 stmt.setString(4, reason);
                 stmt.executeUpdate();
             }
-            
+
             conn.commit();
             return true;
-            
+
         } catch (SQLException e) {
             if (conn != null) {
                 try {
@@ -618,9 +813,10 @@ public class DatabaseProductRepository implements ProductRepository {
             }
         }
     }
-    
+
     /**
      * Get stock change history for a product
+     * 
      * @param barcode Product barcode
      * @return List of stock change logs
      */
@@ -628,13 +824,13 @@ public class DatabaseProductRepository implements ProductRepository {
     public List<StockChangeLog> getStockChangeHistory(String barcode) {
         String sql = "SELECT * FROM stock_change_log WHERE barcode = ? ORDER BY changed_at DESC";
         List<StockChangeLog> logs = new ArrayList<>();
-        
+
         try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
-            
+
             while (rs.next()) {
                 StockChangeLog log = new StockChangeLog();
                 log.setId(rs.getLong("id"));
@@ -645,12 +841,103 @@ public class DatabaseProductRepository implements ProductRepository {
                 log.setChangedAt(rs.getTimestamp("changed_at").toLocalDateTime());
                 logs.add(log);
             }
-            
+
         } catch (SQLException e) {
             System.err.println("ERROR: Failed to get stock change history: " + e.getMessage());
         }
-        
+
         return logs;
     }
-}
 
+    /**
+     * Search products by title, category, or barcode with a limit.
+     * Used for autocomplete suggestions and filtered search.
+     * 
+     * CHANGELOG: Added minPrice and maxPrice parameters for DB-level price filtering.
+     */
+    @Override
+    public List<Product> searchProducts(String query, Double minPrice, Double maxPrice, int limit) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE is_current = true");
+        
+        // Add query condition if present
+        boolean hasQuery = query != null && !query.trim().isEmpty();
+        if (hasQuery) {
+            sql.append(" AND (LOWER(title) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?) OR LOWER(barcode) LIKE LOWER(?))");
+        }
+        
+        // Add price conditions if present
+        if (minPrice != null) {
+            sql.append(" AND current_price >= ?");
+        }
+        if (maxPrice != null) {
+            sql.append(" AND current_price < ?");
+        }
+        
+        sql.append(" LIMIT ?");
+        
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+            
+            if (hasQuery && query != null) {
+                String searchPattern = "%" + query.trim() + "%";
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+            }
+            
+            if (minPrice != null) {
+                stmt.setDouble(paramIndex++, minPrice);
+            }
+            if (maxPrice != null) {
+                stmt.setDouble(paramIndex++, maxPrice);
+            }
+            
+            stmt.setInt(paramIndex, limit);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = createProductFromResultSet(rs);
+                products.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to search products with filters: " + e.getMessage());
+        }
+
+        return products;
+    }
+
+    /**
+     * Get a random list of products with a limit.
+     * Used for Homepage display to avoid loading all products into memory.
+     * 
+     * CHANGELOG: Added for memory-optimization in main homepage display.
+     */
+    @Override
+    public List<Product> getRandomProducts(int limit) {
+        String sql = "SELECT * FROM products WHERE is_current = true ORDER BY RANDOM() LIMIT ?";
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = createProductFromResultSet(rs);
+                products.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to fetch random products: " + e.getMessage());
+        }
+
+        return products;
+    }
+}

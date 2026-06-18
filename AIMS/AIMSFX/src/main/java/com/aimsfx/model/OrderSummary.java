@@ -13,6 +13,7 @@ public class OrderSummary {
     private String paymentMethod;
     private String paymentStatus;
     private OrderStatus orderStatus;
+    private String cancelReason;
 
     public int getOrderId() {
         return orderId;
@@ -68,5 +69,13 @@ public class OrderSummary {
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 }

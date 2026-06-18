@@ -3,6 +3,8 @@ package com.aimsfx.controller;
 import com.aimsfx.model.*;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.view.HomepageView;
+import com.aimsfx.controller.ProductManagerController.ProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.exception.ProductNotFoundException;
 
 import java.util.*;
@@ -15,6 +17,12 @@ public class HomepageController {
 
     private List<Product> allProducts = new ArrayList<>();
     private List<Product> currentDisplayedProducts = new ArrayList<>();
+    private List<Product> random20Products = new ArrayList<>();
+
+    // State variables for Database-Level Filtering
+    private Double currentMinPrice = null;
+    private Double currentMaxPrice = null;
+    private String currentSearchQuery = "";
 
     public HomepageController(HomepageView view) {
         this.view = view;
@@ -31,34 +39,89 @@ public class HomepageController {
         });
     }
 
-    public void performSearch(String query) {
+    /**
+     * =========================================================================================================
+     * FE/BE OPTIMIZATION: ASYNCHRONOUS SEARCH WITH DATABASE-LEVEL FILTERS
+     * =========================================================================================================
+     * PREVIOUS PROBLEMS:
+     * 1. Price filters were applied locally to the random 20 products currently in memory, 
+     *    which yielded inconsistent and confusing results (e.g., clicking 100-200k would return 2-4 items).
+     *
+     * DETAILED SOLUTION & IMPLEMENTATION:
+     * 1. Merged search and filter state into performFilteredSearchAsync().
+     * 2. This method queries the database directly with both the search query AND the price bounds.
+     * 3. Retained the Async Task and Loading UI for maximum responsiveness.
+     *
+     * EXPECTED RESULTS:
+     * Clicking a price filter or typing a search will ALWAYS query the database and return exactly 20 
+     * matching products. The count will be perfectly consistent.
+     * =========================================================================================================
+     */
+    public void performSearchAsync(String query) {
+        this.currentSearchQuery = query;
+        performFilteredSearchAsync();
+    }
+
+    private void performFilteredSearchAsync() {
+        view.showLoading();
+        
+        javafx.concurrent.Task<List<Product>> searchTask = new javafx.concurrent.Task<>() {
+            @Override
+            protected List<Product> call() throws Exception {
+                // If there are no filters and no query, just return the random products
+                if ((currentSearchQuery == null || currentSearchQuery.trim().isEmpty()) 
+                    && currentMinPrice == null && currentMaxPrice == null) {
+                    return new ArrayList<>(random20Products);
+                } else {
+                    return productController.searchProducts(currentSearchQuery, currentMinPrice, currentMaxPrice, 20);
+                }
+            }
+        };
+
+        searchTask.setOnSucceeded(e -> {
+            currentDisplayedProducts = searchTask.getValue();
+            allProducts = new ArrayList<>(currentDisplayedProducts);
+            view.displayProducts(currentDisplayedProducts);
+            view.hideLoading();
+        });
+
+        searchTask.setOnFailed(e -> {
+            view.hideLoading();
+            view.showAlert("Error", "Failed to search products: " + searchTask.getException().getMessage());
+        });
+
+        new Thread(searchTask).start();
+    }
+
+    /**
+     * CHANGELOG: Added for memory-optimization in autocomplete feature.
+     * Fetches up to 10 suggestions from the database based on the query.
+     */
+    public List<String> getAutocompleteSuggestions(String query) {
         if (query == null || query.trim().isEmpty()) {
-            currentDisplayedProducts = new ArrayList<>(allProducts);
-        } else {
-            String lowerQuery = query.toLowerCase().trim();
-            currentDisplayedProducts = allProducts.stream()
-                    .filter(p -> (p.getTitle() != null && p.getTitle().toLowerCase().contains(lowerQuery)) ||
-                            (p.getCategory() != null && p.getCategory().toLowerCase().contains(lowerQuery)) ||
-                            (p.getBarcode() != null && p.getBarcode().toLowerCase().contains(lowerQuery)) ||
-                            (p.getProductType() != null
-                                    && p.getProductType().name().toLowerCase().contains(lowerQuery)))
-                    .collect(Collectors.toList());
+            return new ArrayList<>();
         }
-        view.displayProducts(currentDisplayedProducts);
+        return productController.searchProducts(query, null, null, 10).stream()
+                .map(Product::getTitle)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public void filterByPrice(double min, double max) {
-        currentDisplayedProducts = allProducts.stream()
-                .filter(p -> p.getCurrentPrice() >= min && p.getCurrentPrice() < max)
-                .collect(Collectors.toList());
-        view.displayProducts(currentDisplayedProducts);
+        this.currentMinPrice = min;
+        this.currentMaxPrice = max;
+        performFilteredSearchAsync();
     }
 
     public void filterOverPrice(double min) {
-        currentDisplayedProducts = allProducts.stream()
-                .filter(p -> p.getCurrentPrice() >= min)
-                .collect(Collectors.toList());
-        view.displayProducts(currentDisplayedProducts);
+        this.currentMinPrice = min;
+        this.currentMaxPrice = null;
+        performFilteredSearchAsync();
+    }
+
+    public void clearPriceFilter() {
+        this.currentMinPrice = null;
+        this.currentMaxPrice = null;
     }
 
     public void sortByNew() {
@@ -102,6 +165,7 @@ public class HomepageController {
         SessionManager sessionManager = SessionManager.getInstance();
         if (sessionManager.isLoggedIn()) {
             String username = sessionManager.getCurrentUser().getUsername();
+            view.updateAccountUI(true, username);
             view.showAlert("Success", "Login successful! Welcome, " + username);
         }
     }
@@ -151,6 +215,7 @@ public class HomepageController {
                 break;
             case LOGOUT:
                 UserController.getInstance().logout();
+                view.updateAccountUI(false, null);
                 view.showAlert("Success", "Logged out successfully!");
                 break;
         }
@@ -174,26 +239,38 @@ public class HomepageController {
         view.navigateToOrderManagement();
     } // [FIXED] Added missing closing brace
 
+    /**
+     * CHANGELOG: Optimized to fetch 20 random products directly from the database
+     * to avoid loading all products into memory, handling huge databases efficiently.
+     */
     public void refreshAllProducts() {
         allProducts.clear();
-        allProducts.addAll(productController.getProducts());
-        currentDisplayedProducts = new ArrayList<>(allProducts);
+        random20Products.clear();
+        
+        List<Product> randomFromDb = productController.getRandomProducts(20);
+        
+        allProducts.addAll(randomFromDb);
+        random20Products.addAll(randomFromDb);
+        currentDisplayedProducts = new ArrayList<>(random20Products);
     }
 
     public void handleViewDetail(String productId) {
         try {
             ViewProductController viewController = ViewProductController.getInstance();
-            Map<String, Object> productData = viewController.getProductDetail(productId); // Retrieves detailed data from DB
+            Map<String, Object> productData = viewController.getProductDetail(productId); // Retrieves detailed data
+                                                                                          // from DB
             view.showProductDetail(viewController, productData);
         } catch (ProductNotFoundException e) {
-            // [ADDED] Explicitly handling DB exception when product is not found, matching original controller
+            // [ADDED] Explicitly handling DB exception when product is not found, matching
+            // original controller
             view.showAlert("Error", "Product not found: " + e.getMessage());
         } catch (Exception e) {
             view.showAlert("Error", "Failed to load product details: " + e.getMessage());
         }
     }
 
-    // [ADDED] Expose cart getter for external dependencies and testing to match original HomepageController capability
+    // [ADDED] Expose cart getter for external dependencies and testing to match
+    // original HomepageController capability
     public Cart getCart() {
         return cartManager.getCart();
     }

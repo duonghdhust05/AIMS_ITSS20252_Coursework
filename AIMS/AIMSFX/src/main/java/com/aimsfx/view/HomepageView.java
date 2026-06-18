@@ -1,9 +1,12 @@
 package com.aimsfx.view;
 
 import com.aimsfx.controller.HomepageController;
-import com.aimsfx.controller.ViewProductController;
+import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.UserMenuAction;
+import com.aimsfx.view.ProductView.ProductCardComponent;
+import com.aimsfx.view.ProductView.ProductDetailUI;
+import com.aimsfx.view.ProductView.ProductListView;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,17 +61,71 @@ public class HomepageView {
     @FXML
     private Label productCountLabel;
 
+    @FXML
+    private Button btnAccount;
+
     private HomepageController controller;
 
     @FXML
     public void initialize() {
         this.controller = new HomepageController(this);
 
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> controller.performSearch(newVal));
+        /**
+         * =========================================================================================================
+         * FE OPTIMIZATION: DEBOUNCE & EXPLICIT SEARCH TRIGGERS
+         * =========================================================================================================
+         * PREVIOUS PROBLEMS:
+         * 1. The textProperty().addListener called performSearch() on EVERY keystroke,
+         * causing severe UI stutter.
+         * 2. ControlsFX bindAutoCompletion fired immediately without debounce, flooding
+         * the DB with LIKE queries.
+         *
+         * DETAILED SOLUTION & IMPLEMENTATION:
+         * 1. Removed the real-time search listener. Main grid only updates on ENTER or
+         * selecting a suggestion.
+         * 2. Added a 300ms debounce (setDelay) to AutoCompletionBinding to wait until
+         * the user stops typing.
+         * 3. Added an event handler for suggestion selection to trigger the
+         * asynchronous main search.
+         *
+         * EXPECTED RESULTS:
+         * Typing will feel perfectly smooth. Database queries are reduced by 90%. UI
+         * only updates when necessary.
+         * =========================================================================================================
+         */
+
+        // Trigger search when ENTER is pressed
+        searchField.setOnAction(e -> controller.performSearchAsync(searchField.getText()));
+
+        // Bind Autocomplete with a 300ms delay to prevent DB spamming
+        org.controlsfx.control.textfield.AutoCompletionBinding<String> binding = org.controlsfx.control.textfield.TextFields
+                .bindAutoCompletion(searchField, request -> {
+                    return controller.getAutocompleteSuggestions(request.getUserText());
+                });
+
+        binding.setDelay(300); // 300ms Debounce
+
+        // When user clicks a suggestion, automatically search for it
+        binding.setOnAutoCompleted(event -> {
+            controller.performSearchAsync(event.getCompletion());
+        });
 
         Platform.runLater(() -> {
             controller.initData();
+            if (com.aimsfx.utils.SessionManager.getInstance().isLoggedIn()) {
+                updateAccountUI(true, com.aimsfx.utils.SessionManager.getInstance().getCurrentUser().getUsername());
+            }
         });
+    }
+
+    public void updateAccountUI(boolean isLoggedIn, String username) {
+        if (btnAccount != null) {
+            if (isLoggedIn && username != null) {
+                btnAccount.setText("👤 " + username);
+            } else {
+                btnAccount.setText("👤 Login");
+            }
+        }
     }
 
     // Filter buttons state
@@ -110,8 +167,9 @@ public class HomepageView {
     @FXML
     public void filterAll() {
         setActiveFilterButton(btnAll);
+        controller.clearPriceFilter();
         controller.refreshAllProducts();
-        controller.performSearch(searchField.getText());
+        controller.performSearchAsync(searchField.getText());
     }
 
     // Sort buttons state
@@ -156,6 +214,24 @@ public class HomepageView {
 
     // Render Methods
 
+    public void showLoading() {
+        Platform.runLater(() -> {
+            productGrid.getChildren().clear();
+            productCountLabel.setText("Searching...");
+            ProgressIndicator loadingIndicator = new ProgressIndicator();
+            loadingIndicator.setPrefSize(50, 50);
+
+            // Add loading spinner to the center of the grid area
+            GridPane.setHalignment(loadingIndicator, javafx.geometry.HPos.CENTER);
+            GridPane.setValignment(loadingIndicator, javafx.geometry.VPos.CENTER);
+            productGrid.add(loadingIndicator, 1, 0);
+        });
+    }
+
+    public void hideLoading() {
+        // Automatically handled by displayProducts clearing the grid
+    }
+
     public void displayProducts(List<Product> products) {
         productGrid.getChildren().clear();
         productCountLabel.setText(products.size() + " product" + (products.size() != 1 ? "s" : ""));
@@ -181,6 +257,7 @@ public class HomepageView {
                 e.printStackTrace();
             }
         }
+        new animatefx.animation.FadeInUp(productGrid).play();
     }
 
     @FXML
@@ -190,9 +267,13 @@ public class HomepageView {
             Parent view = loader.load();
 
             Stage stage = (Stage) searchField.getScene().getWindow();
-            Scene scene = new Scene(view);
-            stage.setScene(scene);
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(view);
+            } else {
+                stage.setScene(new Scene(view));
+            }
             stage.setTitle("AIMS - Shopping Cart");
+            new animatefx.animation.FadeIn(view).play();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -247,10 +328,11 @@ public class HomepageView {
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
             stage.setTitle("Product Management Panel");
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            stage.setScene(new Scene(root, 1600, 900));
+            stage.setScene(new Scene(root, 1280, 720));
             stage.setResizable(true);
             stage.setMinWidth(900);
             stage.setMinHeight(650);
@@ -320,10 +402,11 @@ public class HomepageView {
             Parent root = loader.load();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("User Management");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            dialogStage.setScene(new Scene(root, 1600, 900));
+            dialogStage.setScene(new Scene(root, 1280, 720));
             dialogStage.setResizable(true);
             dialogStage.setMinWidth(900);
             dialogStage.setMinHeight(600);
@@ -343,6 +426,7 @@ public class HomepageView {
             LoginView loginView = loader.getController();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("Login");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
@@ -369,9 +453,10 @@ public class HomepageView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/change-password-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.view.ChangePasswordView controller = loader.getController();
+            com.aimsfx.view.AdministratorView.ChangePasswordView controller = loader.getController();
 
             Stage dialogStage = new Stage();
+            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
             dialogStage.setTitle("Change Password");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval

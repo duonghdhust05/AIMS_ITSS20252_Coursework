@@ -289,12 +289,9 @@ public class DeliveryInfo {
         }
         
         String normalizedProvince = province.trim().toLowerCase();
-        boolean result = normalizedProvince.contains("hà nội") || 
-               normalizedProvince.contains("ha noi") ||
+        boolean result = normalizedProvince.contains("ha noi") ||
                normalizedProvince.contains("hanoi") ||
-               normalizedProvince.contains("hồ chí minh") ||
                normalizedProvince.contains("ho chi minh") ||
-               normalizedProvince.contains("tp. hồ chí minh") ||
                normalizedProvince.contains("tp hcm") ||
                normalizedProvince.contains("hcm");
         

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.4</version>
+    <version>3.5.15</version>
     <relativePath/> </parent>
 
   <groupId>com.example</groupId>
@@ -22,6 +22,18 @@
   </properties>
 
   <dependencies>
+    <!-- UI Frameworks & Animations -->
+    <dependency>
+      <groupId>io.github.mkpaz</groupId>
+      <artifactId>atlantafx-base</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.typhon0</groupId>
+      <artifactId>AnimateFX</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -210,7 +222,7 @@
     <dependency>
       <groupId>com.paypal.sdk</groupId>
       <artifactId>paypal-server-sdk</artifactId>
-      <version>2.2.0</version>
+      <version>2.3.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -268,8 +280,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.5.3</version>
         <configuration>
-          <argLine>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</argLine>
-          <!-- Hiển thị @DisplayName đẹp hơn trong console -->
+          <argLine>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED -XX:+EnableDynamicAgentLoading</argLine>
+          <!-- Display @DisplayName nicely in console -->
           <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
             <usePhrasedTestCaseClassName>true</usePhrasedTestCaseClassName>
             <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
