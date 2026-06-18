@@ -222,7 +222,7 @@
     <dependency>
       <groupId>com.paypal.sdk</groupId>
       <artifactId>paypal-server-sdk</artifactId>
-      <version>2.2.0</version>
+      <version>2.3.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -280,7 +280,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.5.3</version>
         <configuration>
-          <argLine>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</argLine>
+          <argLine>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED -XX:+EnableDynamicAgentLoading</argLine>
           <!-- Display @DisplayName nicely in console -->
           <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
             <usePhrasedTestCaseClassName>true</usePhrasedTestCaseClassName>

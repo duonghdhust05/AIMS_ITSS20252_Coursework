@@ -36,6 +36,7 @@ public class PaymentControllerFactory {
     
     // Singleton instance (cached)
     private static PayOrderController cachedController;
+    private static IPaymentGateway cachedPayPalGateway;
     
     // Private constructor to prevent instantiation
     private PaymentControllerFactory() {
@@ -70,9 +71,10 @@ public class PaymentControllerFactory {
             // ==================== PayPal Subsystem Setup ====================
             PayPalConfig payPalConfig = new PayPalConfig();
             CurrencyConverter currencyConverter = new CurrencyConverter();
-            IPaymentGateway payPalSubsystem = new PayPalSubsystem(
+            cachedPayPalGateway = new PayPalSubsystem(
                     payPalConfig.paypalClient(), 
                     currencyConverter);
+            IPaymentGateway payPalSubsystem = cachedPayPalGateway;
             LOGGER.info("✅ PayPal subsystem initialized");
             
             // ==================== PayPal View Setup ====================
@@ -101,6 +103,19 @@ public class PaymentControllerFactory {
     public static void reset() {
         LOGGER.info("Resetting cached PayOrderController");
         cachedController = null;
+        cachedPayPalGateway = null;
+    }
+    
+    /**
+     * Get the configured PayPal gateway instance
+     * 
+     * @return IPaymentGateway instance for PayPal
+     */
+    public static IPaymentGateway getPayPalGateway() {
+        if (cachedPayPalGateway == null) {
+            getPayOrderController();
+        }
+        return cachedPayPalGateway;
     }
     
     /**

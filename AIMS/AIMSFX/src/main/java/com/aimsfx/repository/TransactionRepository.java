@@ -450,6 +450,31 @@ public class TransactionRepository {
     }
 
     /**
+     * Get external transaction ID by order ID
+     *
+     * @param orderId The order ID
+     * @return External transaction ID (e.g. PayPal Order ID) or null if not found
+     */
+    public String getExternalTransactionIdByOrderId(int orderId) {
+        String sql = "SELECT external_transaction_id FROM transactions WHERE order_id = ? ORDER BY created_at DESC LIMIT 1";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("external_transaction_id");
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to find external transaction ID by order ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Get transaction status
      * 
      * @param transactionId Transaction ID
@@ -504,6 +529,36 @@ public class TransactionRepository {
     }
 
     /**
+     * Mark transaction as refunded
+     * 
+     * @param transactionId Internal transaction ID
+     * @return true if successful
+     */
+    public boolean markRefunded(int transactionId) {
+        String sql = """
+                UPDATE transactions
+                SET status = 'REFUNDED', completed_at = CURRENT_TIMESTAMP
+                WHERE transaction_id = ?
+                """;
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, transactionId);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                updateOrderPaymentStatus(transactionId, "REFUNDED");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR: Failed to mark transaction refunded: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Update transaction status
      */
     public void updateStatus(int transactionId, String status) {
@@ -513,6 +568,8 @@ public class TransactionRepository {
             markFailed(transactionId, "Failed pending transaction check");
         } else if ("CANCELLED".equals(status)) {
             markCancelled(transactionId);
+        } else if ("REFUNDED".equals(status)) {
+            markRefunded(transactionId);
         } else {
             String sql = "UPDATE transactions SET status = ? WHERE transaction_id = ?";
             try (Connection conn = DatabaseConnection.getInstance().getConnection();

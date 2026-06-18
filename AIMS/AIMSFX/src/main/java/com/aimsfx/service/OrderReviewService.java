@@ -26,19 +26,22 @@ public class OrderReviewService {
     private final OrderRepository commandRepository;
     private final com.aimsfx.repository.ProductRepository productRepository;
     private final EmailSenderService emailSender;
+    private final RefundService refundService;
 
     public OrderReviewService() {
-        this(new OrderQueryRepository(), new OrderRepository(), new com.aimsfx.repository.DatabaseProductRepository(), new EmailSenderService());
+        this(new OrderQueryRepository(), new OrderRepository(), new com.aimsfx.repository.DatabaseProductRepository(), new EmailSenderService(), new RefundService());
     }
 
     public OrderReviewService(OrderQueryRepository queryRepository,
                               OrderRepository commandRepository,
                               com.aimsfx.repository.ProductRepository productRepository,
-                              EmailSenderService emailSender) {
+                              EmailSenderService emailSender,
+                              RefundService refundService) {
         this.queryRepository = queryRepository;
         this.commandRepository = commandRepository;
         this.productRepository = productRepository;
         this.emailSender = emailSender;
+        this.refundService = refundService;
     }
 
     public int countPendingReviewOrders() throws SQLException {
@@ -91,9 +94,11 @@ public class OrderReviewService {
                 if (order.getDeliveryInfo() != null) {
                     emailSender.sendUpdateNotification(order, order.getDeliveryInfo().getEmail());
                 }
+                
+                // Attempt automated refund if paid
+                refundService.processRefundIfPaid(orderId);
             }
         }
-        // Refund intentionally excluded.
     }
 
     public void cancelByCustomer(int orderId) throws SQLException {
@@ -120,6 +125,9 @@ public class OrderReviewService {
             // Restore stock safely because order will not be delivered
             productRepository.restoreStockForOrder(tempOrder.getOrderItems());
             logAction(orderId, "REFUND_REQUEST", "Customer requested order cancellation/refund");
+            
+            // Attempt automated refund if paid
+            refundService.processRefundIfPaid(orderId);
         }
     }
     

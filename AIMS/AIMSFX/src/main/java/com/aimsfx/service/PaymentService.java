@@ -5,8 +5,6 @@ import com.aimsfx.repository.DatabaseProductRepository;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.ProductRepository;
 import com.aimsfx.repository.TransactionRepository;
-
-// Spring imports for @Transactional (removed because unused)
 import com.aimsfx.model.TransactionInfo;
 import java.sql.SQLException;
 import java.util.List;

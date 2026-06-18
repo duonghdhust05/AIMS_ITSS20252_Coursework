@@ -4,7 +4,6 @@ import com.aimsfx.subsystem.vietqr.model.VietQRRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

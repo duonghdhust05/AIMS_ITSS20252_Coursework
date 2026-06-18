@@ -1,8 +1,6 @@
 package com.aimsfx.view;
 
 import com.aimsfx.model.CartItem;
-import com.aimsfx.model.Product;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -70,7 +68,8 @@ public class CartView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/cart-item.fxml"));
             HBox itemBox = loader.load();
-            com.aimsfx.controller.PlaceOrderController.CartItemController controller = loader.getController();
+            com.aimsfx.controller.PlaceOrderController.CartViewController.CartItemController controller = loader
+                    .getController();
             controller.setItemData(cartItem, onQuantityChange, onRemove);
             return itemBox;
         } catch (java.io.IOException e) {

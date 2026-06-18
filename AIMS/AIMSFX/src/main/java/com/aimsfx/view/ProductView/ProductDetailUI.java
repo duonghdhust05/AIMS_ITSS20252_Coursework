@@ -3,9 +3,6 @@ package com.aimsfx.view.ProductView;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.*;
 import com.aimsfx.view.BaseView;
-
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -77,7 +74,8 @@ public class ProductDetailUI extends BaseView {
         stage.setTitle("Product Details");
 
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/product-detail-ui-view.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/product-detail-ui-view.fxml"));
             loader.setController(this);
             BorderPane root = loader.load();
 

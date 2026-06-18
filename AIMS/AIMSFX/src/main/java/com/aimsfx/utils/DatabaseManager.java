@@ -1,8 +1,5 @@
 package com.aimsfx.utils;
 
-import java.sql.Connection;
-import java.sql.Statement;
-
 /**
  * Utility class to manage the lifecycle of the database connection pool
  */

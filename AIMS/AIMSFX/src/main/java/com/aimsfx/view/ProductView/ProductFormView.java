@@ -6,8 +6,6 @@ import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -422,10 +420,11 @@ public class ProductFormView {
      */
     private void addTrackToList(Track track, int index) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/cd-track-item.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/aimsfx/cd-track-item.fxml"));
             HBox trackItem = loader.load();
             com.aimsfx.controller.ProductManagerController.CDTrackItemController controller = loader.getController();
-            
+
             controller.setTrackData(track, index, (idx) -> {
                 cdTracks.remove(idx.intValue());
                 refreshTracksList();
@@ -473,8 +472,6 @@ public class ProductFormView {
             }
         }
     }
-
-
 
     /**
      * Handle cancel button

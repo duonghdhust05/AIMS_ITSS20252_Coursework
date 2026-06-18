@@ -1,7 +1,6 @@
 package com.aimsfx.view;
 
 import com.aimsfx.model.Invoice;
-import com.aimsfx.model.OrderItem;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
@@ -66,7 +65,8 @@ public class InvoiceUI extends BaseView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.controller.PlaceOrderController.InvoiceDialogController controller = loader.getController();
+            com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.InvoiceDialogController controller = loader
+                    .getController();
 
             // Pass null for order (it will use invoice.getOrderId()) and null for
             // transaction

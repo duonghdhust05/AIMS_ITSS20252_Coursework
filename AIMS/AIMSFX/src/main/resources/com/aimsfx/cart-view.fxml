@@ -15,7 +15,7 @@
 
 <BorderPane prefHeight="720" prefWidth="1280" style="-fx-background-color: white;"
    xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-   fx:controller="com.aimsfx.controller.PlaceOrderController.CartController">
+   fx:controller="com.aimsfx.controller.PlaceOrderController.CartViewController.CartController">
    <top>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
