@@ -85,6 +85,8 @@ public class RefundService {
                 if (transactionId > 0) {
                     transactionRepository.updateStatus(transactionId, "REFUNDED");
                 }
+                // Update Order status to REFUNDED
+                orderRepository.updateOrderStatus(orderId, "REFUNDED", "Automated PayPal Refund Successful");
                 return true;
             } else {
                 LOGGER.warning("Refund failed for PayPal transaction: " + externalTransactionId);

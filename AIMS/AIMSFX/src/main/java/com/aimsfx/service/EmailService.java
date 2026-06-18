@@ -39,6 +39,7 @@ public class EmailService implements IEmailService {
     private final String username;
     private final String password;
     private final String fromName;
+    private final String baseUrl;
 
     /**
      * Constructor: Initialize email service and load configuration
@@ -60,6 +61,7 @@ public class EmailService implements IEmailService {
             this.username = config.getProperty("email.username");
             this.password = config.getProperty("email.password");
             this.fromName = config.getProperty("email.from.name", "AIMS Store");
+            this.baseUrl = config.getProperty("app.base-url");
 
             System.out.println("Email service initialized successfully");
             System.out.println("SMTP: " + host + ":" + port);
@@ -355,9 +357,9 @@ public class EmailService implements IEmailService {
 
         // Actions
         html.append("<div class='actions'>");
-        html.append("<a href='http://localhost:8080/api/orders/").append(order.getOrderId())
+        html.append("<a href='").append(baseUrl).append("/api/orders/").append(order.getOrderId())
                 .append("' class='btn btn-primary'>View Order Detail</a>");
-        html.append("<form method='POST' action='http://localhost:8080/api/orders/").append(order.getOrderId())
+        html.append("<form method='POST' action='").append(baseUrl).append("/api/orders/").append(order.getOrderId())
                 .append("/cancel' style='display:inline;'>");
         html.append(
                 "<button type='submit' class='btn btn-danger' style='border:none;cursor:pointer;'>Cancel Order</button>");

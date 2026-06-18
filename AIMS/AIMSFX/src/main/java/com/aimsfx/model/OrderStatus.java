@@ -15,7 +15,8 @@ public enum OrderStatus {
     APPROVED("APPROVED"),
     REJECTED("REJECTED"),
     CANCELLED("CANCELLED"),
-    REFUND_REQUEST("REFUND_REQUEST");
+    REFUND_REQUEST("REFUND_REQUEST"),
+    REFUNDED("REFUNDED");
 
     private final String dbValue;
 
