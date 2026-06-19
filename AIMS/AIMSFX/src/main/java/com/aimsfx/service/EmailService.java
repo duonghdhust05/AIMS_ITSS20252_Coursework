@@ -1,5 +1,6 @@
 package com.aimsfx.service;
 
+import com.aimsfx.config.JasyptConfig;
 import com.aimsfx.exception.EmailException;
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.model.Order;
@@ -59,7 +60,7 @@ public class EmailService implements IEmailService {
             this.host = config.getProperty("email.smtp.host");
             this.port = Integer.parseInt(config.getProperty("email.smtp.port"));
             this.username = config.getProperty("email.username");
-            this.password = config.getProperty("email.password");
+            this.password = JasyptConfig.decryptProperty(config.getProperty("email.password"));
             this.fromName = config.getProperty("email.from.name", "AIMS Store");
             this.baseUrl = config.getProperty("app.base-url");
 

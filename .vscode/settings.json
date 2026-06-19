@@ -1,5 +1,6 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "java.refactor.renameFromFileExplorer": "prompt",
-    "java.refactor.rename.include": "**/*.java"
+    "java.refactor.rename.include": "**/*.java",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

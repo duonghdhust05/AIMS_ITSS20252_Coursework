@@ -1,0 +1,530 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+\title{UI Design Report: Screen Specification}
+\author{AIMS Project}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Homepage View (\texttt{homepage-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Search Field & Enter Text & Filters the product grid by search query \\
+\hline
+Login Button & Click & Opens the user login dialog \\
+\hline
+Cart Button & Click & Navigates to the Cart View \\
+\hline
+Filter Tabs & Click & Filters products by predefined price ranges \\
+\hline
+Sort Buttons & Click & Sorts the displayed products (New, Price Asc/Desc) \\
+\hline
+Product Management Button & Click & Navigates to Product Management Panel \\
+\hline
+Order Management Button & Click & Navigates to Order Management Panel \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Homepage View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Search Input & 100 & Alphanumeric & Default & Used for searching curated artifacts \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Homepage View}
+\end{table}
+
+\section{Cart View (\texttt{cart-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Back to Shop Button & Click & Navigates back to the homepage \\
+\hline
+Checkout Button & Click & Proceeds to the Place Order screen \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Cart View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Subtotal Label & Variable & Numeric & Default & Displays the subtotal amount \\
+\hline
+VAT Label & Variable & Numeric & Default & Displays the VAT amount (10\%) \\
+\hline
+Total Label & Variable & Numeric & Default & Displays the final total amount \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Cart View}
+\end{table}
+
+\section{Payment View (\texttt{payment-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Cancel / Back Button & Click & Cancels payment and returns to previous screen \\
+\hline
+VietQR Radio Button & Select & Selects VietQR as the payment method \\
+\hline
+PayPal Radio Button & Select & Selects PayPal as the payment method \\
+\hline
+Confirm Payment Button & Click & Initiates the payment confirmation process \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Payment View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Total Amount Label & Variable & Numeric & Red (\#d32f2f) & Displays the final amount to pay \\
+\hline
+Transaction ID Label & Variable & Alphanumeric & Dark Grey & Displays the generated transaction ID \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Payment View}
+\end{table}
+
+\section{Order Success View (\texttt{order-success-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Back to Homepage Button & Click & Returns the user to the homepage \\
+\hline
+View Order Details Button & Click & Opens detailed view of the submitted order \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Order Success View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Order ID & Variable & Alphanumeric & Default & Displays the unique order ID \\
+\hline
+Customer Name & 50 & Alpha & Default & Displays the customer's name \\
+\hline
+Phone Number & 15 & Numeric & Default & Displays the customer's phone \\
+\hline
+Total Amount & Variable & Numeric & Red (\#f44336) & Displays the total paid amount \\
+\hline
+Status & Variable & Alpha & Orange (\#FF9800) & Displays the transaction status \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Order Success View}
+\end{table}
+
+\section{Place Order View (\texttt{place-order-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Back to Cart Button & Click & Returns to the cart view \\
+\hline
+Add Delivery Info Button & Click & Opens form to enter delivery details \\
+\hline
+Place Order Button & Click & Validates and submits the order \\
+\hline
+Pay Order Button & Click & Navigates to the payment view \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Place Order View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Full Name & 50 & Alpha & Default & Delivery recipient's full name \\
+\hline
+Phone Number & 15 & Numeric & Default & Delivery contact number \\
+\hline
+Email & 50 & Alphanumeric & Default & Optional contact email \\
+\hline
+Province/City & Selection & Alpha & Default & Selected province \\
+\hline
+Ward/Subdistrict & 50 & Alpha & Default & Delivery ward/subdistrict \\
+\hline
+Address & 200 & Alphanumeric & Default & Specific street address \\
+\hline
+Delivery Instructions & 200 & Alphanumeric & Default & Optional delivery instructions \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Place Order View}
+\end{table}
+
+\section{Product List View (\texttt{product-list-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Delete Selected Button & Click & Deletes the selected products from the database \\
+\hline
+Add Product Button & Click & Opens the Product Form View to add a new product \\
+\hline
+Product Table & Select Row & Selects a product for management actions \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Product List View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Selection Count & Variable & Numeric & Grey (\#666666) & Displays number of selected items \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Product List View}
+\end{table}
+
+\section{Product Form View (\texttt{product-form-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Product Type ComboBox & Select & Selects the type of product (e.g., Book, CD, DVD) \\
+\hline
+Add Track Button & Click & Adds a new track field for CD products \\
+\hline
+Add Product Button & Click & Saves the new product to the database \\
+\hline
+Cancel Button & Click & Discards changes and closes the form \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Product Form View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Barcode & 15 & Alphanumeric & Default & 8-15 characters unique identifier \\
+\hline
+Title & 100 & Alphanumeric & Default & Product title \\
+\hline
+Category & 50 & Alpha & Default & Product category \\
+\hline
+Price & Variable & Decimal & Default & Product selling price \\
+\hline
+Description & 500 & Alphanumeric & Default & Detailed product description \\
+\hline
+Weight & 10 & Decimal & Default & Product weight in kg \\
+\hline
+Dimensions & 50 & Alphanumeric & Default & Product dimensions (LxWxH) \\
+\hline
+Stock & 10 & Integer & Default & Available quantity \\
+\hline
+VAT Rate & 5 & Decimal & Default & VAT percentage \\
+\hline
+Track Title & 100 & Alphanumeric & Default & Title of the CD track \\
+\hline
+Track Duration & 10 & Integer & Default & Duration in seconds \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Product Form View}
+\end{table}
+
+\section{Product Detail View (\texttt{product-detail-ui-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Close Button & Click & Closes the detailed view popup \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Product Detail View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Title Label & Variable & Alphanumeric & Default & Displays the product title \\
+\hline
+Category Label & Variable & Alpha & Grey (\#666666) & Displays the product category \\
+\hline
+Price Label & Variable & Decimal & Green (\#2e7d32) & Displays the product price \\
+\hline
+Description Label & 500 & Alphanumeric & Default & Displays detailed description \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Product Detail View}
+\end{table}
+
+\section{User Form View (\texttt{user-form-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Admin Role CheckBox & Check & Toggles Administrator role \\
+\hline
+PM Role CheckBox & Check & Toggles Product Manager role \\
+\hline
+Save Button & Click & Validates and saves the user information \\
+\hline
+Cancel Button & Click & Closes the form without saving \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for User Form View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Username & 50 & Alphanumeric & Default & Login identifier \\
+\hline
+Password & 50 & Alphanumeric & Default & Masked field, minimum 6 characters \\
+\hline
+Confirm Password & 50 & Alphanumeric & Default & Masked field, must match password \\
+\hline
+Full Name & 100 & Alpha & Default & User's actual name \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for User Form View}
+\end{table}
+
+\section{User Management View (\texttt{user-management-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Add New User Button & Click & Opens the User Form View \\
+\hline
+Refresh Button & Click & Reloads the user data from the database \\
+\hline
+Filter ComboBox & Select & Filters the user table by role \\
+\hline
+Close Button & Click & Closes the user management panel \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for User Management View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Filter Dropdown & Selection & Alpha & Default & Role to filter by \\
+\hline
+User Count Label & Variable & Numeric & Grey (\#666666) & Total number of users \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for User Management View}
+\end{table}
+
+\section{Delivery Info Dialog (\texttt{delivery-info-dialog})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Full Name TextField & Enter Text & Inputs the recipient's full name \\
+\hline
+Phone Number TextField & Enter Text & Inputs the delivery contact number \\
+\hline
+Email TextField & Enter Text & Inputs the contact email \\
+\hline
+Province/City ComboBox & Select & Selects the destination province or city \\
+\hline
+Ward/Subdistrict ComboBox & Select & Selects the destination ward or subdistrict \\
+\hline
+Detailed Address TextArea & Enter Text & Inputs the specific street address \\
+\hline
+Delivery Instructions TextArea & Enter Text & Inputs optional delivery instructions \\
+\hline
+Cancel Button & Click & Discards changes and closes the dialog \\
+\hline
+Save Information Button & Click & Validates and saves the delivery information \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Delivery Info Dialog}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Full Name & 50 & Alpha & Default & User's full name \\
+\hline
+Phone Number & 15 & Numeric & Default & Contact phone \\
+\hline
+Email & 50 & Alphanumeric & Default & Contact email \\
+\hline
+Province/City & Selection & Alpha & Default & Selected province \\
+\hline
+Ward/Subdistrict & Selection & Alpha & Default & Selected ward \\
+\hline
+Detailed Address & 200 & Alphanumeric & Default & House number, street name \\
+\hline
+Delivery Instructions & 200 & Alphanumeric & Default & Optional delivery instructions \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Delivery Info Dialog}
+\end{table}
+
+\section{Invoice Dialog (\texttt{invoice-dialog})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+\multicolumn{3}{|c|}{This is a read-only view. No interactive controls required apart from scrolling.} \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Invoice Dialog}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Header ID Label & Variable & Alphanumeric & White & Order ID in header \\
+\hline
+Subtotal Label & Variable & Numeric & Dark Grey (\#333) & Subtotal amount \\
+\hline
+VAT Label & Variable & Numeric & Dark Grey (\#333) & VAT amount (10\%) \\
+\hline
+Shipping Fee Label & Variable & Numeric & Dark Grey (\#333) & Delivery cost \\
+\hline
+Discount Label & Variable & Numeric & Green (\#27ae60) & Discount applied \\
+\hline
+Total Label & Variable & Numeric & Purple (\#667eea) & Final total amount \\
+\hline
+Transaction Code Label & Variable & Alphanumeric & Purple (\#667eea) & Transaction identifier \\
+\hline
+Payment Method Label & Variable & Alpha & Purple (\#667eea) & e.g., VietQR, PayPal \\
+\hline
+Status Label & Variable & Alpha & Default & Status of transaction \\
+\hline
+Time Label & Variable & Alphanumeric & Purple (\#667eea) & Transaction timestamp \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Invoice Dialog}
+\end{table}
+
+\section{Login View (\texttt{login-view})}
+\subsection{Screen Specification}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Control} & \textbf{Operation} & \textbf{Function} \\
+\hline
+Username Field & Enter Text & Inputs the user's login ID \\
+\hline
+Password Field & Enter Text & Inputs the user's password \\
+\hline
+Login Button & Click & Submits credentials for authentication \\
+\hline
+Cancel Button & Click & Closes the login dialog \\
+\hline
+\end{tabularx}
+\caption{Screen Specification for Login View}
+\end{table}
+
+\subsection{Defining the Field Attributes}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|l|l|X|}
+\hline
+\textbf{Items} & \textbf{Length} & \textbf{Type} & \textbf{Color} & \textbf{Remark} \\
+\hline
+Username Field & 50 & Alphanumeric & Default & User's login ID \\
+\hline
+Password Field & 50 & Alphanumeric & Default & User's password (masked) \\
+\hline
+\end{tabularx}
+\caption{Field Attributes for Login View}
+\end{table}
+
+\end{document}

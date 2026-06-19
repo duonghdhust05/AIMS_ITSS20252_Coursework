@@ -247,7 +247,7 @@ public class HomepageView {
 
                 productGrid.add(productCard, column, row);
                 column++;
-                if (column == 4) {
+                if (column == 6) {
                     column = 0;
                     row++;
                 }
