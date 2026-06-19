@@ -7,15 +7,15 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" prefWidth="250" spacing="10" style="-fx-background-color: transparent; -fx-border-color: 26D6FF; -fx-border-radius: 20; -fx-border-width: 3;" styleClass="product-card" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.ProductView.ProductCardComponent">
-   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: transparent;">
+   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: transparent;">
       <children>
           
       
-          <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" maxWidth="220" styleClass="label-section-title" wrapText="true" />
+          <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" maxWidth="220" prefHeight="47.0" prefWidth="214.0" styleClass="label-section-title" wrapText="true" />
           <Label fx:id="typeLabel" alignment="CENTER" contentDisplay="CENTER" style="-fx-text-fill: #666666;" textAlignment="CENTER" />
           <Label fx:id="priceLabel" alignment="CENTER" contentDisplay="CENTER" styleClass="label-price" />
           <Label fx:id="stockLabel" alignment="CENTER" contentDisplay="CENTER" />
-         <Region prefHeight="0.0" prefWidth="218.0" VBox.vgrow="ALWAYS" />
+         <Region prefHeight="24.0" prefWidth="214.0" />
           
           <Button fx:id="viewDetailsBtn" prefHeight="23.0" prefWidth="124.0" styleClass="btn-secondary" text="View Details">
             <VBox.margin>
