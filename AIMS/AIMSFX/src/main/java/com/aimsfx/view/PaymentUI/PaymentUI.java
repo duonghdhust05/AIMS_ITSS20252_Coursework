@@ -211,7 +211,7 @@ public class PaymentUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-success-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.view.OrderSuccessScreen controller = loader.getController();
+            com.aimsfx.view.OrderView.OrderSuccessScreen controller = loader.getController();
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();

@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
@@ -98,7 +98,7 @@ public class InvoiceDialogUI {
             }
 
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
-                    
+
                     .ofPattern("dd/MM/yyyy HH:mm:ss");
             timeLabel.setText(txn.getCreatedAt().format(formatter));
         } else {

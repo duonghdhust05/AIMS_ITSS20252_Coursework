@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.OrderView;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;

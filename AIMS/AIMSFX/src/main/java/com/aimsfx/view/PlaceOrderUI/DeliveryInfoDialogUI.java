@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.Province;
 import com.aimsfx.model.Ward;
@@ -194,7 +194,8 @@ public class DeliveryInfoDialogUI {
                     dialogProvinceComboBox.setDisable(false);
 
                     // Show error
-                    UIUtils.showError("Cannot load province list", "Please check your internet connection and try again.");
+                    UIUtils.showError("Cannot load province list",
+                            "Please check your internet connection and try again.");
                 });
             }
         }).start();

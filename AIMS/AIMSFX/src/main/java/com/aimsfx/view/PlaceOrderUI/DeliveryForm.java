@@ -1,6 +1,8 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.DeliveryInfo;
+import com.aimsfx.view.BaseView;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import java.util.Map;

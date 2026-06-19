@@ -1,5 +1,6 @@
 package com.aimsfx.service;
 
+import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Order;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.TransactionRepository;
@@ -15,19 +16,20 @@ import java.util.logging.Logger;
  * when orders are rejected or cancelled.
  */
 public class RefundService {
-    
+
     private static final Logger LOGGER = Logger.getLogger(RefundService.class.getName());
-    
+
     private final TransactionRepository transactionRepository;
     private final OrderRepository orderRepository;
-    
+
     public RefundService() {
         this.transactionRepository = TransactionRepository.getInstance();
         this.orderRepository = new OrderRepository();
     }
-    
+
     /**
-     * Attempts to automatically refund an order if it was paid via a supported gateway.
+     * Attempts to automatically refund an order if it was paid via a supported
+     * gateway.
      * 
      * @param orderId The order ID to process refund for
      * @return true if refund was successful or not needed, false if refund failed
@@ -39,43 +41,46 @@ public class RefundService {
                 LOGGER.warning("Order not found: " + orderId);
                 return false;
             }
-            
-            // In AIMS, order status might be REJECTED/REFUND_REQUEST but payment_status is 'Completed'
+
+            // In AIMS, order status might be REJECTED/REFUND_REQUEST but payment_status is
+            // 'Completed'
             // We just need to check if payment_status is Completed and method is PayPal
             String paymentStatus = getOrderPaymentStatus(orderId);
             String paymentMethod = getOrderPaymentMethod(orderId);
-            
+
             if ("PAYPAL".equalsIgnoreCase(paymentMethod) && "COMPLETED".equalsIgnoreCase(paymentStatus)) {
                 LOGGER.info("Initiating automated refund for PayPal order: " + orderId);
                 return executePayPalRefund(orderId);
             } else if ("VIETQR".equalsIgnoreCase(paymentMethod) && "COMPLETED".equalsIgnoreCase(paymentStatus)) {
-                LOGGER.info("Manual refund required for VietQR order: " + orderId + ". Please process via banking app.");
+                LOGGER.info(
+                        "Manual refund required for VietQR order: " + orderId + ". Please process via banking app.");
                 // Simply log manual task for VietQR as per user request
-                return true; 
+                return true;
             } else {
-                LOGGER.info("No refund necessary for order: " + orderId + " (Status: " + paymentStatus + ", Method: " + paymentMethod + ")");
+                LOGGER.info("No refund necessary for order: " + orderId + " (Status: " + paymentStatus + ", Method: "
+                        + paymentMethod + ")");
                 return true;
             }
-            
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error processing refund for order " + orderId, e);
             return false;
         }
     }
-    
+
     private boolean executePayPalRefund(int orderId) {
         IPaymentGateway payPalGateway = PaymentControllerFactory.getPayPalGateway();
         if (payPalGateway == null) {
             LOGGER.severe("PayPal gateway is not initialized!");
             return false;
         }
-        
+
         String externalTransactionId = transactionRepository.getExternalTransactionIdByOrderId(orderId);
         if (externalTransactionId == null || externalTransactionId.isEmpty()) {
             LOGGER.warning("No external transaction ID found for order: " + orderId);
             return false;
         }
-        
+
         try {
             boolean success = payPalGateway.refundOrder(externalTransactionId);
             if (success) {
@@ -97,11 +102,11 @@ public class RefundService {
             return false;
         }
     }
-    
+
     protected String getOrderPaymentStatus(int orderId) {
         String sql = "SELECT payment_status FROM orders WHERE order_id = ?";
         try (java.sql.Connection conn = com.aimsfx.utils.DatabaseConnection.getInstance().getConnection();
-             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+                java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, orderId);
             java.sql.ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -112,11 +117,11 @@ public class RefundService {
         }
         return null;
     }
-    
+
     protected String getOrderPaymentMethod(int orderId) {
         String sql = "SELECT payment_method FROM orders WHERE order_id = ?";
         try (java.sql.Connection conn = com.aimsfx.utils.DatabaseConnection.getInstance().getConnection();
-             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+                java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, orderId);
             java.sql.ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

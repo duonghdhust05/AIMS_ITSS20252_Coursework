@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.service.PlaceOrderService;

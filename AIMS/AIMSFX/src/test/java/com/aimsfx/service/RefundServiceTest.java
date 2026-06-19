@@ -1,17 +1,13 @@
 package com.aimsfx.service;
 
+import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Order;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.TransactionRepository;
 import com.aimsfx.subsystem.paypal.IPaymentGateway;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
-import java.sql.SQLException;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,8 +29,9 @@ class RefundServiceTest {
     }
 
     // A small helper to inject mocks into the service using reflection
-    // Since RefundService creates its own repositories in the constructor, 
-    // we would normally refactor it to accept them via DI, but for now we use reflection.
+    // Since RefundService creates its own repositories in the constructor,
+    // we would normally refactor it to accept them via DI, but for now we use
+    // reflection.
     private void injectMocks() throws Exception {
         refundService = new RefundService();
         java.lang.reflect.Field txRepoField = RefundService.class.getDeclaredField("transactionRepository");
@@ -63,11 +60,13 @@ class RefundServiceTest {
         Order order = new Order();
         order.setOrderId(1);
         order.setStatus("REJECTED"); // status might be rejected
-        
-        // We have to mock the private methods or we can just mock the connection/statement 
-        // to return VietQR. But it's easier to mock the whole RefundService using a spy 
+
+        // We have to mock the private methods or we can just mock the
+        // connection/statement
+        // to return VietQR. But it's easier to mock the whole RefundService using a spy
         // if we didn't want to deal with DB in private methods.
-        // Let's create a partial mock of RefundService to avoid DB calls in getOrderPaymentMethod.
+        // Let's create a partial mock of RefundService to avoid DB calls in
+        // getOrderPaymentMethod.
         RefundService spyService = spy(refundService);
         doReturn("VIETQR").when(spyService).getOrderPaymentMethod(1);
         doReturn("COMPLETED").when(spyService).getOrderPaymentStatus(1);
@@ -83,12 +82,12 @@ class RefundServiceTest {
         injectMocks();
         Order order = new Order();
         order.setOrderId(2);
-        
+
         RefundService spyService = spy(refundService);
         doReturn("PAYPAL").when(spyService).getOrderPaymentMethod(2);
         doReturn("COMPLETED").when(spyService).getOrderPaymentStatus(2);
         doReturn(order).when(orderRepositoryMock).findById(2);
-        
+
         // Mock getExternalTransactionIdByOrderId
         when(transactionRepositoryMock.getExternalTransactionIdByOrderId(2)).thenReturn("PAYPAL_ORD_123");
         when(payPalGatewayMock.refundOrder("PAYPAL_ORD_123")).thenReturn(true);
@@ -96,9 +95,9 @@ class RefundServiceTest {
 
         try (MockedStatic<PaymentControllerFactory> factoryMock = mockStatic(PaymentControllerFactory.class)) {
             factoryMock.when(PaymentControllerFactory::getPayPalGateway).thenReturn(payPalGatewayMock);
-            
+
             boolean result = spyService.processRefundIfPaid(2);
-            
+
             assertTrue(result);
             verify(payPalGatewayMock, times(1)).refundOrder("PAYPAL_ORD_123");
             verify(transactionRepositoryMock, times(1)).updateStatus(99, "REFUNDED");

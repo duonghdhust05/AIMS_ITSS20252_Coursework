@@ -6,7 +6,8 @@ import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
 import com.aimsfx.model.TransactionInfo;
 import com.aimsfx.utils.UIUtils;
-import com.aimsfx.view.InvoiceDialogUI;
+import com.aimsfx.view.PlaceOrderUI.InvoiceDialogUI;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;

@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.OrderView;
 
 import com.aimsfx.model.OrderDetail;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +39,7 @@ public class OrderManagementView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/order-detail-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.view.OrderDetailDialogUI controller = loader
+            com.aimsfx.view.OrderView.OrderDetailDialogUI controller = loader
                     .getController();
             controller.setOrderDetail(detail);
 
@@ -64,7 +64,7 @@ public class OrderManagementView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/order-reject-dialog.fxml"));
             javafx.scene.layout.VBox vbox = loader.load();
-            com.aimsfx.view.OrderRejectDialogUI controller = loader
+            com.aimsfx.view.OrderView.OrderRejectDialogUI controller = loader
                     .getController();
 
             Dialog<Void> dialog = new Dialog<>();

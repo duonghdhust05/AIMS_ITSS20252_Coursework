@@ -4,6 +4,7 @@ import com.aimsfx.controller.HomepageController;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.UserMenuAction;
+import com.aimsfx.view.OrderView.OrderManagementView;
 import com.aimsfx.view.ProductView.ProductCardComponent;
 import com.aimsfx.view.ProductView.ProductDetailUI;
 import com.aimsfx.view.ProductView.ProductListView;
@@ -293,8 +294,6 @@ public class HomepageView {
             cartBadge.setVisible(count > 0);
         }
     }
-
-
 
     // Navigation UI
 

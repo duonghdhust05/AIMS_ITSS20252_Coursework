@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.OrderView;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderLine;
@@ -83,7 +83,8 @@ public class OrderDetailDialogUI {
     }
 
     public void setOrderDetail(OrderDetail detail) {
-        if (detail == null) return;
+        if (detail == null)
+            return;
 
         OrderSummary summary = detail.getSummary();
         if (summary != null) {
@@ -91,13 +92,13 @@ public class OrderDetailDialogUI {
             statusLabel.setText(summary.getOrderStatus() != null ? summary.getOrderStatus().name() : "");
             totalAmountLabel.setText(UIUtils.formatPrice(summary.getTotalAmount()) + " VND");
             paymentMethodLabel.setText(summary.getPaymentMethod() + " (" + summary.getPaymentStatus() + ")");
-            
+
             deliveryNameLabel.setText(nullToEmpty(summary.getCustomerName()));
         }
 
         deliveryPhoneLabel.setText(nullToEmpty(detail.getDeliveryPhone()));
         deliveryEmailLabel.setText(nullToEmpty(detail.getDeliveryEmail()));
-        
+
         String address = nullToEmpty(detail.getDeliveryAddress());
         if (detail.getDeliveryWard() != null && !detail.getDeliveryWard().isEmpty()) {
             address += ", " + detail.getDeliveryWard();
@@ -106,7 +107,7 @@ public class OrderDetailDialogUI {
             address += ", " + detail.getDeliveryProvince();
         }
         deliveryAddressLabel.setText(address);
-        
+
         deliveryInstructionsLabel.setText(nullToEmpty(detail.getDeliveryInstructions()));
 
         itemsTable.setItems(FXCollections.observableArrayList(detail.getLines()));

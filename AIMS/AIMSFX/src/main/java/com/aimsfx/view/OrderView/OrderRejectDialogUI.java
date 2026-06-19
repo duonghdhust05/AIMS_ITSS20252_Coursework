@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.OrderView;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -35,8 +35,7 @@ public class OrderRejectDialogUI {
                 "Cannot deliver to the specified address",
                 "Customer requested cancellation",
                 "Suspected fraud",
-                "Other (specify below)"
-        ));
+                "Other (specify below)"));
 
         // When a reason is selected, clear custom reason if it's not "Other"
         reasonComboBox.setOnAction(e -> {

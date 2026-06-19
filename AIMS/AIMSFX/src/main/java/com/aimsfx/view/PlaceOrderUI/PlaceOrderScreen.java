@@ -1,9 +1,10 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.exception.*;
 import com.aimsfx.model.*;
 import com.aimsfx.service.*;
 import com.aimsfx.utils.UIUtils;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;

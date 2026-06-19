@@ -1,4 +1,4 @@
-package com.aimsfx.view;
+package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.CartItem;
 import javafx.geometry.Insets;
@@ -51,7 +51,7 @@ public class PlaceOrderCartSection {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/cart-item.fxml"));
             HBox itemBox = loader.load();
-            com.aimsfx.view.CartItemUI controller = loader
+            com.aimsfx.view.PlaceOrderUI.CartItemUI controller = loader
                     .getController();
             controller.setItemData(cartItem, onQuantityChange, onRemove);
             return itemBox;

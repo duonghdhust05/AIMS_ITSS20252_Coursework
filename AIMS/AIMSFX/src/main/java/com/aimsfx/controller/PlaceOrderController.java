@@ -2,6 +2,7 @@ package com.aimsfx.controller;
 
 import com.aimsfx.exception.EmptyCartException;
 import com.aimsfx.exception.InvalidDeliveryInfoException;
+import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Cart;
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.model.Invoice;
@@ -10,7 +11,6 @@ import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.service.PlaceOrderService;
 import com.aimsfx.utils.UIUtils;
 import com.aimsfx.view.PaymentUI.PaymentUI;
-import com.aimsfx.service.PaymentControllerFactory;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
