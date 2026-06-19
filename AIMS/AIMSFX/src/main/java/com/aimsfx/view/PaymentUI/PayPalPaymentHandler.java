@@ -2,7 +2,6 @@ package com.aimsfx.view.PaymentUI;
 
 import com.aimsfx.controller.PayOrderController;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;

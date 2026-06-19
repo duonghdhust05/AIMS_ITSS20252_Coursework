@@ -39,7 +39,7 @@ public class OrderManagementView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/order-detail-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.controller.ProductManagerController.OrderDetailDialogController controller = loader
+            com.aimsfx.view.OrderDetailDialogUI controller = loader
                     .getController();
             controller.setOrderDetail(detail);
 
@@ -59,14 +59,12 @@ public class OrderManagementView {
         }
     }
 
-
-
     public String showRejectReasonDialog() {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/order-reject-dialog.fxml"));
             javafx.scene.layout.VBox vbox = loader.load();
-            com.aimsfx.controller.ProductManagerController.OrderRejectDialogController controller = loader
+            com.aimsfx.view.OrderRejectDialogUI controller = loader
                     .getController();
 
             Dialog<Void> dialog = new Dialog<>();
@@ -79,7 +77,7 @@ public class OrderManagementView {
             dialog.setTitle("Reject Order");
             dialog.getDialogPane().setContent(vbox);
 
-            // Note: The new OrderRejectDialogController uses its own buttons and calls
+            // Note: The new OrderRejectDialogUI uses its own buttons and calls
             // close() on the Stage.
             // But we need a dummy button type so Dialog doesn't crash if X is pressed
             dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);

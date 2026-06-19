@@ -1,11 +1,11 @@
-package com.aimsfx.controller.ProductManagerController;
+package com.aimsfx.view.ProductView;
 
 import com.aimsfx.model.Track;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-public class CDTrackItemController {
+public class CDTrackItemUI {
 
     @FXML
     private Label numberLabel;

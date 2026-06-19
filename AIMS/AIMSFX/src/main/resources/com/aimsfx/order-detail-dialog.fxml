@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" prefHeight="600.0" prefWidth="600.0" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.ProductManagerController.OrderDetailDialogController">
+<ScrollPane fitToWidth="true" prefHeight="600.0" prefWidth="600.0" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.OrderDetailDialogUI">
    <content>
       <VBox spacing="20.0" style="-fx-padding: 20; -fx-background-color: white;">
          <children>

@@ -45,7 +45,7 @@ import java.util.Map;
  * - Uses: order.getOrderId(), order.getTotalAmount()
  * - Type: Stamp coupling - acceptable for data transfer
  * 
- * 3. Control Coupling with PlaceOrderController (navigation)
+ * 3. Control Coupling with PlaceOrderScreen (navigation)
  * - Uses: setSuccessData() to pass data to success screen
  * - Type: Control coupling - controls navigation flow
  */
@@ -211,7 +211,7 @@ public class PaymentUI {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-success-view.fxml"));
             Parent root = loader.load();
 
-            com.aimsfx.controller.PlaceOrderController.OrderSuccessController controller = loader.getController();
+            com.aimsfx.view.OrderSuccessScreen controller = loader.getController();
             controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
 
             Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
@@ -255,11 +255,12 @@ public class PaymentUI {
                     payOrderController.completePayment(currentOrder, activeHandler.getMethodName().toUpperCase());
 
                     TransactionInfo info = createTransactionInfo(activeHandler.getMethodName());
-                    
+
                     // Send order confirmation email
                     new Thread(() -> {
                         try {
-                            new com.aimsfx.service.EmailService().sendOrderConfirmation(currentOrder, currentOrder.getDeliveryInfo(), info);
+                            new com.aimsfx.service.EmailService().sendOrderConfirmation(currentOrder,
+                                    currentOrder.getDeliveryInfo(), info);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

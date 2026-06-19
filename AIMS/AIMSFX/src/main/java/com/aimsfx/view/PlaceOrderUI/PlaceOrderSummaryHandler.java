@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.Cart;
 import com.aimsfx.service.PlaceOrderService;

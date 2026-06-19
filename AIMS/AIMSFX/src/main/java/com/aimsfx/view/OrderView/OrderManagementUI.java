@@ -1,10 +1,9 @@
-package com.aimsfx.controller.ProductManagerController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
 import com.aimsfx.service.OrderReviewService;
 import com.aimsfx.utils.SessionManager;
-import com.aimsfx.view.OrderManagementView;
 import com.aimsfx.utils.UIUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -16,27 +15,40 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * OrderManagementController - Product Manager UI controller for reviewing pending orders.
+ * OrderManagementUI - Product Manager UI controller for reviewing pending
+ * orders.
  *
  * Skeleton implementation:
  * - List pending orders (30/page)
  * - View order detail (read-only dialog)
  * - Approve / Reject (status update only; refund excluded)
  */
-public class OrderManagementController {
+public class OrderManagementUI {
 
-    @FXML private TableView<OrderSummary> ordersTable;
-    @FXML private TableColumn<OrderSummary, Integer> orderIdColumn;
-    @FXML private TableColumn<OrderSummary, String> createdAtColumn;
-    @FXML private TableColumn<OrderSummary, String> customerColumn;
-    @FXML private TableColumn<OrderSummary, Double> totalColumn;
-    @FXML private TableColumn<OrderSummary, String> statusColumn;
-    @FXML private TableColumn<OrderSummary, Void> actionsColumn;
-    @FXML private Pagination pagination;
-    @FXML private Label totalPendingLabel;
-    @FXML private Label refreshNotificationLabel;
-    @FXML private Label lastUpdatedLabel;
-    @FXML private Button refreshBtn;
+    @FXML
+    private TableView<OrderSummary> ordersTable;
+    @FXML
+    private TableColumn<OrderSummary, Integer> orderIdColumn;
+    @FXML
+    private TableColumn<OrderSummary, String> createdAtColumn;
+    @FXML
+    private TableColumn<OrderSummary, String> customerColumn;
+    @FXML
+    private TableColumn<OrderSummary, Double> totalColumn;
+    @FXML
+    private TableColumn<OrderSummary, String> statusColumn;
+    @FXML
+    private TableColumn<OrderSummary, Void> actionsColumn;
+    @FXML
+    private Pagination pagination;
+    @FXML
+    private Label totalPendingLabel;
+    @FXML
+    private Label refreshNotificationLabel;
+    @FXML
+    private Label lastUpdatedLabel;
+    @FXML
+    private Button refreshBtn;
 
     private final OrderReviewService orderReviewService = new OrderReviewService();
     private final OrderManagementView view = new OrderManagementView();
@@ -115,7 +127,8 @@ public class OrderManagementController {
             private final Button viewBtn = new Button("View");
             private final Button approveBtn = new Button("Approve");
             private final Button rejectBtn = new Button("Reject");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn, rejectBtn);
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn,
+                    rejectBtn);
 
             {
                 viewBtn.setOnAction(e -> onView(getCurrentOrderId()));
@@ -138,8 +151,9 @@ public class OrderManagementController {
                     if (row != null) {
                         String status = row.getOrderStatus() != null ? row.getOrderStatus().name() : "";
                         boolean canApprove = "PENDING_REVIEW".equals(status) || "PENDING".equals(status);
-                        boolean canReject = "PENDING_REVIEW".equals(status) || "PENDING".equals(status) || "REFUND_REQUEST".equals(status);
-                        
+                        boolean canReject = "PENDING_REVIEW".equals(status) || "PENDING".equals(status)
+                                || "REFUND_REQUEST".equals(status);
+
                         approveBtn.setVisible(canApprove);
                         approveBtn.setManaged(canApprove);
                         rejectBtn.setVisible(canReject);
@@ -155,7 +169,7 @@ public class OrderManagementController {
         try {
             int total = orderReviewService.countAllOrders();
             this.lastLoadedCount = total;
-            
+
             if (totalPendingLabel != null) {
                 totalPendingLabel.setText("Total Orders: " + total);
             }
@@ -188,7 +202,8 @@ public class OrderManagementController {
                     lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
                 }
 
-                List<OrderSummary> page = orderReviewService.listAllOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
+                List<OrderSummary> page = orderReviewService.listAllOrders(pageIndex,
+                        OrderReviewService.DEFAULT_PAGE_SIZE);
                 ordersTable.getItems().setAll(page);
             } catch (SQLException e) {
                 UIUtils.showError("Database Error", e.getMessage());
@@ -197,7 +212,8 @@ public class OrderManagementController {
     }
 
     private void onView(Integer orderId) {
-        if (orderId == null) return;
+        if (orderId == null)
+            return;
         try {
             OrderDetail detail = orderReviewService.getOrderDetail(orderId);
             if (detail == null) {
@@ -211,8 +227,10 @@ public class OrderManagementController {
     }
 
     private void onApprove(Integer orderId) {
-        if (orderId == null) return;
-        if (!UIUtils.showConfirmation("Approve Order", "Are you sure you want to approve order #" + orderId + "?")) return;
+        if (orderId == null)
+            return;
+        if (!UIUtils.showConfirmation("Approve Order", "Are you sure you want to approve order #" + orderId + "?"))
+            return;
         try {
             orderReviewService.approve(orderId);
             refreshCurrentPage();
@@ -222,9 +240,11 @@ public class OrderManagementController {
     }
 
     private void onReject(Integer orderId) {
-        if (orderId == null) return;
-        if (!UIUtils.showConfirmation("Reject Order", "Are you sure you want to reject order #" + orderId + "?")) return;
-        
+        if (orderId == null)
+            return;
+        if (!UIUtils.showConfirmation("Reject Order", "Are you sure you want to reject order #" + orderId + "?"))
+            return;
+
         String reason = view.showRejectReasonDialog();
         if (reason == null || reason.trim().isEmpty()) {
             return; // Cancelled or empty reason
@@ -244,8 +264,11 @@ public class OrderManagementController {
     }
 
     private void disableUi(String message) {
-        if (ordersTable != null) ordersTable.setDisable(true);
-        if (pagination != null) pagination.setDisable(true);
-        if (totalPendingLabel != null) totalPendingLabel.setText(message);
+        if (ordersTable != null)
+            ordersTable.setDisable(true);
+        if (pagination != null)
+            pagination.setDisable(true);
+        if (totalPendingLabel != null)
+            totalPendingLabel.setText(message);
     }
 }

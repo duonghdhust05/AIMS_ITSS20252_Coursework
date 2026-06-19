@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600" prefWidth="550" spacing="15" style="-fx-background-color: #f5f5f5; -fx-padding: 25;" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.DeliveryInfoDialogController">
+<VBox prefHeight="600" prefWidth="550" spacing="15" style="-fx-background-color: #f5f5f5; -fx-padding: 25;" styleClass="aims-panel-card" stylesheets="@styles2.0.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.aimsfx.view.DeliveryInfoDialogUI">
     
     <!-- Header -->
     <VBox alignment="CENTER" spacing="5">

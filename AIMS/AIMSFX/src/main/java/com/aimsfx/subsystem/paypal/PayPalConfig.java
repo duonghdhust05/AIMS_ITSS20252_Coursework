@@ -27,7 +27,7 @@ import java.util.Properties;
  * - Risk: If PayPal SDK changes its API, this class must change
  * - Justification: Unavoidable when configuring external SDK
  * 
- * 2. Data Coupling with PlaceOrderController (consumer)
+ * 2. Data Coupling with PlaceOrderScreen (consumer)
  * - Uses: paypalClient() to get configured client
  * - Type: Stamp coupling - passes entire PaypalServerSdkClient object
  * - Justification: PayPalSubsystem needs full SDK client for API operations

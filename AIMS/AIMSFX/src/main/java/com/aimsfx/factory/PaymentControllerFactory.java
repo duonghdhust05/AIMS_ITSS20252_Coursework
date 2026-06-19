@@ -20,11 +20,11 @@ import java.util.logging.Logger;
  * 
  * SOLID COMPLIANCE:
  * - SRP: Single responsibility - create and manage PayOrderController lifecycle
- * - DIP: PlaceOrderController depends on this factory (abstraction) instead of
+ * - DIP: PlaceOrderScreen depends on this factory (abstraction) instead of
  * creating subsystems directly
  * 
  * BENEFITS:
- * - PlaceOrderController no longer needs to know how to create payment
+ * - PlaceOrderScreen no longer needs to know how to create payment
  * subsystems
  * - Easy to mock for testing
  * - Centralized payment system initialization

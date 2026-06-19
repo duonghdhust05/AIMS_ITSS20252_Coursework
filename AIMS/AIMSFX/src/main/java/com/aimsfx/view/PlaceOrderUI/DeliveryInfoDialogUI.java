@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.Province;
 import com.aimsfx.model.Ward;
@@ -10,7 +10,7 @@ import com.aimsfx.utils.UIUtils;
 import javafx.stage.Stage;
 import java.util.List;
 
-public class DeliveryInfoDialogController {
+public class DeliveryInfoDialogUI {
 
     @FXML
     private TextField dialogNameField;

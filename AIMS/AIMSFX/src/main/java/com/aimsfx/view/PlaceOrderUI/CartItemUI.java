@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.CartViewController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.CartItem;
 import com.aimsfx.model.Product;
@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class CartItemController {
+public class CartItemUI {
 
     @SuppressWarnings("deprecation")
     private static final Locale VN_LOCALE = new Locale("vi", "VN");

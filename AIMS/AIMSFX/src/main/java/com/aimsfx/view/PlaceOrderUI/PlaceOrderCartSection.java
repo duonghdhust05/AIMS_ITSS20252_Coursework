@@ -13,20 +13,18 @@ import java.util.Locale;
 /**
  * CartView - View Layer for Cart Use Case
  */
-public class CartView {
+public class PlaceOrderCartSection {
 
     @SuppressWarnings("deprecation")
     private static final Locale VN_LOCALE = new Locale("vi", "VN");
     private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance(VN_LOCALE);
 
-    public CartView() {
+    public PlaceOrderCartSection() {
     }
 
     public String formatPrice(double price) {
         return PRICE_FORMATTER.format(price);
     }
-
-
 
     public void showEmptyCartMessage(VBox container) {
         if (container == null)
@@ -53,7 +51,7 @@ public class CartView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/cart-item.fxml"));
             HBox itemBox = loader.load();
-            com.aimsfx.controller.PlaceOrderController.CartViewController.CartItemController controller = loader
+            com.aimsfx.view.CartItemUI controller = loader
                     .getController();
             controller.setItemData(cartItem, onQuantityChange, onRemove);
             return itemBox;

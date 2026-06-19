@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.Cart;
 import com.aimsfx.model.CartItem;
@@ -26,7 +26,7 @@ public class PlaceOrderCartHandler {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/aimsfx/place-order-item.fxml"));
             HBox card = loader.load();
-            PlaceOrderItemController controller = loader.getController();
+            PlaceOrderItemUI controller = loader.getController();
             controller.setItemData(cartItem);
             return card;
         } catch (java.io.IOException e) {

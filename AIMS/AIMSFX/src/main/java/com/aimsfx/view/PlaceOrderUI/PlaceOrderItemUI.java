@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.CartItem;
 import com.aimsfx.model.Product;
@@ -6,7 +6,7 @@ import com.aimsfx.utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class PlaceOrderItemController {
+public class PlaceOrderItemUI {
 
     @FXML
     private Label nameLabel;

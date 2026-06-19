@@ -1,4 +1,4 @@
-package com.aimsfx.controller.ProductManagerController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderLine;
@@ -13,7 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-public class OrderDetailDialogController {
+public class OrderDetailDialogUI {
 
     @FXML
     private Label orderIdLabel;

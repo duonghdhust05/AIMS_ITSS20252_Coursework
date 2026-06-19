@@ -1,22 +1,11 @@
-package com.aimsfx.controller.PlaceOrderController;
+package com.aimsfx.view;
 
-import com.aimsfx.controller.PayOrderController;
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.DeliveryInfoDialogController;
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.PlaceOrderCartHandler;
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.PlaceOrderDeliveryFormHandler;
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.PlaceOrderSummaryHandler;
 import com.aimsfx.exception.*;
 import com.aimsfx.model.*;
-import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.service.*;
 import com.aimsfx.utils.UIUtils;
-import com.aimsfx.view.InvoiceUI;
-import com.aimsfx.view.ViewCartUI;
-import com.aimsfx.view.PaymentUI.PaymentUI;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -25,7 +14,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.*;
 
-public class PlaceOrderController implements Initializable {
+public class PlaceOrderScreen implements Initializable {
 
     private Cart currentCart;
     private Order currentOrder;
@@ -37,7 +26,7 @@ public class PlaceOrderController implements Initializable {
     private final InvoiceUI invoiceUI;
     private final ViewCartUI viewCartUI;
     private final PlaceOrderService placeOrderService;
-    private final OrderRepository orderRepository;
+    private final com.aimsfx.controller.PlaceOrderController logicController;
 
     // FXML Elements
     @FXML
@@ -72,16 +61,15 @@ public class PlaceOrderController implements Initializable {
     private PlaceOrderDeliveryFormHandler deliveryFormHandler;
     private PlaceOrderSummaryHandler orderSummaryHandler;
 
-    public PlaceOrderController() {
-        this(new PlaceOrderService(), new InvoiceUI(), new ViewCartUI(), new OrderRepository());
+    public PlaceOrderScreen() {
+        this(new PlaceOrderService(), new InvoiceUI(), new ViewCartUI());
     }
 
-    public PlaceOrderController(PlaceOrderService placeOrderService, InvoiceUI invoiceUI, ViewCartUI viewCartUI,
-            OrderRepository orderRepository) {
+    public PlaceOrderScreen(PlaceOrderService placeOrderService, InvoiceUI invoiceUI, ViewCartUI viewCartUI) {
         this.placeOrderService = placeOrderService;
         this.invoiceUI = invoiceUI;
         this.viewCartUI = viewCartUI;
-        this.orderRepository = orderRepository;
+        this.logicController = new com.aimsfx.controller.PlaceOrderController();
     }
 
     public void setCart(Cart cart) {
@@ -157,8 +145,7 @@ public class PlaceOrderController implements Initializable {
     @FXML
     public void onBackToCart() {
         Stage stage = cartItemsContainer != null ? (Stage) cartItemsContainer.getScene().getWindow() : null;
-        if (stage != null)
-            UIUtils.navigate(stage, "/com/aimsfx/cart-view.fxml", "AIMS - Shopping Cart");
+        logicController.navigateBackToCart(stage);
     }
 
     @FXML
@@ -186,7 +173,7 @@ public class PlaceOrderController implements Initializable {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/delivery-info-dialog.fxml"));
             VBox dialogRoot = loader.load();
-            DeliveryInfoDialogController controller = loader.getController();
+            DeliveryInfoDialogUI controller = loader.getController();
             controller.setOrderData(totalWeight, totalAmount);
 
             if (deliveryFormHandler.getName() != null && !deliveryFormHandler.getName().trim().isEmpty()) {
@@ -230,17 +217,6 @@ public class PlaceOrderController implements Initializable {
                     orderSummaryHandler.getDeliveryFeeText()))
                 return;
 
-            if (currentCart == null || currentCart.getItems() == null || currentCart.getItems().isEmpty()) {
-                UIUtils.showAlert("Empty Cart", "No products in cart to place order.");
-                return;
-            }
-
-            String stockError = placeOrderService.checkProductAvailability(currentCart);
-            if (stockError != null) {
-                UIUtils.showAlert("Out of Stock", stockError);
-                return;
-            }
-
             DeliveryInfo info = placeOrderService.createDeliveryInfoFromForm(
                     deliveryFormHandler.getName().trim(),
                     deliveryFormHandler.getPhone().trim().replaceAll("\\s+", ""),
@@ -251,9 +227,14 @@ public class PlaceOrderController implements Initializable {
                             : null);
 
             if (currentOrder == null) {
-                currentOrder = placeOrderService.createAndSaveOrder(currentCart, info, orderRepository);
+                currentOrder = logicController.processOrderCreation(currentCart, info);
             }
-            submitDeliveryInfo(info);
+
+            Map<String, Object> result = logicController.submitDeliveryInfo(currentOrder, info);
+            this.currentInvoice = (Invoice) result.get("invoice");
+            this.originalDeliveryFee = ((Number) result.get("originalFee")).floatValue();
+
+            invoiceUI.displayInvoice(currentInvoice);
 
             if (payOrderButton != null)
                 payOrderButton.setDisable(false);
@@ -269,39 +250,7 @@ public class PlaceOrderController implements Initializable {
 
     @FXML
     public void payOrder() {
-        try {
-            if (currentOrder == null) {
-                UIUtils.showAlert("Error", "Please place an order first.");
-                return;
-            }
-            if (currentInvoice != null) {
-                currentOrder.setTotalAmount(currentInvoice.getTotalAmount());
-            }
-
-            PayOrderController paymentController = PaymentControllerFactory.getPayOrderController();
-            if (paymentController == null) {
-                UIUtils.showAlert("Payment Error", "Failed to initialize payment system.");
-                return;
-            }
-
-            Stage stage = (Stage) payOrderButton.getScene().getWindow();
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/payment-view.fxml"));
-            loader.setControllerFactory(c -> new PaymentUI(paymentController));
-            Parent root = loader.load();
-
-            PaymentUI paymentUI = loader.getController();
-            paymentUI.initializeData(currentOrder, currentInvoice);
-
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(root);
-            } else {
-                stage.setScene(new Scene(root));
-            }
-            stage.setTitle("AIMS - Payment");
-
-        } catch (Exception e) {
-            UIUtils.showAlert("System Error", "Could not process payment: " + e.getMessage());
-        }
+        Stage stage = (Stage) payOrderButton.getScene().getWindow();
+        logicController.navigateToPayment(currentOrder, currentInvoice, stage);
     }
 }

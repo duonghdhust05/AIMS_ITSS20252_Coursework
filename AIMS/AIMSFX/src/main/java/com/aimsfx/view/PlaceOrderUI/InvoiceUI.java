@@ -67,7 +67,7 @@ public class InvoiceUI extends BaseView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController.InvoiceDialogController controller = loader
+            com.aimsfx.view.InvoiceDialogUI controller = loader
                     .getController();
 
             // Pass null for order (it will use invoice.getOrderId()) and null for

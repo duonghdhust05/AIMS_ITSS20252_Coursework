@@ -424,7 +424,7 @@ public class ProductFormView {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/com/aimsfx/cd-track-item.fxml"));
             HBox trackItem = loader.load();
-            com.aimsfx.controller.ProductManagerController.CDTrackItemController controller = loader.getController();
+            com.aimsfx.view.ProductView.CDTrackItemUI controller = loader.getController();
 
             controller.setTrackData(track, index, (idx) -> {
                 cdTracks.remove(idx.intValue());
@@ -519,6 +519,5 @@ public class ProductFormView {
     }
 
     // Utility methods
-
 
 }

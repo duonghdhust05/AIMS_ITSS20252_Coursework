@@ -1,4 +1,4 @@
-package com.aimsfx.controller.ProductManagerController;
+package com.aimsfx.view;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
-public class OrderRejectDialogController {
+public class OrderRejectDialogUI {
 
     @FXML
     private ComboBox<String> reasonComboBox;

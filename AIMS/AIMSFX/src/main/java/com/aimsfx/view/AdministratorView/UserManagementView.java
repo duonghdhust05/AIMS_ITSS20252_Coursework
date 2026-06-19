@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -261,7 +260,8 @@ public class UserManagementView implements Initializable {
 
         if (!UIUtils.showConfirmation(
                 "Confirm " + (user.isBlocked() ? "Unblock" : "Block"),
-                "Are you sure you want to " + action + " this user?\n\nUser: " + user.getUsername() + " (" + user.getFullName() + ")")) {
+                "Are you sure you want to " + action + " this user?\n\nUser: " + user.getUsername() + " ("
+                        + user.getFullName() + ")")) {
             return;
         }
 
@@ -288,7 +288,8 @@ public class UserManagementView implements Initializable {
     private void confirmAndDeleteUser(User user) {
         if (!UIUtils.showConfirmation(
                 "Confirm Delete",
-                "Are you sure you want to delete this user?\n\nUser: " + user.getUsername() + " (" + user.getFullName() + ")\n\nThis action cannot be undone!")) {
+                "Are you sure you want to delete this user?\n\nUser: " + user.getUsername() + " (" + user.getFullName()
+                        + ")\n\nThis action cannot be undone!")) {
             return;
         }
 
@@ -313,8 +314,6 @@ public class UserManagementView implements Initializable {
         loadUsers();
         applyFilter();
     }
-
-
 
     // ==================== INNER CLASS: Action Button Cell ====================
 

@@ -1,32 +1,23 @@
-package com.aimsfx.controller.PlaceOrderController.CartViewController;
+package com.aimsfx.view;
 
-import com.aimsfx.controller.PlaceOrderController.PlaceOrderController;
+import com.aimsfx.view.PlaceOrderUI.PlaceOrderCartSection;
 import com.aimsfx.model.*;
 import com.aimsfx.service.ICartService;
 import com.aimsfx.service.CartService;
-import com.aimsfx.view.CartView;
-import com.aimsfx.utils.UIUtils;
-
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * CartController - Controller for Cart View (cart-view.fxml)
+ * CartScreen - Controller for Cart View (cart-view.fxml)
  */
-public class CartController implements Initializable {
+public class CartScreen implements Initializable {
 
     @FXML
     private VBox cartItemsContainer;
@@ -45,13 +36,15 @@ public class CartController implements Initializable {
 
     private ICartManager cartManager;
     private ICartService cartService;
-    private CartView cartView;
+    private PlaceOrderCartSection cartView;
     private Cart currentCart;
+    private com.aimsfx.controller.CartController logicController;
 
-    public CartController() {
+    public CartScreen() {
         this.cartManager = CartManager.getInstance();
         this.cartService = new CartService();
-        this.cartView = new CartView();
+        this.cartView = new PlaceOrderCartSection();
+        this.logicController = new com.aimsfx.controller.CartController();
     }
 
     public void setCartManager(ICartManager cartManager) {
@@ -62,7 +55,7 @@ public class CartController implements Initializable {
         this.cartService = cartService;
     }
 
-    public void setCartView(CartView cartView) {
+    public void setCartView(PlaceOrderCartSection cartView) {
         this.cartView = cartView;
     }
 
@@ -117,60 +110,17 @@ public class CartController implements Initializable {
 
     @FXML
     public void onContinueShopping() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/homepage-view.fxml"));
-            Parent homepageView = loader.load();
-
-            Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(homepageView);
-            } else {
-                stage.setScene(new Scene(homepageView));
-            }
-            stage.setTitle("AIMS - Product Management System");
-            new animatefx.animation.FadeIn(homepageView).play();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Could not load homepage: " + e.getMessage());
-        }
+        Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
+        logicController.handleContinueShopping(stage);
     }
 
     @FXML
     public void onCheckout() {
-        try {
-            if (currentCart == null || currentCart.getItems().isEmpty()) {
-                UIUtils.showWarning("Empty Cart", "Your cart is empty. Please add items before checkout.");
-                return;
-            }
-
-            List<Map<String, Object>> insufficientItems = cartService.checkCartStockWithDatabaseRefresh(currentCart);
-
-            if (!insufficientItems.isEmpty()) {
-                String errorMessage = cartView.buildInsufficientStockMessage(insufficientItems);
-                UIUtils.showError("Insufficient Stock", errorMessage);
-                loadCartData();
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/place-order-view.fxml"));
-            Parent placeOrderViewRoot = loader.load();
-
-            PlaceOrderController placeOrderController = loader.getController();
-            placeOrderController.setCart(currentCart);
-
-            Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(placeOrderViewRoot);
-            } else {
-                stage.setScene(new Scene(placeOrderViewRoot));
-            }
-            stage.setTitle("AIMS - Place Order");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Could not proceed to checkout: " + e.getMessage());
-        }
+        Stage stage = (Stage) cartItemsContainer.getScene().getWindow();
+        logicController.handleCheckoutRequest(currentCart, stage, cartView);
+        // Reload data in case it was rejected due to insufficient stock and cartView
+        // displayed a message
+        loadCartData();
     }
 
     public Cart getCurrentCart() {

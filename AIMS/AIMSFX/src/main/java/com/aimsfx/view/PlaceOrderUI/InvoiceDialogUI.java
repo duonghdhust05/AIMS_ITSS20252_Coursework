@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
@@ -13,7 +13,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-public class InvoiceDialogController {
+public class InvoiceDialogUI {
 
     @FXML
     private Label headerIdLabel;

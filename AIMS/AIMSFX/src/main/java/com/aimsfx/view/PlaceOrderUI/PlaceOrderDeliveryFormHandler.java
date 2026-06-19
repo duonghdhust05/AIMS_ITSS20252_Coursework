@@ -1,4 +1,4 @@
-package com.aimsfx.controller.PlaceOrderController.PlaceOrderSubcomponentController;
+package com.aimsfx.view;
 
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.service.PlaceOrderService;
@@ -133,7 +133,7 @@ public class PlaceOrderDeliveryFormHandler {
         return true;
     }
 
-    public void updateFormFromDialog(DeliveryInfoDialogController controller) {
+    public void updateFormFromDialog(DeliveryInfoDialogUI controller) {
         nameField.setText(controller.getName());
         phoneField.setText(controller.getPhone());
         emailField.setText(controller.getEmail());

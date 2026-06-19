@@ -58,7 +58,7 @@ public class DeliveryForm extends BaseView {
      * Processing (UI-side):
      * 1. Run client-side validation (non-empty, regex for email/phone).
      * 2. Build a DeliveryInfo DTO and send to
-     * PlaceOrderController.submitDeliveryInfo().
+     * PlaceOrderScreen.submitDeliveryInfo().
      * 3. Handle response: on success, navigate to the next step (cart
      * review/payment);
      * on error, show messages per field.
@@ -100,7 +100,7 @@ public class DeliveryForm extends BaseView {
      * Purpose: Allow the user to adjust fields after initial submission.
      * Processing (UI-side):
      * 1. Collect modified fields into updatedFields.
-     * 2. Call PlaceOrderController to update and revalidate the underlying
+     * 2. Call PlaceOrderScreen to update and revalidate the underlying
      * DeliveryInfo.
      * 3. Refresh the view with updated values or highlight errors returned by the
      * controller.
