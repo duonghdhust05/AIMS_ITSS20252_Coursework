@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import com.aimsfx.utils.UIUtils;
 
 /**
  * OrderManagementView - Pure View Layer for Product Manager order review
@@ -43,34 +44,22 @@ public class OrderManagementView {
             controller.setOrderDetail(detail);
 
             Dialog<Void> dialog = new Dialog<>();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
+            if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+                javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+                if (window instanceof Stage) {
+                    com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
+                }
+            }
             dialog.setTitle("Order Detail");
             dialog.getDialogPane().setContent(scrollPane);
             dialog.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Error", "Could not load order details view.");
+            UIUtils.showError("Error", "Could not load order details view.");
         }
     }
 
-    public void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-    public boolean confirmAction(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText("Warning: This action cannot be undone.");
-        alert.setContentText(message);
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-        return alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
-    }
 
     public String showRejectReasonDialog() {
         try {
@@ -81,7 +70,12 @@ public class OrderManagementView {
                     .getController();
 
             Dialog<Void> dialog = new Dialog<>();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
+            if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+                javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+                if (window instanceof Stage) {
+                    com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
+                }
+            }
             dialog.setTitle("Reject Order");
             dialog.getDialogPane().setContent(vbox);
 
@@ -99,7 +93,7 @@ public class OrderManagementView {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Error", "Could not load reject dialog.");
+            UIUtils.showError("Error", "Could not load reject dialog.");
         }
         return null;
     }

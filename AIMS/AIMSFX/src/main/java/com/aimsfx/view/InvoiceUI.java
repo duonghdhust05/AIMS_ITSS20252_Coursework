@@ -1,6 +1,7 @@
 package com.aimsfx.view;
 
 import com.aimsfx.model.Invoice;
+import com.aimsfx.utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
@@ -60,6 +61,7 @@ public class InvoiceUI extends BaseView {
         javafx.scene.control.Dialog<Void> dialog = new javafx.scene.control.Dialog<>();
         dialog.setTitle("Invoice Details");
         dialog.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.OK);
+        UIUtils.applyAppDialogIcon(dialog);
 
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(

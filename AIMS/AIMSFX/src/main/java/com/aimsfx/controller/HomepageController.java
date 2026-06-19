@@ -6,6 +6,7 @@ import com.aimsfx.view.HomepageView;
 import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.exception.ProductNotFoundException;
+import com.aimsfx.utils.UIUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,16 +45,20 @@ public class HomepageController {
      * FE/BE OPTIMIZATION: ASYNCHRONOUS SEARCH WITH DATABASE-LEVEL FILTERS
      * =========================================================================================================
      * PREVIOUS PROBLEMS:
-     * 1. Price filters were applied locally to the random 20 products currently in memory, 
-     *    which yielded inconsistent and confusing results (e.g., clicking 100-200k would return 2-4 items).
+     * 1. Price filters were applied locally to the random 20 products currently in
+     * memory,
+     * which yielded inconsistent and confusing results (e.g., clicking 100-200k
+     * would return 2-4 items).
      *
      * DETAILED SOLUTION & IMPLEMENTATION:
      * 1. Merged search and filter state into performFilteredSearchAsync().
-     * 2. This method queries the database directly with both the search query AND the price bounds.
+     * 2. This method queries the database directly with both the search query AND
+     * the price bounds.
      * 3. Retained the Async Task and Loading UI for maximum responsiveness.
      *
      * EXPECTED RESULTS:
-     * Clicking a price filter or typing a search will ALWAYS query the database and return exactly 20 
+     * Clicking a price filter or typing a search will ALWAYS query the database and
+     * return exactly 20
      * matching products. The count will be perfectly consistent.
      * =========================================================================================================
      */
@@ -64,13 +69,13 @@ public class HomepageController {
 
     private void performFilteredSearchAsync() {
         view.showLoading();
-        
+
         javafx.concurrent.Task<List<Product>> searchTask = new javafx.concurrent.Task<>() {
             @Override
             protected List<Product> call() throws Exception {
                 // If there are no filters and no query, just return the random products
-                if ((currentSearchQuery == null || currentSearchQuery.trim().isEmpty()) 
-                    && currentMinPrice == null && currentMaxPrice == null) {
+                if ((currentSearchQuery == null || currentSearchQuery.trim().isEmpty())
+                        && currentMinPrice == null && currentMaxPrice == null) {
                     return new ArrayList<>(random20Products);
                 } else {
                     return productController.searchProducts(currentSearchQuery, currentMinPrice, currentMaxPrice, 20);
@@ -82,12 +87,10 @@ public class HomepageController {
             currentDisplayedProducts = searchTask.getValue();
             allProducts = new ArrayList<>(currentDisplayedProducts);
             view.displayProducts(currentDisplayedProducts);
-            view.hideLoading();
         });
 
         searchTask.setOnFailed(e -> {
-            view.hideLoading();
-            view.showAlert("Error", "Failed to search products: " + searchTask.getException().getMessage());
+            UIUtils.showError("Error", "Failed to search products: " + searchTask.getException().getMessage());
         });
 
         new Thread(searchTask).start();
@@ -137,17 +140,17 @@ public class HomepageController {
 
     public void handleAddToCart(Product product, int quantity) {
         if (quantity <= 0) {
-            view.showAlert("Invalid Quantity", "Please enter a positive number.");
+            UIUtils.showError("Invalid Quantity", "Please enter a positive number.");
             return;
         }
         if (quantity > product.getStock()) {
-            view.showAlert("Out of Stock", "Only " + product.getStock() + " items available.");
+            UIUtils.showWarning("Out of Stock", "Only " + product.getStock() + " items available.");
             return;
         }
 
         cartManager.addProduct(product.copy(), quantity);
         CartEvents.notifyCartUpdated();
-        view.showAlert("Added to Cart", quantity + "x " + product.getTitle() + " added to cart!");
+        UIUtils.showAlert("Added to Cart", quantity + "x " + product.getTitle() + " added to cart!");
     }
 
     public void handleProductsUpdated() {
@@ -166,7 +169,7 @@ public class HomepageController {
         if (sessionManager.isLoggedIn()) {
             String username = sessionManager.getCurrentUser().getUsername();
             view.updateAccountUI(true, username);
-            view.showAlert("Success", "Login successful! Welcome, " + username);
+            UIUtils.showAlert("Success", "Login successful! Welcome, " + username);
         }
     }
 
@@ -216,7 +219,7 @@ public class HomepageController {
             case LOGOUT:
                 UserController.getInstance().logout();
                 view.updateAccountUI(false, null);
-                view.showAlert("Success", "Logged out successfully!");
+                UIUtils.showAlert("Success", "Logged out successfully!");
                 break;
         }
     }
@@ -224,7 +227,7 @@ public class HomepageController {
     public void handleOpenProductManagement() {
         SessionManager session = SessionManager.getInstance();
         if (!session.isLoggedIn() || !session.canManageProducts()) {
-            view.showAlert("Access Denied", "You need Product Manager role to manage products");
+            UIUtils.showError("Access Denied", "You need Product Manager role to manage products");
             return;
         }
         view.navigateToProductManagement();
@@ -233,7 +236,7 @@ public class HomepageController {
     public void handleOpenOrderManagement() {
         SessionManager session = SessionManager.getInstance();
         if (!session.isLoggedIn() || !session.canManageOrders()) {
-            view.showAlert("Access Denied", "You need Product Manager role to manage orders");
+            UIUtils.showError("Access Denied", "You need Product Manager role to manage orders");
             return;
         }
         view.navigateToOrderManagement();
@@ -241,14 +244,15 @@ public class HomepageController {
 
     /**
      * CHANGELOG: Optimized to fetch 20 random products directly from the database
-     * to avoid loading all products into memory, handling huge databases efficiently.
+     * to avoid loading all products into memory, handling huge databases
+     * efficiently.
      */
     public void refreshAllProducts() {
         allProducts.clear();
         random20Products.clear();
-        
+
         List<Product> randomFromDb = productController.getRandomProducts(20);
-        
+
         allProducts.addAll(randomFromDb);
         random20Products.addAll(randomFromDb);
         currentDisplayedProducts = new ArrayList<>(random20Products);
@@ -263,9 +267,9 @@ public class HomepageController {
         } catch (ProductNotFoundException e) {
             // [ADDED] Explicitly handling DB exception when product is not found, matching
             // original controller
-            view.showAlert("Error", "Product not found: " + e.getMessage());
+            UIUtils.showError("Error", "Product not found: " + e.getMessage());
         } catch (Exception e) {
-            view.showAlert("Error", "Failed to load product details: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to load product details: " + e.getMessage());
         }
     }
 

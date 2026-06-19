@@ -5,6 +5,7 @@ import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.exception.ProductNotFoundException;
 import com.aimsfx.utils.SessionManager;
+import com.aimsfx.utils.UIUtils;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -122,7 +123,7 @@ public class ProductListView implements Initializable {
             if (prop != null) {
                 Platform.runLater(() -> prop.set(false));
             }
-            showAlert("Selection Limit", "You can only select up to " + MAX_SELECTION + " products at a time.");
+            UIUtils.showError("Selection Limit", "You can only select up to " + MAX_SELECTION + " products at a time.");
             return;
         }
 
@@ -224,9 +225,9 @@ public class ProductListView implements Initializable {
             ProductDetailUI detailUI = new ProductDetailUI(viewProductController, currentStage);
             detailUI.displayProduct(productData);
         } catch (ProductNotFoundException e) {
-            showAlert("Error", "Product not found: " + e.getMessage());
+            UIUtils.showError("Error", "Product not found: " + e.getMessage());
         } catch (Exception e) {
-            showAlert("Error", "Failed to load product details: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to load product details: " + e.getMessage());
         }
     }
 
@@ -236,7 +237,7 @@ public class ProductListView implements Initializable {
         // Check if user is logged in and has permission
         SessionManager sessionManager = SessionManager.getInstance();
         if (!sessionManager.isLoggedIn() || !sessionManager.canManageProducts()) {
-            showAlert("Access Denied", "You need Product Manager role to manage products");
+            UIUtils.showError("Access Denied", "You need Product Manager role to manage products");
             return;
         }
 
@@ -265,7 +266,7 @@ public class ProductListView implements Initializable {
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open product creation dialog.");
+            UIUtils.showError("Error", "Failed to open product creation dialog.");
         }
     }
 
@@ -303,10 +304,10 @@ public class ProductListView implements Initializable {
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open product update dialog: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to open product update dialog: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to update product: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to update product: " + e.getMessage());
         }
     }
 
@@ -320,7 +321,7 @@ public class ProductListView implements Initializable {
             historyView.show(productId, ownerStage);
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to load product history: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to load product history: " + e.getMessage());
         }
     }
 
@@ -333,14 +334,14 @@ public class ProductListView implements Initializable {
         List<Product> selectedProducts = getSelectedProducts();
 
         if (selectedProducts.isEmpty()) {
-            showAlert("No Selection", "Please select at least one product to delete.");
+            UIUtils.showError("No Selection", "Please select at least one product to delete.");
             return;
         }
 
         // Check if user is logged in
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser == null) {
-            showAlert("Error", "No user logged in.");
+            UIUtils.showError("Error", "No user logged in.");
             return;
         }
 
@@ -356,7 +357,7 @@ public class ProductListView implements Initializable {
             // Show result with remaining quota and refresh
             clearSelections();
             refreshProductList();
-            showSuccess("Deletion Successful",
+            UIUtils.showAlert("Deletion Successful",
                     "Successfully processed " + deletedCount + " product(s).\n" +
                             "Products with stock = 0 were deleted. Products with stock > 0 were deactivated.\n\n" +
                             "Remaining deletion quota for today: " + remainingQuota + "/20");
@@ -367,39 +368,14 @@ public class ProductListView implements Initializable {
                         + "Your remaining daily deletion quota is: " + e.getRemainingQuota() + "\n"
                         + "Daily limit: 20 products per day.\n\n"
                         + "Please try again tomorrow or select fewer products.";
-                showWarning("Deletion Limit Exceeded", message);
+                UIUtils.showWarning("Deletion Limit Exceeded", message);
             }
         } catch (Exception e) {
-            showAlert("Error", "Failed to delete products: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to delete products: " + e.getMessage());
         }
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-    private void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showSuccess(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
     public void refreshProductList() {
         selectionMap.clear(); // Clear old selections when refreshing

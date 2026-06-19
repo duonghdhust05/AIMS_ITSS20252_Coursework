@@ -364,12 +364,7 @@ public class DeliveryForm extends BaseView {
         }
     }
 
-    // ==================== Public Utility Methods (for Controller)
-    // ====================
-
-    // ==================== Public Utility Methods (for Controller)
-    // ====================
-
+    // Public Utility Methods for Controller
     /**
      * Collect delivery information from form (for controller use)
      * 

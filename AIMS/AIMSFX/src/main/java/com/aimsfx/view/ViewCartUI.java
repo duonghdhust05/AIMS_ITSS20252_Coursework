@@ -2,8 +2,7 @@ package com.aimsfx.view;
 
 import com.aimsfx.model.CartItem;
 import com.aimsfx.model.Product;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import com.aimsfx.utils.UIUtils;
 import java.util.List;
 import java.util.Map;
 
@@ -78,12 +77,7 @@ public class ViewCartUI extends BaseView {
     }
     
     public boolean confirmRemoveProduct(Product product) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Remove Product");
-        alert.setHeaderText("Remove from cart?");
-        alert.setContentText("Remove " + product.getTitle() + " from your cart?");
-        
-        return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
+        return UIUtils.showConfirmation("Remove Product", "Remove " + product.getTitle() + " from your cart?");
     }
     
     public void requestToAddBookToCart(int productId) {
@@ -100,11 +94,6 @@ public class ViewCartUI extends BaseView {
     }
     
     public boolean confirmProceedToCheckout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Proceed to Checkout");
-        alert.setHeaderText("Ready to place order?");
-        alert.setContentText("Do you want to proceed with this order?");
-        
-        return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
+        return UIUtils.showConfirmation("Proceed to Checkout", "Do you want to proceed with this order?");
     }
 }

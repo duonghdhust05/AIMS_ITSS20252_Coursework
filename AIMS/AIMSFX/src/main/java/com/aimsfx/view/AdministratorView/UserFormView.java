@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import com.aimsfx.utils.UIUtils;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -150,9 +151,9 @@ public class UserFormView implements Initializable {
             showError(e.getMessage());
             usernameField.requestFocus();
         } catch (UnauthorizedAccessException e) {
-            showErrorAlert("Access Denied", e.getMessage());
+            UIUtils.showError("Access Denied", e.getMessage());
         } catch (UserNotFoundException e) {
-            showErrorAlert("Error", e.getMessage());
+            UIUtils.showError("Error", e.getMessage());
         } catch (InvalidPasswordException e) {
             showError(e.getMessage());
             passwordField.requestFocus();
@@ -166,7 +167,7 @@ public class UserFormView implements Initializable {
         Set<UserRole> roles = collectSelectedRoles();
         
         userController.createUser(username, password, roles, fullName);
-        showSuccessAlert("User created successfully!");
+        UIUtils.showAlert("Success", "User created successfully!");
     }
     
     private void updateExistingUser() {
@@ -174,7 +175,7 @@ public class UserFormView implements Initializable {
         Set<UserRole> roles = collectSelectedRoles();
         
         userController.updateUser(user.getUserId(), null, roles, fullName);
-        showSuccessAlert("User updated successfully!");
+        UIUtils.showAlert("Success", "User updated successfully!");
     }
     
     private Set<UserRole> collectSelectedRoles() {
@@ -223,21 +224,5 @@ public class UserFormView implements Initializable {
             errorLabel.setText(message);
             errorLabel.setStyle("-fx-text-fill: #f44336;");
         }
-    }
-    
-    private void showSuccessAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-    
-    private void showErrorAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

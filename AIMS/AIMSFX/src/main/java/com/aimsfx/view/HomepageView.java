@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -228,10 +229,6 @@ public class HomepageView {
         });
     }
 
-    public void hideLoading() {
-        // Automatically handled by displayProducts clearing the grid
-    }
-
     public void displayProducts(List<Product> products) {
         productGrid.getChildren().clear();
         productCountLabel.setText(products.size() + " product" + (products.size() != 1 ? "s" : ""));
@@ -277,7 +274,7 @@ public class HomepageView {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Could not load cart view: " + e.getMessage());
+            UIUtils.showError("Error", "Could not load cart view: " + e.getMessage());
         }
     }
 
@@ -297,12 +294,7 @@ public class HomepageView {
         }
     }
 
-    public void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
-    }
+
 
     // Navigation UI
 
@@ -317,7 +309,7 @@ public class HomepageView {
                 int quantity = Integer.parseInt(qty);
                 controller.handleAddToCart(product, quantity);
             } catch (NumberFormatException e) {
-                showAlert("Invalid Input", "Please enter a valid number.");
+                UIUtils.showError("Invalid Input", "Please enter a valid number.");
             }
         });
     }
@@ -347,7 +339,7 @@ public class HomepageView {
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open product update dialog.");
+            UIUtils.showError("Error", "Failed to open product update dialog.");
         }
     }
 
@@ -358,7 +350,7 @@ public class HomepageView {
             view.show(owner);
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open order management view: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to open order management view: " + e.getMessage());
         }
     }
 
@@ -414,7 +406,7 @@ public class HomepageView {
             dialogStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to open user management view: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to open user management view: " + e.getMessage());
         }
     }
 
@@ -444,7 +436,7 @@ public class HomepageView {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Could not load login view: " + e.getMessage());
+            UIUtils.showError("Error", "Could not load login view: " + e.getMessage());
         }
     }
 
@@ -469,7 +461,7 @@ public class HomepageView {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Could not load change password view: " + e.getMessage());
+            UIUtils.showError("Error", "Could not load change password view: " + e.getMessage());
         }
     }
 

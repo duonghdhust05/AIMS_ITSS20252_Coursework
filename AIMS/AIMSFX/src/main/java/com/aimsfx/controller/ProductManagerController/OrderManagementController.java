@@ -5,6 +5,7 @@ import com.aimsfx.model.OrderSummary;
 import com.aimsfx.service.OrderReviewService;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.view.OrderManagementView;
+import com.aimsfx.utils.UIUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -170,7 +171,7 @@ public class OrderManagementController {
 
             loadPage(0);
         } catch (SQLException e) {
-            view.showError("Database Error", e.getMessage());
+            UIUtils.showError("Database Error", e.getMessage());
             disableUi("Failed to load orders.");
         }
     }
@@ -190,7 +191,7 @@ public class OrderManagementController {
                 List<OrderSummary> page = orderReviewService.listAllOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
                 ordersTable.getItems().setAll(page);
             } catch (SQLException e) {
-                view.showError("Database Error", e.getMessage());
+                UIUtils.showError("Database Error", e.getMessage());
             }
         });
     }
@@ -200,29 +201,29 @@ public class OrderManagementController {
         try {
             OrderDetail detail = orderReviewService.getOrderDetail(orderId);
             if (detail == null) {
-                view.showError("Not Found", "Order not found: " + orderId);
+                UIUtils.showError("Not Found", "Order not found: " + orderId);
                 return;
             }
             view.showDetailDialog(detail);
         } catch (SQLException e) {
-            view.showError("Database Error", e.getMessage());
+            UIUtils.showError("Database Error", e.getMessage());
         }
     }
 
     private void onApprove(Integer orderId) {
         if (orderId == null) return;
-        if (!view.confirmAction("Approve Order", "Are you sure you want to approve order #" + orderId + "?")) return;
+        if (!UIUtils.showConfirmation("Approve Order", "Are you sure you want to approve order #" + orderId + "?")) return;
         try {
             orderReviewService.approve(orderId);
             refreshCurrentPage();
         } catch (SQLException e) {
-            view.showError("Database Error", e.getMessage());
+            UIUtils.showError("Database Error", e.getMessage());
         }
     }
 
     private void onReject(Integer orderId) {
         if (orderId == null) return;
-        if (!view.confirmAction("Reject Order", "Are you sure you want to reject order #" + orderId + "?")) return;
+        if (!UIUtils.showConfirmation("Reject Order", "Are you sure you want to reject order #" + orderId + "?")) return;
         
         String reason = view.showRejectReasonDialog();
         if (reason == null || reason.trim().isEmpty()) {
@@ -233,7 +234,7 @@ public class OrderManagementController {
             orderReviewService.reject(orderId, reason);
             refreshCurrentPage();
         } catch (SQLException e) {
-            view.showError("Database Error", e.getMessage());
+            UIUtils.showError("Database Error", e.getMessage());
         }
     }
 

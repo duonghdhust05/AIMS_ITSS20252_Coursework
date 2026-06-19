@@ -3,10 +3,9 @@ package com.aimsfx.controller.PlaceOrderController.CartViewController;
 import com.aimsfx.model.CartItem;
 import com.aimsfx.model.Product;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -84,7 +83,7 @@ public class CartItemController {
             if (onQuantityChange != null)
                 onQuantityChange.run();
         } else {
-            showAlert("Out of Stock", "Maximum available quantity: " + product.getStock());
+            UIUtils.showWarning("Out of Stock", "Maximum available quantity: " + product.getStock());
         }
     }
 
@@ -98,12 +97,4 @@ public class CartItemController {
         return PRICE_FORMATTER.format(price);
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.showAndWait();
-    }
 }

@@ -6,6 +6,7 @@ import com.aimsfx.service.VietnamProvinceService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import com.aimsfx.utils.UIUtils;
 import javafx.stage.Stage;
 import java.util.List;
 
@@ -193,11 +194,7 @@ public class DeliveryInfoDialogController {
                     dialogProvinceComboBox.setDisable(false);
 
                     // Show error
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Cannot load province list");
-                    alert.setContentText("Please check your internet connection and try again.");
-                    alert.showAndWait();
+                    UIUtils.showError("Cannot load province list", "Please check your internet connection and try again.");
                 });
             }
         }).start();

@@ -41,11 +41,12 @@ public class UIUtils {
     /**
      * Apply the application icon to a Dialog (or Alert)
      */
-    public static void applyAppIcon(Dialog<?> dialog) {
+    public static void applyAppDialogIcon(Dialog<?> dialog) {
         if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
             javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+            Image icon = new Image(UIUtils.class.getResourceAsStream("/com/aimsfx/aims-logo.png"));
             if (window instanceof Stage) {
-                applyAppIcon((Stage) window);
+                ((Stage) window).getIcons().add(icon);
             }
         }
     }
@@ -58,7 +59,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        applyAppIcon(alert);
+        applyAppDialogIcon(alert);
         alert.showAndWait();
     }
 
@@ -70,7 +71,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        applyAppIcon(alert);
+        applyAppDialogIcon(alert);
         alert.showAndWait();
     }
 
@@ -82,12 +83,13 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        applyAppIcon(alert);
+        applyAppDialogIcon(alert);
         alert.show(); // Non-blocking
     }
 
     /**
      * Show confirmation dialog
+     * 
      * @return true if user confirmed
      */
     public static boolean showConfirmation(String title, String message) {
@@ -95,7 +97,7 @@ public class UIUtils {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        applyAppIcon(alert);
+        applyAppDialogIcon(alert);
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;

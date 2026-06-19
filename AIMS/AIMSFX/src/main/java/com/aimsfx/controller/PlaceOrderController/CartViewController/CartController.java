@@ -5,6 +5,7 @@ import com.aimsfx.model.*;
 import com.aimsfx.service.ICartService;
 import com.aimsfx.service.CartService;
 import com.aimsfx.view.CartView;
+import com.aimsfx.utils.UIUtils;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -131,7 +132,7 @@ public class CartController implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
-            cartView.showError("Error", "Could not load homepage: " + e.getMessage());
+            UIUtils.showError("Error", "Could not load homepage: " + e.getMessage());
         }
     }
 
@@ -139,7 +140,7 @@ public class CartController implements Initializable {
     public void onCheckout() {
         try {
             if (currentCart == null || currentCart.getItems().isEmpty()) {
-                cartView.showAlert("Empty Cart", "Your cart is empty. Please add items before checkout.");
+                UIUtils.showWarning("Empty Cart", "Your cart is empty. Please add items before checkout.");
                 return;
             }
 
@@ -147,7 +148,7 @@ public class CartController implements Initializable {
 
             if (!insufficientItems.isEmpty()) {
                 String errorMessage = cartView.buildInsufficientStockMessage(insufficientItems);
-                cartView.showAlert("Insufficient Stock", errorMessage);
+                UIUtils.showError("Insufficient Stock", errorMessage);
                 loadCartData();
                 return;
             }
@@ -168,7 +169,7 @@ public class CartController implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
-            cartView.showError("Error", "Could not proceed to checkout: " + e.getMessage());
+            UIUtils.showError("Error", "Could not proceed to checkout: " + e.getMessage());
         }
     }
 

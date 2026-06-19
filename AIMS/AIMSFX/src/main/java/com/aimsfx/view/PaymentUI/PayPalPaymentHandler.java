@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import com.aimsfx.utils.UIUtils;
 
 /**
  * PayPalPaymentHandler Class
@@ -111,11 +112,7 @@ public class PayPalPaymentHandler implements IPaymentMethodHandler {
      */
     private void displayErrorMessage(String message) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Payment Failed");
-            alert.setHeaderText("PayPal Payment Error");
-            alert.setContentText(message);
-            alert.showAndWait();
+            UIUtils.showError("Payment Failed", message);
         });
     }
 
@@ -124,11 +121,7 @@ public class PayPalPaymentHandler implements IPaymentMethodHandler {
      */
     private void displayCancelMessage() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Payment Cancelled");
-            alert.setHeaderText(null);
-            alert.setContentText("You cancelled the PayPal payment.");
-            alert.showAndWait();
+            UIUtils.showAlert("Payment Cancelled", "You cancelled the PayPal payment.");
         });
     }
 }

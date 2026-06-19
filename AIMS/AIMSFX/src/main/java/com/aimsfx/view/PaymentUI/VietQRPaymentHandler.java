@@ -5,8 +5,8 @@ import com.aimsfx.exception.PaymentException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -117,19 +117,11 @@ public class VietQRPaymentHandler implements IPaymentMethodHandler {
                 onHideLoading.run();
 
                 if (finalSuccess) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Success");
-                    alert.setHeaderText(null);
-                    alert.setContentText("VietQR Payment Successful!");
-                    alert.showAndWait();
+                    UIUtils.showAlert("Success", "VietQR Payment Successful!");
                     onSuccess.run();
                 } else {
                     // Show clean error message (error code logged to console for debugging)
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Payment Failed");
-                    alert.setHeaderText(null);
-                    alert.setContentText(finalErrorMsg);
-                    alert.showAndWait();
+                    UIUtils.showError("Payment Failed", finalErrorMsg);
                 }
             });
         }).start();
@@ -159,21 +151,14 @@ public class VietQRPaymentHandler implements IPaymentMethodHandler {
                 System.err.println("[VietQRPaymentHandler] QR Error [" + errorCode + "]: " + errorMsg);
                 Platform.runLater(() -> {
                     hideLoading();
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Payment Error");
-                    alert.setHeaderText(null);
-                    alert.setContentText(errorMsg);
-                    alert.showAndWait();
+                    UIUtils.showError("Payment Error", errorMsg);
                 });
 
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
                     hideLoading();
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setContentText("Failed to generate QR code: " + e.getMessage());
-                    alert.showAndWait();
+                    UIUtils.showError("Error", "Failed to generate QR code: " + e.getMessage());
                 });
             }
         }).start();

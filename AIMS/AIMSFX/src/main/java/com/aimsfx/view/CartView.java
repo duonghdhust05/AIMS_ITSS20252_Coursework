@@ -4,6 +4,7 @@ import com.aimsfx.model.CartItem;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.*;
 
 import java.text.NumberFormat;
@@ -25,23 +26,7 @@ public class CartView {
         return PRICE_FORMATTER.format(price);
     }
 
-    public void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.showAndWait();
-    }
 
-    public void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.showAndWait();
-    }
 
     public void showEmptyCartMessage(VBox container) {
         if (container == null)
@@ -74,7 +59,7 @@ public class CartView {
             return itemBox;
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            showError("Error", "Could not load cart item UI.");
+            UIUtils.showError("Error", "Could not load cart item UI.");
             return new HBox();
         }
     }

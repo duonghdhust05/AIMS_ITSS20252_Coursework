@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -145,7 +146,7 @@ public class UserManagementView implements Initializable {
             userTableView.setItems(users);
             updateUserCount();
         } catch (UnauthorizedAccessException e) {
-            showErrorAlert("Access Denied", e.getMessage());
+            UIUtils.showError("Access Denied", e.getMessage());
         }
     }
 
@@ -157,7 +158,7 @@ public class UserManagementView implements Initializable {
             userTableView.setItems(filteredUsers);
             updateUserCount();
         } catch (UnauthorizedAccessException e) {
-            showErrorAlert("Access Denied", e.getMessage());
+            UIUtils.showError("Access Denied", e.getMessage());
         }
     }
 
@@ -220,13 +221,19 @@ public class UserManagementView implements Initializable {
 
             dialogStage.showAndWait();
         } catch (IOException e) {
-            showErrorAlert("Error", "Failed to open user form: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to open user form: " + e.getMessage());
         }
     }
 
     private void openResetPasswordDialog(User user) {
         TextInputDialog dialog = new TextInputDialog();
-        com.aimsfx.utils.UIUtils.applyAppIcon(dialog);
+        if ((Dialog<?>) dialog != null && (dialog).getDialogPane() != null
+                && (dialog).getDialogPane().getScene() != null) {
+            javafx.stage.Window window = (dialog).getDialogPane().getScene().getWindow();
+            if (window instanceof Stage) {
+                com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
+            }
+        }
         dialog.setTitle("Reset Password");
         dialog.setHeaderText("Reset password for: " + user.getUsername());
         dialog.setContentText("New Password:");
@@ -235,16 +242,16 @@ public class UserManagementView implements Initializable {
             try {
                 boolean success = userController.resetPassword(user.getUserId(), newPassword);
                 if (success) {
-                    showSuccessAlert("Success", "Password reset successfully for " + user.getUsername());
+                    UIUtils.showAlert("Success", "Password reset successfully for " + user.getUsername());
                 } else {
-                    showErrorAlert("Error", "Failed to reset password!");
+                    UIUtils.showError("Error", "Failed to reset password!");
                 }
             } catch (InvalidPasswordException e) {
-                showErrorAlert("Validation Error", e.getMessage());
+                UIUtils.showError("Validation Error", e.getMessage());
             } catch (UnauthorizedAccessException e) {
-                showErrorAlert("Access Denied", e.getMessage());
+                UIUtils.showError("Access Denied", e.getMessage());
             } catch (UserNotFoundException e) {
-                showErrorAlert("Error", e.getMessage());
+                UIUtils.showError("Error", e.getMessage());
             }
         });
     }
@@ -252,10 +259,9 @@ public class UserManagementView implements Initializable {
     private void confirmAndToggleBlock(User user) {
         String action = user.isBlocked() ? "unblock" : "block";
 
-        if (!showConfirmDialog(
+        if (!UIUtils.showConfirmation(
                 "Confirm " + (user.isBlocked() ? "Unblock" : "Block"),
-                "Are you sure you want to " + action + " this user?",
-                "User: " + user.getUsername() + " (" + user.getFullName() + ")")) {
+                "Are you sure you want to " + action + " this user?\n\nUser: " + user.getUsername() + " (" + user.getFullName() + ")")) {
             return;
         }
 
@@ -265,42 +271,41 @@ public class UserManagementView implements Initializable {
                     : userController.blockUser(user.getUserId());
 
             if (success) {
-                showSuccessAlert("Success", "User " + action + "ed successfully!");
+                UIUtils.showAlert("Success", "User " + action + "ed successfully!");
                 refreshAfterChange();
             } else {
-                showErrorAlert("Error", "Failed to " + action + " user!");
+                UIUtils.showError("Error", "Failed to " + action + " user!");
             }
         } catch (UnauthorizedAccessException e) {
-            showErrorAlert("Access Denied", e.getMessage());
+            UIUtils.showError("Access Denied", e.getMessage());
         } catch (SelfOperationException e) {
-            showErrorAlert("Error", e.getMessage());
+            UIUtils.showError("Error", e.getMessage());
         } catch (UserNotFoundException e) {
-            showErrorAlert("Error", e.getMessage());
+            UIUtils.showError("Error", e.getMessage());
         }
     }
 
     private void confirmAndDeleteUser(User user) {
-        if (!showConfirmDialog(
+        if (!UIUtils.showConfirmation(
                 "Confirm Delete",
-                "Are you sure you want to delete this user?",
-                "User: " + user.getUsername() + " (" + user.getFullName() + ")\n\nThis action cannot be undone!")) {
+                "Are you sure you want to delete this user?\n\nUser: " + user.getUsername() + " (" + user.getFullName() + ")\n\nThis action cannot be undone!")) {
             return;
         }
 
         try {
             boolean success = userController.deleteUser(user.getUserId());
             if (success) {
-                showSuccessAlert("Success", "User deleted successfully!");
+                UIUtils.showAlert("Success", "User deleted successfully!");
                 refreshAfterChange();
             } else {
-                showErrorAlert("Error", "Failed to delete user!");
+                UIUtils.showError("Error", "Failed to delete user!");
             }
         } catch (UnauthorizedAccessException e) {
-            showErrorAlert("Access Denied", e.getMessage());
+            UIUtils.showError("Access Denied", e.getMessage());
         } catch (SelfOperationException e) {
-            showErrorAlert("Error", e.getMessage());
+            UIUtils.showError("Error", e.getMessage());
         } catch (UserNotFoundException e) {
-            showErrorAlert("Error", e.getMessage());
+            UIUtils.showError("Error", e.getMessage());
         }
     }
 
@@ -309,35 +314,7 @@ public class UserManagementView implements Initializable {
         applyFilter();
     }
 
-    // ==================== ALERT HELPERS (UI) ====================
 
-    private void showSuccessAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showErrorAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        com.aimsfx.utils.UIUtils.applyAppIcon(alert);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private boolean showConfirmDialog(String title, String header, String content) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        com.aimsfx.utils.UIUtils.applyAppIcon(confirm);
-        confirm.setTitle(title);
-        confirm.setHeaderText(header);
-        confirm.setContentText(content);
-        Optional<ButtonType> result = confirm.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
 
     // ==================== INNER CLASS: Action Button Cell ====================
 

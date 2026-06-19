@@ -5,10 +5,10 @@ import com.aimsfx.exception.InvalidPasswordException;
 import com.aimsfx.utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
+import com.aimsfx.utils.UIUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -92,7 +92,7 @@ public class ChangePasswordView implements Initializable {
             boolean success = userController.changePassword(oldPassword, newPassword);
 
             if (success) {
-                showSuccessAlert("Password changed successfully!");
+                UIUtils.showAlert("Success", "Password changed successfully!");
                 closeDialog();
             } else {
                 showError("Current password is incorrect!");
@@ -143,13 +143,5 @@ public class ChangePasswordView implements Initializable {
         if (errorLabel != null) {
             errorLabel.setText(message);
         }
-    }
-
-    private void showSuccessAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

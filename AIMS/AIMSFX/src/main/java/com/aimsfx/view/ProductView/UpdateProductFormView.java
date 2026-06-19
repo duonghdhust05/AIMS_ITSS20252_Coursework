@@ -5,6 +5,7 @@ import com.aimsfx.model.Product;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
 import com.aimsfx.model.meta.InputType;
+import com.aimsfx.utils.UIUtils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -119,7 +120,7 @@ public class UpdateProductFormView {
             Map<String, Object> productData = controller.getProductDetails(productId);
 
             if (productData == null) {
-                showAlert("Error", "Product not found!");
+                UIUtils.showError("Error", "Product not found!");
                 handleCancel();
                 return;
             }
@@ -147,7 +148,7 @@ public class UpdateProductFormView {
             populateSpecificFields(productData);
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to load product: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to load product: " + e.getMessage());
             e.printStackTrace();
             handleCancel();
         }
@@ -190,7 +191,7 @@ public class UpdateProductFormView {
             specificFieldsTitle.setText(productType + " Specific Information");
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to generate fields: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to generate fields: " + e.getMessage());
         }
     }
 
@@ -348,7 +349,7 @@ public class UpdateProductFormView {
                     specificAttributes);
 
             // Step 4: Show success
-            showSuccess("Product updated successfully!\nBarcode: " + product.getBarcode());
+            UIUtils.showAlert("Success", "Product updated successfully!\nBarcode: " + product.getBarcode());
 
             // Step 5: Trigger callback
             if (onProductUpdated != null) {
@@ -360,9 +361,9 @@ public class UpdateProductFormView {
 
         } catch (IllegalArgumentException e) {
             // Controller throws IllegalArgumentException with user-friendly messages
-            showAlert("Validation Error", e.getMessage());
+            UIUtils.showError("Validation Error", e.getMessage());
         } catch (Exception e) {
-            showAlert("Error", "Failed to update product: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to update product: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -493,20 +494,20 @@ public class UpdateProductFormView {
                         stockField.setText(newStockRaw);
 
                         // Show success
-                        showSuccess("Stock updated successfully!");
+                        UIUtils.showAlert("Success", "Stock updated successfully!");
 
                     } catch (IllegalArgumentException e) {
                         // Controller throws IllegalArgumentException with user-friendly messages
-                        showAlert("Validation Error", e.getMessage());
+                        UIUtils.showError("Validation Error", e.getMessage());
                     } catch (Exception e) {
-                        showAlert("Error", "Failed to update stock: " + e.getMessage());
+                        UIUtils.showError("Error", "Failed to update stock: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
             });
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to open stock update dialog: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to open stock update dialog: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -531,19 +532,5 @@ public class UpdateProductFormView {
         return value.toString();
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

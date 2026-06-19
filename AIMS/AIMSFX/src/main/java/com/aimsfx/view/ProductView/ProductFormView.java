@@ -4,6 +4,7 @@ import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
+import com.aimsfx.utils.UIUtils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -208,7 +209,7 @@ public class ProductFormView {
             }
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to load product fields: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to load product fields: " + e.getMessage());
         }
     }
 
@@ -273,7 +274,7 @@ public class ProductFormView {
             // Step 1: Collect product type
             String productType = productTypeComboBox.getValue();
             if (productType == null) {
-                showAlert("Validation Error", "Please select a product type!");
+                UIUtils.showError("Validation Error", "Please select a product type!");
                 return;
             }
 
@@ -307,7 +308,7 @@ public class ProductFormView {
             if ("CD".equals(productType)) {
                 successMessage += "\nTracks added: " + cdTracks.size();
             }
-            showSuccess(successMessage);
+            UIUtils.showAlert("Success", successMessage);
 
             // Step 7: Trigger callback
             if (onProductAdded != null) {
@@ -319,9 +320,9 @@ public class ProductFormView {
 
         } catch (IllegalArgumentException e) {
             // Controller throws IllegalArgumentException with user-friendly messages
-            showAlert("Validation Error", e.getMessage());
+            UIUtils.showError("Validation Error", e.getMessage());
         } catch (Exception e) {
-            showAlert("Error", "Failed to add product: " + e.getMessage());
+            UIUtils.showError("Error", "Failed to add product: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -371,13 +372,13 @@ public class ProductFormView {
 
         // Validate track fields
         if (title.isEmpty()) {
-            showAlert("Validation Error", "Track title is required!");
+            UIUtils.showError("Validation Error", "Track title is required!");
             trackTitleField.requestFocus();
             return;
         }
 
         if (durationStr.isEmpty()) {
-            showAlert("Validation Error", "Track duration is required!");
+            UIUtils.showError("Validation Error", "Track duration is required!");
             trackDurationField.requestFocus();
             return;
         }
@@ -386,7 +387,7 @@ public class ProductFormView {
             Integer duration = Integer.parseInt(durationStr);
 
             if (duration <= 0) {
-                showAlert("Validation Error", "Duration must be greater than 0 seconds!");
+                UIUtils.showError("Validation Error", "Duration must be greater than 0 seconds!");
                 trackDurationField.requestFocus();
                 return;
             }
@@ -410,7 +411,7 @@ public class ProductFormView {
             updateCDTrackCountField();
 
         } catch (NumberFormatException e) {
-            showAlert("Validation Error", "Duration must be a valid number (in seconds)!");
+            UIUtils.showError("Validation Error", "Duration must be a valid number (in seconds)!");
             trackDurationField.requestFocus();
         }
     }
@@ -433,7 +434,7 @@ public class ProductFormView {
             tracksList.getChildren().add(trackItem);
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            showAlert("Error", "Could not load track item UI.");
+            UIUtils.showError("Error", "Could not load track item UI.");
         }
     }
 
@@ -519,19 +520,5 @@ public class ProductFormView {
 
     // Utility methods
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

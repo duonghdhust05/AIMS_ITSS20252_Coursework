@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -201,7 +202,7 @@ public class PaymentUI {
             stage.setTitle("AIMS - Place Order");
         } catch (IOException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Cannot go back: " + e.getMessage()).showAndWait();
+            UIUtils.showError("Error", "Cannot go back: " + e.getMessage());
         }
     }
 
@@ -223,7 +224,7 @@ public class PaymentUI {
 
         } catch (IOException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Failed to load success screen: " + e.getMessage()).showAndWait();
+            UIUtils.showError("Error", "Failed to load success screen: " + e.getMessage());
         }
     }
 
