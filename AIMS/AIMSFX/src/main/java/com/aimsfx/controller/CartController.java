@@ -4,7 +4,7 @@ import com.aimsfx.model.Cart;
 import com.aimsfx.service.CartService;
 import com.aimsfx.service.ICartService;
 import com.aimsfx.utils.UIUtils;
-import com.aimsfx.view.PlaceOrderScreen;
+import com.aimsfx.view.PlaceOrderUI.PlaceOrderScreen;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,11 +19,11 @@ import java.util.Map;
  * Pure MVC Logic Controller for Cart operations.
  * Handles user input intent, business logic delegation, and view selection/navigation.
  */
-public class CartLogicController {
+public class CartController {
 
     private final ICartService cartService;
 
-    public CartLogicController() {
+    public CartController() {
         this.cartService = new CartService();
     }
 
@@ -45,7 +45,7 @@ public class CartLogicController {
         }
     }
 
-    public void handleCheckoutRequest(Cart currentCart, Stage currentStage, com.aimsfx.view.PlaceOrderCartSection cartView) {
+    public void handleCheckoutRequest(Cart currentCart, Stage currentStage, com.aimsfx.view.PlaceOrderUI.PlaceOrderCartSection cartView) {
         if (currentCart == null || currentCart.getItems().isEmpty()) {
             UIUtils.showWarning("Empty Cart", "Your cart is empty. Please add items before checkout.");
             return;

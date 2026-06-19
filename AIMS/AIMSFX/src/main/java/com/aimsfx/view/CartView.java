@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * CartScreen - Controller for Cart View (cart-view.fxml)
  */
-public class CartScreen implements Initializable {
+public class CartView implements Initializable {
 
     @FXML
     private VBox cartItemsContainer;
@@ -40,7 +40,7 @@ public class CartScreen implements Initializable {
     private Cart currentCart;
     private com.aimsfx.controller.CartController logicController;
 
-    public CartScreen() {
+    public CartView() {
         this.cartManager = CartManager.getInstance();
         this.cartService = new CartService();
         this.cartView = new PlaceOrderCartSection();
