@@ -1,4 +1,4 @@
-package com.aimsfx.view.PaymentUI;
+package com.aimsfx.view.PaymentView;
 
 import com.aimsfx.controller.PayOrderController;
 import javafx.application.Platform;

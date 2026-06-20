@@ -1,4 +1,4 @@
-package com.aimsfx.subsystem.vietqr;
+package com.aimsfx.service.payment;
 
 import com.aimsfx.exception.PaymentException;
 

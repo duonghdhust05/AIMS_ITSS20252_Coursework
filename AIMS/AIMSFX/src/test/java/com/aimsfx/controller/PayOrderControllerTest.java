@@ -2,9 +2,9 @@ package com.aimsfx.controller;
 
 import com.aimsfx.exception.PaymentException;
 import com.aimsfx.service.PaymentService;
-import com.aimsfx.subsystem.paypal.IPaymentGateway;
+import com.aimsfx.service.payment.IPaymentGateway;
 import com.aimsfx.subsystem.paypal.IPayPalView;
-import com.aimsfx.subsystem.vietqr.IPaymentQRCode;
+import com.aimsfx.service.payment.IPaymentQRCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -4,7 +4,7 @@ import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Order;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.TransactionRepository;
-import com.aimsfx.subsystem.paypal.IPaymentGateway;
+import com.aimsfx.service.payment.IPaymentGateway;
 
 import java.sql.SQLException;
 import java.util.logging.Level;

@@ -40,45 +40,31 @@ public class ProductHistoryView {
         this.controller = ProductController.getInstance();
     }
 
-    public void show(Long productId, Stage ownerStage) {
-        dialogStage = new Stage();
-        com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-        dialogStage.initModality(Modality.WINDOW_MODAL);
-        dialogStage.initOwner(ownerStage);
-        dialogStage.setTitle("Product History - ID: " + productId);
-
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/product-history-view.fxml"));
-            loader.setController(this);
-            VBox root = loader.load();
-
-            setupTableColumns();
-
-            ObservableList<Product> history = controller.getProductHistory(productId);
-            historyTable.setItems(history);
-
-            historyTable.setRowFactory(tv -> new TableRow<Product>() {
-                @Override
-                protected void updateItem(Product product, boolean empty) {
-                    super.updateItem(product, empty);
-                    if (product == null || empty) {
-                        setStyle("");
-                    } else if (product.getIsCurrent() != null && product.getIsCurrent()) {
-                        setStyle("-fx-background-color: #d4edda;");
-                    } else {
-                        setStyle("-fx-background-color: #f8f9fa;");
-                    }
-                }
-            });
-
-            Scene scene = new Scene(root, 1000, 600);
-            dialogStage.setScene(scene);
-            dialogStage.showAndWait();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
     }
+
+    public void setProductHistory(Long productId) {
+        setupTableColumns();
+        ObservableList<Product> history = controller.getProductHistory(productId);
+        historyTable.setItems(history);
+
+        historyTable.setRowFactory(tv -> new TableRow<Product>() {
+            @Override
+            protected void updateItem(Product product, boolean empty) {
+                super.updateItem(product, empty);
+                if (product == null || empty) {
+                    setStyle("");
+                } else if (product.getIsCurrent() != null && product.getIsCurrent()) {
+                    setStyle("-fx-background-color: #d4edda;");
+                } else {
+                    setStyle("-fx-background-color: #f8f9fa;");
+                }
+            }
+        });
+    }
+
+
 
     @FXML
     private void handleClose() {

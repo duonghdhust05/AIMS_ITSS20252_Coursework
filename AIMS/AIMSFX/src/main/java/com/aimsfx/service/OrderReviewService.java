@@ -70,6 +70,10 @@ public class OrderReviewService {
         return queryRepository.findDetailById(orderId);
     }
 
+    public Order getOrderById(int orderId) throws SQLException {
+        return commandRepository.findById(orderId);
+    }
+
     public void approve(int orderId) throws SQLException {
         boolean success = commandRepository.updateOrderStatusWithCheck(orderId, OrderStatus.APPROVED.toDbValue(),
                 OrderStatus.PENDING_REVIEW.toDbValue(), null);

@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import com.aimsfx.router.ProductRouter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -445,64 +446,23 @@ public class UpdateProductFormView {
      */
     private void handleUpdateStock() {
         try {
-            // Create dialog
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("Update Stock");
-            dialog.setHeaderText("Update Stock for Product");
+            ProductRouter.getInstance().showUpdateStockDialog(stockField.getText().trim(), (newStockRaw, reason) -> {
+                try {
+                    // Call controller ONCE - controller handles parsing and validation
+                    controller.handleUpdateStock(barcodeField.getText().trim(), newStockRaw, reason);
 
-            // Create form
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
+                    // Update display - refetch the value to ensure consistency
+                    stockField.setText(newStockRaw);
 
-            Label currentStockLabel = new Label("Current Stock:");
-            Label currentStockValue = new Label(stockField.getText().trim());
-            currentStockValue.setStyle("-fx-font-weight: bold;");
+                    // Show success
+                    UIUtils.showAlert("Success", "Stock updated successfully!");
 
-            Label newStockLabel = new Label("New Stock:");
-            TextField newStockField = new TextField();
-            newStockField.setPromptText("Enter new stock quantity");
-
-            Label reasonLabel = new Label("Reason:");
-            TextArea reasonField = new TextArea();
-            reasonField.setPromptText("Enter reason for stock change (required)");
-            reasonField.setPrefRowCount(3);
-
-            grid.add(currentStockLabel, 0, 0);
-            grid.add(currentStockValue, 1, 0);
-            grid.add(newStockLabel, 0, 1);
-            grid.add(newStockField, 1, 1);
-            grid.add(reasonLabel, 0, 2);
-            grid.add(reasonField, 1, 2);
-
-            dialog.getDialogPane().setContent(grid);
-            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-            // Show dialog and process result
-            dialog.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    try {
-                        // Collect raw inputs (no parsing in View!)
-                        String barcode = barcodeField.getText().trim();
-                        String newStockRaw = newStockField.getText().trim();
-                        String reason = reasonField.getText().trim();
-
-                        // Call controller ONCE - controller handles parsing and validation
-                        controller.handleUpdateStock(barcode, newStockRaw, reason);
-
-                        // Update display - refetch the value to ensure consistency
-                        stockField.setText(newStockRaw);
-
-                        // Show success
-                        UIUtils.showAlert("Success", "Stock updated successfully!");
-
-                    } catch (IllegalArgumentException e) {
-                        // Controller throws IllegalArgumentException with user-friendly messages
-                        UIUtils.showError("Validation Error", e.getMessage());
-                    } catch (Exception e) {
-                        UIUtils.showError("Error", "Failed to update stock: " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                } catch (IllegalArgumentException e) {
+                    // Controller throws IllegalArgumentException with user-friendly messages
+                    UIUtils.showError("Validation Error", e.getMessage());
+                } catch (Exception e) {
+                    UIUtils.showError("Error", "Failed to update stock: " + e.getMessage());
+                    e.printStackTrace();
                 }
             });
 

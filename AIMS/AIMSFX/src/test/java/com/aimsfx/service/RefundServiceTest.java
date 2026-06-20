@@ -4,7 +4,7 @@ import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Order;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.repository.TransactionRepository;
-import com.aimsfx.subsystem.paypal.IPaymentGateway;
+import com.aimsfx.service.payment.IPaymentGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

@@ -1,5 +1,8 @@
-package com.aimsfx.subsystem.vietqr.controller;
+package com.aimsfx.controller.api;
 
+import com.aimsfx.model.Order;
+import com.aimsfx.model.OrderStatus;
+import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.subsystem.vietqr.model.VietQRCallbackRequest;
 import com.aimsfx.subsystem.vietqr.model.VietQRCallbackResponse;
 import io.jsonwebtoken.Jwts;
@@ -15,13 +18,15 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 @RestController
-@RequestMapping("/bank/api")
-public class TransactionSyncController {
+@RequestMapping("/api/webhooks")
+public class PaymentWebhookController {
 
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @PostMapping(value = "/transaction-callback", consumes = MediaType.APPLICATION_JSON_VALUE)
+    private final OrderRepository orderRepository = new OrderRepository();
+
+    @PostMapping(value = "/vietqr-callback", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VietQRCallbackResponse> transactionSync(
             @RequestBody VietQRCallbackRequest payload,
             HttpServletRequest request) {
@@ -41,12 +46,28 @@ public class TransactionSyncController {
         }
 
         try {
-            // Transaction saving is handled by VietQRPaymentHandler
-            // This webhook just validates the callback and returns success
+            System.out.println("[PaymentWebhookController] Received VietQR callback for order: " + payload.orderId());
 
-            // Log the callback for debugging
-            System.out.println(
-                    "[TransactionSyncController] Received VietQR callback for transaction: " + payload.transactionid());
+            if (payload.orderId() != null && !payload.orderId().isEmpty()) {
+                int orderId = Integer.parseInt(payload.orderId());
+                Order order = orderRepository.findById(orderId);
+                
+                if (order != null) {
+                    boolean success = orderRepository.updateOrderStatusWithCheck(
+                        orderId, 
+                        OrderStatus.PENDING_REVIEW.toDbValue(), 
+                        order.getStatus(), 
+                        "Paid via VietQR"
+                    );
+                    if (success) {
+                        System.out.println("[PaymentWebhookController] Successfully updated Order " + orderId + " to PENDING_REVIEW");
+                    } else {
+                        System.err.println("[PaymentWebhookController] Failed to update Order " + orderId + " from " + order.getStatus());
+                    }
+                } else {
+                    System.err.println("[PaymentWebhookController] Order " + orderId + " not found!");
+                }
+            }
 
             // Return Success Response
             return ResponseEntity.ok(VietQRCallbackResponse.success(payload.transactionid()));

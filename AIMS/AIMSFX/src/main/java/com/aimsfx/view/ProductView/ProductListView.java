@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import com.aimsfx.router.ProductRouter;
+
 public class ProductListView implements Initializable {
 
     @FXML
@@ -218,17 +220,8 @@ public class ProductListView implements Initializable {
      * @param productId The ID of the product to view
      */
     public void handleViewDetailClick(String productId) {
-        try {
-            java.util.Map<String, Object> productData = viewProductController.getProductDetail(productId);
-
-            Stage currentStage = (Stage) productTableView.getScene().getWindow();
-            ProductDetailUI detailUI = new ProductDetailUI(viewProductController, currentStage);
-            detailUI.displayProduct(productData);
-        } catch (ProductNotFoundException e) {
-            UIUtils.showError("Error", "Product not found: " + e.getMessage());
-        } catch (Exception e) {
-            UIUtils.showError("Error", "Failed to load product details: " + e.getMessage());
-        }
+        Stage currentStage = (Stage) productTableView.getScene().getWindow();
+        ProductRouter.getInstance().showProductDetail(productId, currentStage);
     }
 
     // Add new method for Add Product functionality
@@ -241,33 +234,10 @@ public class ProductListView implements Initializable {
             return;
         }
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/product-form-view.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
-            stage.setTitle("Add Product");
-            stage.initModality(Modality.WINDOW_MODAL);
-
-            stage.setScene(new Scene(root, 900, 700));
-            stage.setResizable(true);
-            stage.setMinWidth(900);
-            stage.setMinHeight(700);
-
-            // Get controller and set callback
-            ProductFormView controller = loader.getController();
-            controller.setDialogStage(stage);
-            controller.setOnProductAdded(() -> {
-                refreshProductList(); // Let the success dialog handle closing the add product form window
-
-            });
-
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to open product creation dialog.");
-        }
+        Stage currentStage = (Stage) productTableView.getScene().getWindow();
+        ProductRouter.getInstance().showAddProductForm(currentStage, () -> {
+            refreshProductList();
+        });
     }
 
     /**
@@ -276,53 +246,18 @@ public class ProductListView implements Initializable {
      * @param productId The ID of the product to update
      */
     public void handleUpdateProduct(Long productId) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/product-update-form-view.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
-            stage.setTitle("Update Product");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(productTableView.getScene().getWindow());
-            stage.setScene(new Scene(root, 900, 650));
-            stage.setResizable(true);
-            stage.setMinWidth(850);
-            stage.setMinHeight(600);
-
-            // Get controller and set product data
-            UpdateProductFormView controller = loader.getController();
-            controller.setProductData(productId);
-            controller.setOnProductUpdated(() -> {
-                refreshProductList();
-                // Let the success dialog handle closing the update form window
-                Platform.runLater(() -> {
-                    stage.close();
-                });
-            });
-
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to open product update dialog: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to update product: " + e.getMessage());
-        }
+        Stage currentStage = (Stage) productTableView.getScene().getWindow();
+        ProductRouter.getInstance().showUpdateProductForm(productId, currentStage, () -> {
+            refreshProductList();
+        });
     }
 
     /**
      * Handle view history button click - opens history dialog
      */
     private void handleViewHistory(Long productId) {
-        try {
-            ProductHistoryView historyView = new ProductHistoryView();
-            Stage ownerStage = (Stage) productTableView.getScene().getWindow();
-            historyView.show(productId, ownerStage);
-        } catch (Exception e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to load product history: " + e.getMessage());
-        }
+        Stage currentStage = (Stage) productTableView.getScene().getWindow();
+        ProductRouter.getInstance().showProductHistory(productId, currentStage);
     }
 
     /**

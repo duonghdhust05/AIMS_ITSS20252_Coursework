@@ -8,6 +8,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import animatefx.animation.FadeIn;
+import animatefx.animation.BounceIn;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -60,6 +62,7 @@ public class UIUtils {
         alert.setHeaderText(null);
         alert.setContentText(message);
         applyAppDialogIcon(alert);
+        new BounceIn(alert.getDialogPane()).play();
         alert.showAndWait();
     }
 
@@ -72,6 +75,7 @@ public class UIUtils {
         alert.setHeaderText(null);
         alert.setContentText(message);
         applyAppDialogIcon(alert);
+        new BounceIn(alert.getDialogPane()).play();
         alert.showAndWait();
     }
 
@@ -84,6 +88,7 @@ public class UIUtils {
         alert.setHeaderText(null);
         alert.setContentText(message);
         applyAppDialogIcon(alert);
+        new BounceIn(alert.getDialogPane()).play();
         alert.show(); // Non-blocking
     }
 
@@ -98,6 +103,7 @@ public class UIUtils {
         alert.setHeaderText(null);
         alert.setContentText(message);
         applyAppDialogIcon(alert);
+        new BounceIn(alert.getDialogPane()).play();
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
@@ -116,6 +122,9 @@ public class UIUtils {
                 currentStage.setScene(new Scene(view));
             }
             currentStage.setTitle(title);
+            
+            // Apply Fade-In animation
+            new FadeIn(view).play();
         } catch (IOException e) {
             showError("Navigation Error", "Could not load " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();

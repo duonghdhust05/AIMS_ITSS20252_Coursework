@@ -1,4 +1,4 @@
-package com.aimsfx.subsystem.paypal;
+package com.aimsfx.service.payment;
 
 import com.aimsfx.exception.PaymentException;
 import java.util.Map;

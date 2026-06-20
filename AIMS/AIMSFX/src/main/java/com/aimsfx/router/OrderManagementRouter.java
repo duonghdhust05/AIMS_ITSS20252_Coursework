@@ -1,53 +1,63 @@
-package com.aimsfx.view.OrderView;
+package com.aimsfx.router;
 
 import com.aimsfx.model.OrderDetail;
+import com.aimsfx.utils.UIUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import com.aimsfx.utils.UIUtils;
+import animatefx.animation.FadeIn;
 
 /**
- * OrderManagementView - Pure View Layer for Product Manager order review
- * screen.
+ * Router class for Order Management.
+ * Handles loading FXML files and opening new stages or dialogs.
  */
-public class OrderManagementView {
+public class OrderManagementRouter {
 
+    /**
+     * Shows the main order management view.
+     */
     public void show(Stage owner) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-management-view.fxml"));
         Parent root = loader.load();
 
         Stage stage = new Stage();
-        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
+        UIUtils.applyAppIcon(stage);
         stage.setTitle("Order Management");
         stage.initModality(Modality.WINDOW_MODAL);
         if (owner != null) {
             stage.initOwner(owner);
         }
-        stage.setScene(new Scene(root, 1280, 720));
+        stage.setScene(new Scene(root, 1600, 900));
         stage.setMinWidth(900);
         stage.setMinHeight(600);
+
+        new FadeIn(root).play();
+
         stage.showAndWait();
     }
 
+    /**
+     * Shows the order detail dialog for a specific order.
+     */
     public void showDetailDialog(OrderDetail detail) {
-        if (detail == null)
+        if (detail == null) {
             return;
+        }
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/order-detail-dialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-detail-dialog.fxml"));
             javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.view.OrderView.OrderDetailDialogUI controller = loader
-                    .getController();
+            com.aimsfx.view.OrderView.OrderDetailDialogUI controller = loader.getController();
             controller.setOrderDetail(detail);
 
             Dialog<Void> dialog = new Dialog<>();
-            if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+            if (dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
                 javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
                 if (window instanceof Stage) {
-                    com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
+                    UIUtils.applyAppIcon((Stage) window);
                 }
             }
             dialog.setTitle("Order Detail");
@@ -59,29 +69,28 @@ public class OrderManagementView {
         }
     }
 
+    /**
+     * Shows the reject reason dialog and returns the entered reason.
+     * Returns null if cancelled.
+     */
     public String showRejectReasonDialog() {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/order-reject-dialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-reject-dialog.fxml"));
             javafx.scene.layout.VBox vbox = loader.load();
-            com.aimsfx.view.OrderView.OrderRejectDialogUI controller = loader
-                    .getController();
+            com.aimsfx.view.OrderView.OrderRejectDialogUI controller = loader.getController();
 
             Dialog<Void> dialog = new Dialog<>();
-            if (dialog != null && dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
+            if (dialog.getDialogPane() != null && dialog.getDialogPane().getScene() != null) {
                 javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
                 if (window instanceof Stage) {
-                    com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
+                    UIUtils.applyAppIcon((Stage) window);
                 }
             }
             dialog.setTitle("Reject Order");
             dialog.getDialogPane().setContent(vbox);
 
-            // Note: The new OrderRejectDialogUI uses its own buttons and calls
-            // close() on the Stage.
-            // But we need a dummy button type so Dialog doesn't crash if X is pressed
+            // Dummy button to prevent Dialog from crashing
             dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-            // Hide the default close button
             dialog.getDialogPane().lookupButton(ButtonType.CLOSE).setVisible(false);
 
             dialog.showAndWait();
@@ -95,5 +104,4 @@ public class OrderManagementView {
         }
         return null;
     }
-
 }

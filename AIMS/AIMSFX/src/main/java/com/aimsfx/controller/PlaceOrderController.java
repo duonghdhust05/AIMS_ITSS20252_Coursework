@@ -2,19 +2,14 @@ package com.aimsfx.controller;
 
 import com.aimsfx.exception.EmptyCartException;
 import com.aimsfx.exception.InvalidDeliveryInfoException;
-import com.aimsfx.factory.PaymentControllerFactory;
 import com.aimsfx.model.Cart;
 import com.aimsfx.model.DeliveryInfo;
 import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
 import com.aimsfx.repository.OrderRepository;
 import com.aimsfx.service.PlaceOrderService;
-import com.aimsfx.utils.UIUtils;
-import com.aimsfx.view.PaymentUI.PaymentUI;
+import com.aimsfx.router.PlaceOrderRouter;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.Map;
@@ -33,9 +28,7 @@ public class PlaceOrderController {
     }
 
     public void navigateBackToCart(Stage currentStage) {
-        if (currentStage != null) {
-            UIUtils.navigate(currentStage, "/com/aimsfx/cart-view.fxml", "AIMS - Shopping Cart");
-        }
+        PlaceOrderRouter.getInstance().navigateToCart(currentStage);
     }
 
     public Order processOrderCreation(Cart cart, DeliveryInfo info) throws Exception {
@@ -63,37 +56,6 @@ public class PlaceOrderController {
     }
 
     public void navigateToPayment(Order currentOrder, Invoice currentInvoice, Stage currentStage) {
-        try {
-            if (currentOrder == null) {
-                UIUtils.showAlert("Error", "Please place an order first.");
-                return;
-            }
-            if (currentInvoice != null) {
-                currentOrder.setTotalAmount(currentInvoice.getTotalAmount());
-            }
-
-            PayOrderController paymentController = PaymentControllerFactory.getPayOrderController();
-            if (paymentController == null) {
-                UIUtils.showAlert("Payment Error", "Failed to initialize payment system.");
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/payment-view.fxml"));
-            loader.setControllerFactory(c -> new PaymentUI(paymentController));
-            Parent root = loader.load();
-
-            PaymentUI paymentUI = loader.getController();
-            paymentUI.initializeData(currentOrder, currentInvoice);
-
-            if (currentStage.getScene() != null) {
-                currentStage.getScene().setRoot(root);
-            } else {
-                currentStage.setScene(new Scene(root));
-            }
-            currentStage.setTitle("AIMS - Payment");
-
-        } catch (Exception e) {
-            UIUtils.showAlert("System Error", "Could not process payment: " + e.getMessage());
-        }
+        PlaceOrderRouter.getInstance().navigateToPayment(currentOrder, currentInvoice, currentStage);
     }
 }

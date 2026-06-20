@@ -6,7 +6,7 @@ import com.aimsfx.model.Invoice;
 import com.aimsfx.model.Order;
 import com.aimsfx.model.TransactionInfo;
 import com.aimsfx.utils.UIUtils;
-import com.aimsfx.view.PlaceOrderUI.InvoiceDialogUI;
+import com.aimsfx.router.PlaceOrderRouter;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -108,24 +108,6 @@ public class OrderSuccessScreen {
     }
 
     private void showOrderDetailsDialog(Order order, Invoice invoice, TransactionInfo txn) {
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Detail Information");
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
-            javafx.scene.control.ScrollPane scrollPane = loader.load();
-            InvoiceDialogUI controller = loader.getController();
-            controller.setInvoiceData(order, invoice, txn);
-
-            dialog.getDialogPane().setContent(scrollPane);
-            dialog.getDialogPane().setStyle("-fx-background-color: #f5f5f5;");
-
-            dialog.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-            UIUtils.showAlert("Error", "Could not load invoice details.");
-        }
+        PlaceOrderRouter.getInstance().showInvoiceDialog(order, invoice, txn);
     }
 }

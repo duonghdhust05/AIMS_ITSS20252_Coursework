@@ -1,9 +1,10 @@
 package com.aimsfx.view.OrderView;
 
+import com.aimsfx.controller.OrderReviewController;
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
+import com.aimsfx.router.OrderManagementRouter;
 import com.aimsfx.service.OrderReviewService;
-import com.aimsfx.utils.SessionManager;
 import com.aimsfx.utils.UIUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,13 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * OrderManagementUI - Product Manager UI controller for reviewing pending
- * orders.
- *
- * Skeleton implementation:
- * - List pending orders (30/page)
- * - View order detail (read-only dialog)
- * - Approve / Reject (status update only; refund excluded)
+ * OrderManagementUI - FXML Controller for reviewing pending orders.
+ * Now acts as a Passive View.
  */
 public class OrderManagementUI {
 
@@ -50,17 +46,15 @@ public class OrderManagementUI {
     @FXML
     private Button refreshBtn;
 
-    private final OrderReviewService orderReviewService = new OrderReviewService();
-    private final OrderManagementView view = new OrderManagementView();
+    private final OrderReviewController controller = new OrderReviewController();
+    private final OrderManagementRouter router = new OrderManagementRouter();
+    
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private java.util.concurrent.ScheduledExecutorService scheduler;
-    private int lastLoadedCount = -1;
-
     @FXML
     public void initialize() {
-        if (!SessionManager.getInstance().canManageOrders()) {
+        if (!controller.canManageOrders()) {
             disableUi("Access denied: Product Manager role required.");
             return;
         }
@@ -68,7 +62,16 @@ public class OrderManagementUI {
         setupColumns();
         setupActions();
         loadFirstPage();
-        startBackgroundPolling();
+        
+        // Register background polling callback
+        controller.startBackgroundPolling(currentCount -> {
+            Platform.runLater(() -> {
+                if (refreshNotificationLabel != null) {
+                    refreshNotificationLabel.setVisible(true);
+                    refreshNotificationLabel.setManaged(true);
+                }
+            });
+        });
     }
 
     @FXML
@@ -78,30 +81,6 @@ public class OrderManagementUI {
             refreshNotificationLabel.setManaged(false);
         }
         refreshCurrentPage();
-    }
-
-    private void startBackgroundPolling() {
-        scheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            return t;
-        });
-
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                int currentCount = orderReviewService.countAllOrders();
-                if (lastLoadedCount != -1 && currentCount != lastLoadedCount) {
-                    Platform.runLater(() -> {
-                        if (refreshNotificationLabel != null) {
-                            refreshNotificationLabel.setVisible(true);
-                            refreshNotificationLabel.setManaged(true);
-                        }
-                    });
-                }
-            } catch (SQLException e) {
-                // Ignore background polling errors
-            }
-        }, 15, 15, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     private void setupColumns() {
@@ -127,8 +106,7 @@ public class OrderManagementUI {
             private final Button viewBtn = new Button("View");
             private final Button approveBtn = new Button("Approve");
             private final Button rejectBtn = new Button("Reject");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn,
-                    rejectBtn);
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn, rejectBtn);
 
             {
                 viewBtn.setOnAction(e -> onView(getCurrentOrderId()));
@@ -167,15 +145,8 @@ public class OrderManagementUI {
 
     private void loadFirstPage() {
         try {
-            int total = orderReviewService.countAllOrders();
-            this.lastLoadedCount = total;
-
-            if (totalPendingLabel != null) {
-                totalPendingLabel.setText("Total Orders: " + total);
-            }
-            if (lastUpdatedLabel != null) {
-                lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
-            }
+            int total = controller.countAllOrders();
+            updateTotalLabels(total);
 
             int pageSize = OrderReviewService.DEFAULT_PAGE_SIZE;
             int pageCount = (int) Math.ceil(total / (double) pageSize);
@@ -193,17 +164,10 @@ public class OrderManagementUI {
     private void loadPage(int pageIndex) {
         Platform.runLater(() -> {
             try {
-                int total = orderReviewService.countAllOrders();
-                this.lastLoadedCount = total;
-                if (totalPendingLabel != null) {
-                    totalPendingLabel.setText("Total Orders: " + total);
-                }
-                if (lastUpdatedLabel != null) {
-                    lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
-                }
+                int total = controller.countAllOrders();
+                updateTotalLabels(total);
 
-                List<OrderSummary> page = orderReviewService.listAllOrders(pageIndex,
-                        OrderReviewService.DEFAULT_PAGE_SIZE);
+                List<OrderSummary> page = controller.loadOrders(pageIndex, OrderReviewService.DEFAULT_PAGE_SIZE);
                 ordersTable.getItems().setAll(page);
             } catch (SQLException e) {
                 UIUtils.showError("Database Error", e.getMessage());
@@ -211,28 +175,35 @@ public class OrderManagementUI {
         });
     }
 
+    private void updateTotalLabels(int total) {
+        if (totalPendingLabel != null) {
+            totalPendingLabel.setText("Total Orders: " + total);
+        }
+        if (lastUpdatedLabel != null) {
+            lastUpdatedLabel.setText("Last updated: " + java.time.LocalTime.now().format(timeFmt));
+        }
+    }
+
     private void onView(Integer orderId) {
-        if (orderId == null)
-            return;
+        if (orderId == null) return;
         try {
-            OrderDetail detail = orderReviewService.getOrderDetail(orderId);
+            OrderDetail detail = controller.getOrderDetail(orderId);
             if (detail == null) {
                 UIUtils.showError("Not Found", "Order not found: " + orderId);
                 return;
             }
-            view.showDetailDialog(detail);
+            router.showDetailDialog(detail);
         } catch (SQLException e) {
             UIUtils.showError("Database Error", e.getMessage());
         }
     }
 
     private void onApprove(Integer orderId) {
-        if (orderId == null)
-            return;
+        if (orderId == null) return;
         if (!UIUtils.showConfirmation("Approve Order", "Are you sure you want to approve order #" + orderId + "?"))
             return;
         try {
-            orderReviewService.approve(orderId);
+            controller.approveOrder(orderId);
             refreshCurrentPage();
         } catch (SQLException e) {
             UIUtils.showError("Database Error", e.getMessage());
@@ -240,18 +211,17 @@ public class OrderManagementUI {
     }
 
     private void onReject(Integer orderId) {
-        if (orderId == null)
-            return;
+        if (orderId == null) return;
         if (!UIUtils.showConfirmation("Reject Order", "Are you sure you want to reject order #" + orderId + "?"))
             return;
 
-        String reason = view.showRejectReasonDialog();
+        String reason = router.showRejectReasonDialog();
         if (reason == null || reason.trim().isEmpty()) {
             return; // Cancelled or empty reason
         }
 
         try {
-            orderReviewService.reject(orderId, reason);
+            controller.rejectOrder(orderId, reason);
             refreshCurrentPage();
         } catch (SQLException e) {
             UIUtils.showError("Database Error", e.getMessage());
@@ -264,11 +234,8 @@ public class OrderManagementUI {
     }
 
     private void disableUi(String message) {
-        if (ordersTable != null)
-            ordersTable.setDisable(true);
-        if (pagination != null)
-            pagination.setDisable(true);
-        if (totalPendingLabel != null)
-            totalPendingLabel.setText(message);
+        if (ordersTable != null) ordersTable.setDisable(true);
+        if (pagination != null) pagination.setDisable(true);
+        if (totalPendingLabel != null) totalPendingLabel.setText(message);
     }
 }

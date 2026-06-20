@@ -19,7 +19,6 @@ import java.util.Map;
  */
 public class ProductDetailUI extends BaseView {
 
-    private final Stage parentStage;
     private Map<String, Object> productData;
 
     @javafx.fxml.FXML
@@ -55,45 +54,30 @@ public class ProductDetailUI extends BaseView {
         this.cartManager = cartManager;
     }
 
-    public ProductDetailUI(ViewProductController controller, Stage parentStage) {
-        this.parentStage = parentStage;
+    private Stage dialogStage;
+
+    public ProductDetailUI() {
+        // Default constructor for FXML loader
     }
 
-    public void displayProduct(Map<String, Object> productData) {
+    public void setDialogStage(Stage stage) {
+        this.dialogStage = stage;
+        if (closeButton != null) {
+            closeButton.setOnAction(e -> stage.close());
+        }
+    }
+
+    public void setProductData(Map<String, Object> productData) {
         if (productData == null || productData.isEmpty()) {
             displayError("No product data to display");
             return;
         }
 
         this.productData = productData;
+        populateProductData();
 
-        Stage stage = new Stage();
-        com.aimsfx.utils.UIUtils.applyAppIcon(stage);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(parentStage);
-        stage.setTitle("Product Details");
-
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/product-detail-ui-view.fxml"));
-            loader.setController(this);
-            BorderPane root = loader.load();
-
-            populateProductData();
-
-            if (closeButton != null) {
-                closeButton.setOnAction(e -> stage.close());
-            }
-            if (addToCartButton != null) {
-                addToCartButton.setOnAction(e -> handleAddToCart());
-            }
-
-            Scene scene = new Scene(root, 800, 700);
-            stage.setScene(scene);
-            stage.show();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            displayError("Failed to load product details UI.");
+        if (addToCartButton != null) {
+            addToCartButton.setOnAction(e -> handleAddToCart());
         }
     }
 

@@ -4,19 +4,15 @@ import com.aimsfx.controller.HomepageController;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.Product;
 import com.aimsfx.model.UserMenuAction;
-import com.aimsfx.view.OrderView.OrderManagementView;
+import com.aimsfx.router.OrderManagementRouter;
 import com.aimsfx.view.ProductView.ProductCardComponent;
-import com.aimsfx.view.ProductView.ProductDetailUI;
-import com.aimsfx.view.ProductView.ProductListView;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import com.aimsfx.router.AdministratorRouter;
+import com.aimsfx.router.PlaceOrderRouter;
 import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.*;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 import java.io.IOException;
@@ -25,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.aimsfx.router.ProductRouter;
 
 public class HomepageView {
     @FXML
@@ -260,23 +258,8 @@ public class HomepageView {
 
     @FXML
     public void onCartClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/cart-view.fxml"));
-            Parent view = loader.load();
-
-            Stage stage = (Stage) searchField.getScene().getWindow();
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(view);
-            } else {
-                stage.setScene(new Scene(view));
-            }
-            stage.setTitle("AIMS - Shopping Cart");
-            new animatefx.animation.FadeIn(view).play();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Could not load cart view: " + e.getMessage());
-        }
+        Stage stage = getMainWindow();
+        PlaceOrderRouter.getInstance().navigateToCart(stage);
     }
 
     // [ADDED] Helper method to safely retrieve the current main window stage to act
@@ -298,55 +281,24 @@ public class HomepageView {
     // Navigation UI
 
     private void promptQuantityAndAdd(Product product) {
-        TextInputDialog dialog = new TextInputDialog("1");
-        dialog.setTitle("Add to Cart");
-        dialog.setHeaderText("Add " + product.getTitle() + " to cart");
-        dialog.setContentText("Quantity (Available: " + product.getStock() + "):");
-
-        dialog.showAndWait().ifPresent(qty -> {
-            try {
-                int quantity = Integer.parseInt(qty);
-                controller.handleAddToCart(product, quantity);
-            } catch (NumberFormatException e) {
-                UIUtils.showError("Invalid Input", "Please enter a valid number.");
-            }
+        ProductRouter.getInstance().showQuantityPromptDialog(product, quantity -> {
+            controller.handleAddToCart(product, quantity);
         });
     }
 
     public void navigateToProductManagement() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/product-list-view.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(stage);
-            stage.setTitle("Product Management Panel");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            stage.setScene(new Scene(root, 1280, 720));
-            stage.setResizable(true);
-            stage.setMinWidth(900);
-            stage.setMinHeight(650);
-
-            ProductListView subcontroller = loader.getController();
-            subcontroller.setOnProductUpdated(() -> {
-                if (controller != null) {
-                    controller.handleProductsUpdated();
-                }
-            });
-
-            stage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to open product update dialog.");
-        }
+        ProductRouter.getInstance().showProductList(getMainWindow(), () -> {
+            if (controller != null) {
+                controller.handleProductsUpdated();
+            }
+        });
     }
 
     public void navigateToOrderManagement() {
         try {
-            OrderManagementView view = new OrderManagementView();
+            OrderManagementRouter router = new OrderManagementRouter();
             Stage owner = getMainWindow(); // [ADDED] Safe owner retrieval
-            view.show(owner);
+            router.show(owner);
         } catch (Exception e) {
             e.printStackTrace();
             UIUtils.showError("Error", "Failed to open order management view: " + e.getMessage());
@@ -359,109 +311,28 @@ public class HomepageView {
     }
 
     public void displayUserMenuDialog(String username, String rolesStr, List<UserMenuAction> availableActions) {
-        Alert menu = new Alert(Alert.AlertType.INFORMATION);
-        menu.setTitle("Account");
-        menu.setHeaderText("Logged in as: " + username + " (" + rolesStr + ")");
-
-        Map<ButtonType, UserMenuAction> buttonMap = new HashMap<>();
-        List<ButtonType> buttonTypes = new ArrayList<>();
-
-        for (UserMenuAction action : availableActions) {
-            ButtonType btn = new ButtonType(action.getLabel());
-            buttonTypes.add(btn);
-            buttonMap.put(btn, action);
-        }
-
-        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        buttonTypes.add(cancelBtn);
-
-        menu.getButtonTypes().setAll(buttonTypes);
-
-        Optional<ButtonType> result = menu.showAndWait();
-
-        if (result.isPresent() && result.get() != cancelBtn) {
-            UserMenuAction selectedAction = buttonMap.get(result.get());
-            if (selectedAction != null) {
-                controller.executeMenuAction(selectedAction);
-            }
-        }
+        AdministratorRouter.getInstance().showUserMenuDialog(username, rolesStr, availableActions, action -> {
+            controller.executeMenuAction(action);
+        });
     }
 
     public void showUserManagementView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/user-management-view.fxml"));
-            Parent root = loader.load();
-
-            Stage dialogStage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-            dialogStage.setTitle("User Management");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            dialogStage.setScene(new Scene(root, 1280, 720));
-            dialogStage.setResizable(true);
-            dialogStage.setMinWidth(900);
-            dialogStage.setMinHeight(600);
-
-            dialogStage.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to open user management view: " + e.getMessage());
-        }
+        Stage owner = getMainWindow();
+        AdministratorRouter.getInstance().showUserManagementView(owner);
     }
 
     public void showLoginDialog() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/login-view.fxml"));
-            Parent root = loader.load();
-
-            LoginView loginView = loader.getController();
-
-            Stage dialogStage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-            dialogStage.setTitle("Login");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            dialogStage.setScene(new Scene(root));
-
-            loginView.setDialogStage(dialogStage);
-
-            loginView.setOnLoginSuccess(() -> {
-                if (controller != null) {
-                    controller.handleLoginSuccess();
-                }
-            });
-
-            dialogStage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Could not load login view: " + e.getMessage());
-        }
+        Stage owner = getMainWindow();
+        AdministratorRouter.getInstance().showLoginDialog(owner, () -> {
+            if (controller != null) {
+                controller.handleLoginSuccess();
+            }
+        });
     }
 
     public void showChangePasswordDialog() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/change-password-view.fxml"));
-            Parent root = loader.load();
-
-            com.aimsfx.view.AdministratorView.ChangePasswordView controller = loader.getController();
-
-            Stage dialogStage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-            dialogStage.setTitle("Change Password");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(getMainWindow()); // [ADDED] Safe owner retrieval
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
-
-            controller.setDialogStage(dialogStage);
-
-            dialogStage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Could not load change password view: " + e.getMessage());
-        }
+        Stage owner = getMainWindow();
+        AdministratorRouter.getInstance().showChangePasswordDialog(owner);
     }
 
     private void openProductDetail(Product product) {
@@ -470,7 +341,6 @@ public class HomepageView {
 
     public void showProductDetail(ViewProductController viewController, Map<String, Object> productData) {
         Stage currentStage = getMainWindow(); // [ADDED] Safe owner retrieval for product details view
-        ProductDetailUI detailUI = new ProductDetailUI(viewController, currentStage);
-        detailUI.displayProduct(productData);
+        ProductRouter.getInstance().showProductDetail(String.valueOf(productData.get("productId")), currentStage);
     }
 }

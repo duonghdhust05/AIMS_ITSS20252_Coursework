@@ -10,14 +10,15 @@ import java.util.Objects;
  * 
  * HIERARCHY:
  * Product (abstract) - THIS CLASS - Core attributes (no physical attributes)
- *   └── PhysicalProduct (abstract) - adds weight/dimensions for shippable products
- *         ├── Book
- *         ├── CD
- *         ├── DVD
- *         └── Newspaper
- *         └── [Future: SportProduct, ElectronicProduct, etc.]
- *   └── [Future: DigitalProduct (abstract) - no weight/dimensions needed]
- *         └── [EBook, DigitalMusic, etc.]
+ * └── PhysicalProduct (abstract) - adds weight/dimensions for shippable
+ * products
+ * ├── Book
+ * ├── CD
+ * ├── DVD
+ * └── Newspaper
+ * └── [Future: SportProduct, ElectronicProduct, etc.]
+ * └── [Future: DigitalProduct (abstract) - no weight/dimensions needed]
+ * └── [EBook, DigitalMusic, etc.]
  * 
  * COHESION: Functional/Informational
  * - All fields and methods relate to product entity
@@ -99,20 +100,6 @@ public abstract class Product {
         this.stock = stock;
         this.status = status != null ? ProductStatus.fromString(status) : ProductStatus.AVAILABLE;
         this.vatRate = vatRate;
-    }
-
-    /**
-     * @deprecated Use PhysicalProduct constructor for products with weight/dimensions
-     *             Kept for backward compatibility
-     */
-    @Deprecated
-    public Product(Long productId, String barcode, String title, String category,
-            Double originalPrice, Double currentPrice,
-            String description, Double weight, String dimensions,
-            Integer stock, String status, Double vatRate) {
-        this(productId, barcode, title, category, originalPrice, currentPrice,
-             description, stock, status, vatRate);
-        // weight and dimensions are ignored - handled by PhysicalProduct
     }
 
     // -------- Getter and Setter Methods --------
@@ -210,7 +197,7 @@ public abstract class Product {
     public String getStatus() {
         return status != null ? status.getValue() : "available";
     }
-    
+
     public ProductStatus getStatusEnum() {
         return status;
     }
@@ -218,7 +205,7 @@ public abstract class Product {
     public void setStatus(String status) {
         this.status = status != null ? ProductStatus.fromString(status) : ProductStatus.AVAILABLE;
     }
-    
+
     public void setStatusEnum(ProductStatus status) {
         this.status = status != null ? status : ProductStatus.AVAILABLE;
     }
@@ -292,7 +279,7 @@ public abstract class Product {
      * 
      * Returns common product information as a map
      * NOTE: weight and dimensions are included for backward compatibility
-     *       but will be null for digital products
+     * but will be null for digital products
      * 
      * @return Map containing common product attributes
      */
@@ -353,27 +340,29 @@ public abstract class Product {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+
         Product other = (Product) obj;
         return Objects.equals(barcode, other.barcode) &&
-               Objects.equals(title, other.title) &&
-               Objects.equals(category, other.category) &&
-               Objects.equals(originalPrice, other.originalPrice) &&
-               Objects.equals(currentPrice, other.currentPrice) &&
-               Objects.equals(description, other.description) &&
-               Objects.equals(getWeight(), other.getWeight()) &&
-               Objects.equals(getDimensions(), other.getDimensions()) &&
-               Objects.equals(stock, other.stock) &&
-               Objects.equals(status, other.status) &&
-               Objects.equals(vatRate, other.vatRate);
+                Objects.equals(title, other.title) &&
+                Objects.equals(category, other.category) &&
+                Objects.equals(originalPrice, other.originalPrice) &&
+                Objects.equals(currentPrice, other.currentPrice) &&
+                Objects.equals(description, other.description) &&
+                Objects.equals(getWeight(), other.getWeight()) &&
+                Objects.equals(getDimensions(), other.getDimensions()) &&
+                Objects.equals(stock, other.stock) &&
+                Objects.equals(status, other.status) &&
+                Objects.equals(vatRate, other.vatRate);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(barcode, title, category, originalPrice, currentPrice,
-                           description, getWeight(), getDimensions(), stock, status, vatRate);
+                description, getWeight(), getDimensions(), stock, status, vatRate);
     }
 
     /**

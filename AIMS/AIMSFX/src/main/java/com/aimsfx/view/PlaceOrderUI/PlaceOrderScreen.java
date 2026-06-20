@@ -2,6 +2,7 @@ package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.exception.*;
 import com.aimsfx.model.*;
+import com.aimsfx.router.PlaceOrderRouter;
 import com.aimsfx.service.*;
 import com.aimsfx.utils.UIUtils;
 
@@ -24,7 +25,6 @@ public class PlaceOrderScreen implements Initializable {
 
     private float originalDeliveryFee = 0f;
 
-    private final InvoiceUI invoiceUI;
     private final ViewCartUI viewCartUI;
     private final PlaceOrderService placeOrderService;
     private final com.aimsfx.controller.PlaceOrderController logicController;
@@ -63,12 +63,11 @@ public class PlaceOrderScreen implements Initializable {
     private PlaceOrderSummaryHandler orderSummaryHandler;
 
     public PlaceOrderScreen() {
-        this(new PlaceOrderService(), new InvoiceUI(), new ViewCartUI());
+        this(new PlaceOrderService(), new ViewCartUI());
     }
 
-    public PlaceOrderScreen(PlaceOrderService placeOrderService, InvoiceUI invoiceUI, ViewCartUI viewCartUI) {
+    public PlaceOrderScreen(PlaceOrderService placeOrderService, ViewCartUI viewCartUI) {
         this.placeOrderService = placeOrderService;
-        this.invoiceUI = invoiceUI;
         this.viewCartUI = viewCartUI;
         this.logicController = new com.aimsfx.controller.PlaceOrderController();
     }
@@ -139,7 +138,7 @@ public class PlaceOrderScreen implements Initializable {
         this.currentInvoice = (Invoice) result.get("invoice");
         this.originalDeliveryFee = ((Number) result.get("originalFee")).floatValue();
 
-        invoiceUI.displayInvoice(currentInvoice);
+        PlaceOrderRouter.getInstance().showInvoiceDialog(currentOrder, currentInvoice, null);
         return currentInvoice;
     }
 
@@ -171,30 +170,21 @@ public class PlaceOrderScreen implements Initializable {
             double totalAmount = placeOrderService.calculateSubtotal(
                     currentCart != null ? currentCart.getItems() : java.util.Collections.emptyList());
 
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/delivery-info-dialog.fxml"));
-            VBox dialogRoot = loader.load();
-            DeliveryInfoDialogUI controller = loader.getController();
-            controller.setOrderData(totalWeight, totalAmount);
+            Optional<DeliveryInfoDialogUI> result = PlaceOrderRouter.getInstance().showDeliveryInfoDialog(
+                    (Stage) nameField.getScene().getWindow(),
+                    totalWeight,
+                    totalAmount,
+                    deliveryFormHandler.getName(),
+                    deliveryFormHandler.getPhone(),
+                    deliveryFormHandler.getEmail(),
+                    deliveryFormHandler.getProvince(),
+                    deliveryFormHandler.getSubDistrict(),
+                    deliveryFormHandler.getAddress(),
+                    deliveryFormHandler.getDeliveryInstructions()
+            );
 
-            if (deliveryFormHandler.getName() != null && !deliveryFormHandler.getName().trim().isEmpty()) {
-                controller.setExistingData(deliveryFormHandler.getName(), deliveryFormHandler.getPhone(),
-                        deliveryFormHandler.getEmail(),
-                        deliveryFormHandler.getProvince(), deliveryFormHandler.getSubDistrict(),
-                        deliveryFormHandler.getAddress(),
-                        deliveryFormHandler.getDeliveryInstructions());
-            }
-
-            Stage dialogStage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(nameField.getScene().getWindow());
-            dialogStage.setTitle("Delivery Information");
-            dialogStage.setScene(new Scene(dialogRoot));
-            dialogStage.setResizable(false);
-            dialogStage.showAndWait();
-
-            if (controller.isSaved()) {
+            if (result.isPresent()) {
+                DeliveryInfoDialogUI controller = result.get();
                 deliveryFormHandler.updateFormFromDialog(controller);
                 orderSummaryHandler.setDeliveryFeeText(controller.getDeliveryFee());
 
@@ -235,7 +225,7 @@ public class PlaceOrderScreen implements Initializable {
             this.currentInvoice = (Invoice) result.get("invoice");
             this.originalDeliveryFee = ((Number) result.get("originalFee")).floatValue();
 
-            invoiceUI.displayInvoice(currentInvoice);
+            PlaceOrderRouter.getInstance().showInvoiceDialog(currentOrder, currentInvoice, null);
 
             if (payOrderButton != null)
                 payOrderButton.setDisable(false);

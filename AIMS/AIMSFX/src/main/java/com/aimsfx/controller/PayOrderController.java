@@ -3,9 +3,9 @@ package com.aimsfx.controller;
 import com.aimsfx.exception.PaymentException;
 import com.aimsfx.model.Order;
 import com.aimsfx.service.PaymentService;
-import com.aimsfx.subsystem.paypal.IPaymentGateway;
+import com.aimsfx.service.payment.IPaymentGateway;
 import com.aimsfx.subsystem.paypal.IPayPalView;
-import com.aimsfx.subsystem.vietqr.IPaymentQRCode;
+import com.aimsfx.service.payment.IPaymentQRCode;
 import javafx.application.Platform;
 
 import java.util.Map;

@@ -9,6 +9,8 @@ import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import com.aimsfx.service.payment.IPaymentQRCode;
+
 /**
  * VietQRSubsystem Class
  * Purpose: Implementation of IPaymentQRCode for VietQR payment processing

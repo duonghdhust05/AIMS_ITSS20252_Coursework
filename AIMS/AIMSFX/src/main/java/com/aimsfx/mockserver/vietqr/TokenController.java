@@ -1,4 +1,4 @@
-package com.aimsfx.subsystem.vietqr.controller;
+package com.aimsfx.mockserver.vietqr;
 
 import com.aimsfx.subsystem.vietqr.model.VietQRResponse;
 import io.jsonwebtoken.Jwts;

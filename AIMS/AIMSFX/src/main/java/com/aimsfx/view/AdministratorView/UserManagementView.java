@@ -8,18 +8,14 @@ import com.aimsfx.utils.SessionManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import com.aimsfx.router.AdministratorRouter;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import com.aimsfx.utils.UIUtils;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
@@ -199,58 +195,25 @@ public class UserManagementView implements Initializable {
     // ==================== DIALOG NAVIGATION (UI) ====================
 
     private void openUserFormDialog(User user) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/aimsfx/user-form-view.fxml"));
-            Parent root = loader.load();
-
-            UserFormView controller = loader.getController();
-            controller.setUser(user);
-
-            Stage dialogStage = new Stage();
-            com.aimsfx.utils.UIUtils.applyAppIcon(dialogStage);
-            dialogStage.setTitle(user == null ? "Add New User" : "Edit User");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(userTableView.getScene().getWindow());
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
-
-            controller.setDialogStage(dialogStage);
-            controller.setOnSaveSuccess(this::refreshAfterChange);
-
-            dialogStage.showAndWait();
-        } catch (IOException e) {
-            UIUtils.showError("Error", "Failed to open user form: " + e.getMessage());
-        }
+        Stage owner = (Stage) userTableView.getScene().getWindow();
+        AdministratorRouter.getInstance().showUserFormDialog(owner, user, this::refreshAfterChange);
     }
 
     private void openResetPasswordDialog(User user) {
-        TextInputDialog dialog = new TextInputDialog();
-        if ((Dialog<?>) dialog != null && (dialog).getDialogPane() != null
-                && (dialog).getDialogPane().getScene() != null) {
-            javafx.stage.Window window = (dialog).getDialogPane().getScene().getWindow();
-            if (window instanceof Stage) {
-                com.aimsfx.utils.UIUtils.applyAppIcon((Stage) window);
-            }
-        }
-        dialog.setTitle("Reset Password");
-        dialog.setHeaderText("Reset password for: " + user.getUsername());
-        dialog.setContentText("New Password:");
-
-        dialog.showAndWait().ifPresent(newPassword -> {
+        AdministratorRouter.getInstance().showResetPasswordDialog(user, newPassword -> {
             try {
                 boolean success = userController.resetPassword(user.getUserId(), newPassword);
                 if (success) {
                     UIUtils.showAlert("Success", "Password reset successfully for " + user.getUsername());
                 } else {
-                    UIUtils.showError("Error", "Failed to reset password!");
+                    UIUtils.showError("Error", "Failed to reset password.");
                 }
             } catch (InvalidPasswordException e) {
                 UIUtils.showError("Validation Error", e.getMessage());
             } catch (UnauthorizedAccessException e) {
-                UIUtils.showError("Access Denied", e.getMessage());
+                UIUtils.showError("Unauthorized", e.getMessage());
             } catch (UserNotFoundException e) {
-                UIUtils.showError("Error", e.getMessage());
+                UIUtils.showError("Error", "User not found.");
             }
         });
     }

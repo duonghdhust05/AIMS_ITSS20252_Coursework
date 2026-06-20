@@ -3,7 +3,9 @@ package com.aimsfx.factory;
 import com.aimsfx.controller.PayOrderController;
 import com.aimsfx.subsystem.paypal.*;
 import com.aimsfx.subsystem.vietqr.*;
-import com.aimsfx.view.PaymentUI.PayPalWebView;
+import com.aimsfx.service.payment.IPaymentGateway;
+import com.aimsfx.service.payment.IPaymentQRCode;
+import com.aimsfx.view.PaymentView.PayPalWebView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

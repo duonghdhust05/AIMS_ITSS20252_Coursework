@@ -56,42 +56,7 @@ public class InvoiceUI extends BaseView {
         }
     }
 
-    public void displayInvoice(Invoice invoice) {
-        if (invoice == null)
-            return;
 
-        javafx.scene.control.Dialog<Void> dialog = new javafx.scene.control.Dialog<>();
-        dialog.setTitle("Invoice Details");
-        dialog.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.OK);
-        UIUtils.applyAppDialogIcon(dialog);
-
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/com/aimsfx/invoice-dialog.fxml"));
-            javafx.scene.control.ScrollPane scrollPane = loader.load();
-            com.aimsfx.view.PlaceOrderUI.InvoiceDialogUI controller = loader
-                    .getController();
-
-            // Pass null for order (it will use invoice.getOrderId()) and null for
-            // transaction
-            controller.setInvoiceData(null, invoice, null);
-
-            dialog.getDialogPane().setContent(scrollPane);
-            dialog.getDialogPane().setStyle("-fx-background-color: #f5f5f5;");
-
-            // Add OK button styling
-            javafx.scene.Node okButton = dialog.getDialogPane().lookupButton(javafx.scene.control.ButtonType.OK);
-            if (okButton instanceof javafx.scene.control.Button) {
-                okButton.setStyle(
-                        "-fx-background-color: #667eea; -fx-text-fill: white; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;");
-            }
-
-            dialog.showAndWait();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            displayError("Could not load invoice view.");
-        }
-    }
 
     /**
      * Request invoice creation/update

@@ -1,4 +1,4 @@
-package com.aimsfx.view.PaymentUI;
+package com.aimsfx.view.PaymentView;
 
 import com.aimsfx.controller.PayOrderController;
 import com.aimsfx.model.Invoice;
@@ -7,16 +7,12 @@ import com.aimsfx.model.TransactionInfo;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import com.aimsfx.utils.UIUtils;
+import com.aimsfx.router.PaymentRouter;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -189,43 +185,18 @@ public class PaymentUI {
 
     @FXML
     void handleBack(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/place-order-view.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(root);
-            } else {
-                stage.setScene(new Scene(root));
-            }
-            stage.setTitle("AIMS - Place Order");
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Cannot go back: " + e.getMessage());
-        }
+        Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
+        PaymentRouter.getInstance().navigateToPlaceOrder(stage);
     }
 
     private void navigateToSuccess(TransactionInfo transactionInfo) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/aimsfx/order-success-view.fxml"));
-            Parent root = loader.load();
-
-            com.aimsfx.view.OrderView.OrderSuccessScreen controller = loader.getController();
-            controller.setSuccessData(currentOrder, currentInvoice, transactionInfo, currentOrder.getDeliveryInfo());
-
-            Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
-            if (stage.getScene() != null) {
-                stage.getScene().setRoot(root);
-            } else {
-                stage.setScene(new Scene(root));
-            }
-            stage.setTitle("AIMS - Order Success");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            UIUtils.showError("Error", "Failed to load success screen: " + e.getMessage());
-        }
+        Stage stage = (Stage) btnConfirmPayment.getScene().getWindow();
+        PaymentRouter.getInstance().navigateToOrderSuccess(
+                currentOrder,
+                currentInvoice,
+                transactionInfo,
+                currentOrder.getDeliveryInfo(),
+                stage);
     }
 
     // --- Payment Logic (Strategy Pattern) ---
