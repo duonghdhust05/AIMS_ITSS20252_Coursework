@@ -50,6 +50,7 @@ Thumbs.db
 secret.properties
 AIMSFX/src/main/resources/application.properties
 AIMSFX/src/main/resources/database.properties
+AIMSFX/src/main/java/com/aimsfx/config/JasyptConfig.java
 
 # Docker ignore (if any)
 docker-compose.override.yml
