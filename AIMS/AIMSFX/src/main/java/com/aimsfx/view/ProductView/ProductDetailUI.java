@@ -3,10 +3,8 @@ package com.aimsfx.view.ProductView;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.model.*;
 import com.aimsfx.view.BaseView;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDateTime;

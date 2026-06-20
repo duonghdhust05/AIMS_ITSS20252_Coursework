@@ -18,7 +18,7 @@
 
 <BorderPane prefHeight="720" prefWidth="1280" style="-fx-background-color: white;"
     xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.aimsfx.view.PaymentUI.PaymentUI">
+    fx:controller="com.aimsfx.view.PaymentView.PaymentUI">
 
     <fx:define>
         <ToggleGroup fx:id="paymentMethodGroup" />

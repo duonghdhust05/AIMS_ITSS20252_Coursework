@@ -1,4 +1,4 @@
-package com.aimsfx.view.html;
+package com.aimsfx.view.OrderView;
 
 import com.aimsfx.model.Order;
 

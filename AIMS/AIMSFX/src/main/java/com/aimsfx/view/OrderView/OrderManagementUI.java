@@ -1,6 +1,6 @@
 package com.aimsfx.view.OrderView;
 
-import com.aimsfx.controller.OrderReviewController;
+import com.aimsfx.controller.ProductManagerController.OrderReviewController;
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
 import com.aimsfx.router.OrderManagementRouter;
@@ -48,7 +48,7 @@ public class OrderManagementUI {
 
     private final OrderReviewController controller = new OrderReviewController();
     private final OrderManagementRouter router = new OrderManagementRouter();
-    
+
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -62,7 +62,7 @@ public class OrderManagementUI {
         setupColumns();
         setupActions();
         loadFirstPage();
-        
+
         // Register background polling callback
         controller.startBackgroundPolling(currentCount -> {
             Platform.runLater(() -> {
@@ -106,7 +106,8 @@ public class OrderManagementUI {
             private final Button viewBtn = new Button("View");
             private final Button approveBtn = new Button("Approve");
             private final Button rejectBtn = new Button("Reject");
-            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn, rejectBtn);
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(8, viewBtn, approveBtn,
+                    rejectBtn);
 
             {
                 viewBtn.setOnAction(e -> onView(getCurrentOrderId()));
@@ -185,7 +186,8 @@ public class OrderManagementUI {
     }
 
     private void onView(Integer orderId) {
-        if (orderId == null) return;
+        if (orderId == null)
+            return;
         try {
             OrderDetail detail = controller.getOrderDetail(orderId);
             if (detail == null) {
@@ -199,7 +201,8 @@ public class OrderManagementUI {
     }
 
     private void onApprove(Integer orderId) {
-        if (orderId == null) return;
+        if (orderId == null)
+            return;
         if (!UIUtils.showConfirmation("Approve Order", "Are you sure you want to approve order #" + orderId + "?"))
             return;
         try {
@@ -211,7 +214,8 @@ public class OrderManagementUI {
     }
 
     private void onReject(Integer orderId) {
-        if (orderId == null) return;
+        if (orderId == null)
+            return;
         if (!UIUtils.showConfirmation("Reject Order", "Are you sure you want to reject order #" + orderId + "?"))
             return;
 
@@ -234,8 +238,11 @@ public class OrderManagementUI {
     }
 
     private void disableUi(String message) {
-        if (ordersTable != null) ordersTable.setDisable(true);
-        if (pagination != null) pagination.setDisable(true);
-        if (totalPendingLabel != null) totalPendingLabel.setText(message);
+        if (ordersTable != null)
+            ordersTable.setDisable(true);
+        if (pagination != null)
+            pagination.setDisable(true);
+        if (totalPendingLabel != null)
+            totalPendingLabel.setText(message);
     }
 }

@@ -1,4 +1,4 @@
-package com.aimsfx.controller;
+package com.aimsfx.controller.ProductManagerController;
 
 import com.aimsfx.model.OrderDetail;
 import com.aimsfx.model.OrderSummary;
@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 
 /**
  * Controller responsible for managing order review business logic.
- * Enforces MVC pattern by handling data fetching, authorization, and background tasks.
+ * Enforces MVC pattern by handling data fetching, authorization, and background
+ * tasks.
  */
 public class OrderReviewController {
 
@@ -71,7 +72,9 @@ public class OrderReviewController {
     }
 
     /**
-     * Starts background polling for new orders and invokes the callback when a change is detected.
+     * Starts background polling for new orders and invokes the callback when a
+     * change is detected.
+     * 
      * @param onOrderCountChanged Callback to execute when new orders are found.
      */
     public void startBackgroundPolling(Consumer<Integer> onOrderCountChanged) {

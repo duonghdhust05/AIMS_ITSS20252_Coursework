@@ -3,7 +3,8 @@ package com.aimsfx.controller.ProductManagerController;
 import com.aimsfx.model.Order;
 import com.aimsfx.model.OrderStatus;
 import com.aimsfx.service.OrderReviewService;
-import com.aimsfx.view.html.OrderHtmlView;
+import com.aimsfx.view.OrderView.OrderHtmlView;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +48,7 @@ public class OrderApiController {
 
             orderReviewService.requestRefund(orderId);
 
-            return OrderHtmlView.renderMessage("Order Cancelled Successfully!", 
+            return OrderHtmlView.renderMessage("Order Cancelled Successfully!",
                     "Your order has been updated to REFUND_REQUEST.");
         } catch (SQLException e) {
             e.printStackTrace();
