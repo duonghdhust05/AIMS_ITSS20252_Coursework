@@ -3,7 +3,6 @@ package com.aimsfx.subsystem.vietqr;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import com.aimsfx.config.JasyptConfig;
 
 public class VietQRConfig {
 
@@ -40,7 +39,7 @@ public class VietQRConfig {
             this.bankAccount = prop.getProperty("vietqr.bank.account");
             this.accountName = prop.getProperty("vietqr.bank.name");
             this.clientUsername = prop.getProperty("vietqr.client.username");
-            this.clientPassword = JasyptConfig.decryptProperty(prop.getProperty("vietqr.client.password"));
+            this.clientPassword = prop.getProperty("vietqr.client.password");
             this.tokenUrl = prop.getProperty("vietqr.api.token.url");
             this.qrUrl = prop.getProperty("vietqr.api.qr.url");
             this.simulateUrl = prop.getProperty("vietqr.api.simulate.url");

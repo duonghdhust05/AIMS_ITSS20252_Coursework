@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.aimsfx.config.JasyptConfig;
 
 /**
  * Singleton class to manage PostgreSQL database connection pool using HikariCP
@@ -49,7 +48,7 @@ public class DatabaseConnection {
             props.load(input);
             this.url = props.getProperty("spring.datasource.url");
             this.username = props.getProperty("spring.datasource.username");
-            this.password = JasyptConfig.decryptProperty(props.getProperty("spring.datasource.password"));
+            this.password = props.getProperty("spring.datasource.password");
 
             // Load connection pool settings
             this.maxConnections = Integer.parseInt(props.getProperty("db.max.connections", "15"));
