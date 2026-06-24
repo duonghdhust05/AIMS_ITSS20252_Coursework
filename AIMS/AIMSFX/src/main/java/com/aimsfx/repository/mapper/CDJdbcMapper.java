@@ -1,101 +1,75 @@
 package com.aimsfx.repository.mapper;
 
 import com.aimsfx.model.CD;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * CDJdbcMapper - JDBC Mapper for CD products
  * 
- * SOLID PRINCIPLES:
- * - SRP: Only responsible for mapping CD data to/from database
- * - OCP: Can add new mappers without modifying existing code
- * - LSP: Correctly implements ProductJdbcMapper contract
- * - ISP: Interface is focused and minimal
- * - DIP: Depends on abstraction (Product, not concrete types)
- * 
- * COLUMNS HANDLED (with values):
- * - genre (VARCHAR) - in Book columns section (shared)
- * - artist (VARCHAR)
- * - record_label (VARCHAR)
- * - track_count (INTEGER)
- * - release_date (TIMESTAMP)
- * 
- * COLUMNS SET TO NULL:
- * - Book columns (except genre): author, publisher, publication_date, pages, language, cover_type
- * - DVD columns: director, studio, subtitle, disc_type, duration
- * - Newspaper columns: issue_number, frequency, editor_in_chief, section
+ * DESIGN IMPROVEMENT (JSONB Migration):
+ * - Eliminates sparse table columns by using a unified JSONB structure.
+ * - This mapper is responsible for serializing specific details into JSON
+ *   and deserializing them back from the `attributes` JSONB column.
  */
 public class CDJdbcMapper implements ProductJdbcMapper<CD> {
     
+    private static final Gson gson = new Gson();
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
-    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, CD cd) throws SQLException {
-        int idx = startIndex;
-        
-        // ===== Book columns (7) - SET TO NULL except genre =====
-        stmt.setNull(idx++, Types.VARCHAR);    // author
-        stmt.setNull(idx++, Types.VARCHAR);    // publisher
-        stmt.setNull(idx++, Types.VARCHAR);    // publication_date
-        stmt.setNull(idx++, Types.INTEGER);    // pages
-        stmt.setNull(idx++, Types.VARCHAR);    // language
-        stmt.setNull(idx++, Types.VARCHAR);    // cover_type
-        stmt.setString(idx++, cd.getGenre());  // genre (shared - SET WITH VALUE)
-        
-        // ===== CD columns (4) - SET WITH VALUES =====
-        stmt.setString(idx++, cd.getArtist());
-        stmt.setString(idx++, cd.getRecordLabel());
-        if (cd.getTrackCount() != null) {
-            stmt.setInt(idx++, cd.getTrackCount());
-        } else {
-            stmt.setNull(idx++, Types.INTEGER);
+    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, CD product) throws SQLException {
+        Map<String, Object> details = product.getSpecificDetail();
+        // Format dates before serialization if needed
+        for (Map.Entry<String, Object> entry : details.entrySet()) {
+            if (entry.getValue() instanceof java.util.Date) {
+                entry.setValue(sdf.format((java.util.Date) entry.getValue()));
+            }
         }
-        if (cd.getReleaseDate() != null) {
-            stmt.setTimestamp(idx++, new Timestamp(cd.getReleaseDate().getTime()));
-        } else {
-            stmt.setNull(idx++, Types.TIMESTAMP);
-        }
-        
-        // ===== DVD columns (5) - SET TO NULL =====
-        stmt.setNull(idx++, Types.VARCHAR);    // director
-        stmt.setNull(idx++, Types.VARCHAR);    // studio
-        stmt.setNull(idx++, Types.VARCHAR);    // subtitle
-        stmt.setNull(idx++, Types.VARCHAR);    // disc_type
-        stmt.setNull(idx++, Types.INTEGER);    // duration
-        
-        // ===== Newspaper columns (4) - SET TO NULL =====
-        stmt.setNull(idx++, Types.VARCHAR);    // issue_number
-        stmt.setNull(idx++, Types.VARCHAR);    // frequency
-        stmt.setNull(idx++, Types.VARCHAR);    // editor_in_chief
-        stmt.setNull(idx++, Types.VARCHAR);    // section
-        
-        return idx;
+        stmt.setString(startIndex, gson.toJson(details));
+        return startIndex + 1;
     }
     
     @Override
     public CD mapRow(ResultSet rs) throws SQLException {
-        CD cd = new CD();
-        populateFromResultSet(rs, cd);
-        return cd;
+        CD product = new CD();
+        populateFromResultSet(rs, product);
+        return product;
     }
     
     @Override
-    public void populateFromResultSet(ResultSet rs, CD cd) throws SQLException {
-        cd.setArtist(rs.getString("artist"));
-        cd.setRecordLabel(rs.getString("record_label"));
-        cd.setGenre(rs.getString("genre"));
-        
-        int trackCount = rs.getInt("track_count");
-        if (!rs.wasNull()) {
-            cd.setTrackCount(trackCount);
-        }
-        
-        Timestamp releaseDate = rs.getTimestamp("release_date");
-        if (releaseDate != null) {
-            cd.setReleaseDate(new java.util.Date(releaseDate.getTime()));
+    public void populateFromResultSet(ResultSet rs, CD product) throws SQLException {
+        String attributesJson = rs.getString("attributes");
+        if (attributesJson != null && !attributesJson.isEmpty()) {
+            Map<String, Object> details = gson.fromJson(attributesJson, new TypeToken<Map<String, Object>>(){}.getType());
+            if (details != null) {
+                if (details.containsKey("artist") && details.get("artist") != null) {
+                    product.setArtist(String.valueOf(details.get("artist")));
+                }
+                if (details.containsKey("record_label") && details.get("record_label") != null) {
+                    product.setRecordLabel(String.valueOf(details.get("record_label")));
+                }
+                if (details.containsKey("genre") && details.get("genre") != null) {
+                    product.setGenre(String.valueOf(details.get("genre")));
+                }
+                if (details.containsKey("track_count") && details.get("track_count") != null) {
+                    product.setTrackCount(((Number) details.get("track_count")).intValue());
+                }
+                if (details.containsKey("release_date") && details.get("release_date") != null) {
+                    try {
+                        product.setReleaseDate(sdf.parse(String.valueOf(details.get("release_date"))));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }

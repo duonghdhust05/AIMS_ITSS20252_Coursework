@@ -4,11 +4,8 @@ import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.model.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.time.LocalDateTime;
 
@@ -63,8 +60,6 @@ public class ProductHistoryView {
             }
         });
     }
-
-
 
     @FXML
     private void handleClose() {

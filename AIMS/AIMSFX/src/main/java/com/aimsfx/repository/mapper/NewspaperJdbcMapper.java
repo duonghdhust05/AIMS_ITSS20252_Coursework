@@ -1,93 +1,81 @@
 package com.aimsfx.repository.mapper;
 
 import com.aimsfx.model.Newspaper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * NewspaperJdbcMapper - JDBC Mapper for Newspaper products
  * 
- * SOLID PRINCIPLES:
- * - SRP: Only responsible for mapping Newspaper data to/from database
- * - OCP: Can add new mappers without modifying existing code
- * - LSP: Correctly implements ProductJdbcMapper contract
- * - ISP: Interface is focused and minimal
- * - DIP: Depends on abstraction (Product, not concrete types)
- * 
- * COLUMNS HANDLED (with values):
- * - publisher (VARCHAR) - in Book columns section (shared)
- * - language (VARCHAR) - in Book columns section (shared)
- * - issue_number (VARCHAR)
- * - frequency (VARCHAR)
- * - editor_in_chief (VARCHAR)
- * - section (VARCHAR)
- * 
- * COLUMNS SET TO NULL:
- * - Book columns (except publisher, language): author, publication_date, pages, cover_type, genre
- * - CD columns: artist, record_label, track_count, release_date
- * - DVD columns: director, studio, subtitle, disc_type, duration
+ * DESIGN IMPROVEMENT (JSONB Migration):
+ * - Eliminates sparse table columns by using a unified JSONB structure.
+ * - This mapper is responsible for serializing specific details into JSON
+ *   and deserializing them back from the `attributes` JSONB column.
  */
 public class NewspaperJdbcMapper implements ProductJdbcMapper<Newspaper> {
     
+    private static final Gson gson = new Gson();
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
-    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, Newspaper newspaper) throws SQLException {
-        int idx = startIndex;
-        
-        // ===== Book columns (7) - SET TO NULL except publisher, language =====
-        stmt.setNull(idx++, Types.VARCHAR);            // author
-        stmt.setString(idx++, newspaper.getPublisher()); // publisher (shared - SET WITH VALUE)
-        stmt.setNull(idx++, Types.VARCHAR);            // publication_date (Book uses VARCHAR, we skip)
-        stmt.setNull(idx++, Types.INTEGER);            // pages
-        stmt.setString(idx++, newspaper.getLanguage()); // language (shared - SET WITH VALUE)
-        stmt.setNull(idx++, Types.VARCHAR);            // cover_type
-        stmt.setNull(idx++, Types.VARCHAR);            // genre
-        
-        // ===== CD columns (4) - SET TO NULL =====
-        stmt.setNull(idx++, Types.VARCHAR);    // artist
-        stmt.setNull(idx++, Types.VARCHAR);    // record_label
-        stmt.setNull(idx++, Types.INTEGER);    // track_count
-        stmt.setNull(idx++, Types.TIMESTAMP);  // release_date
-        
-        // ===== DVD columns (5) - SET TO NULL =====
-        stmt.setNull(idx++, Types.VARCHAR);    // director
-        stmt.setNull(idx++, Types.VARCHAR);    // studio
-        stmt.setNull(idx++, Types.VARCHAR);    // subtitle
-        stmt.setNull(idx++, Types.VARCHAR);    // disc_type
-        stmt.setNull(idx++, Types.INTEGER);    // duration
-        
-        // ===== Newspaper columns (4) - SET WITH VALUES =====
-        stmt.setString(idx++, newspaper.getIssn());
-        stmt.setString(idx++, newspaper.getFrequency());
-        stmt.setString(idx++, newspaper.getEditorInChief());
-        stmt.setString(idx++, newspaper.getSection());
-        
-        return idx;
+    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, Newspaper product) throws SQLException {
+        Map<String, Object> details = product.getSpecificDetail();
+        // Format dates before serialization if needed
+        for (Map.Entry<String, Object> entry : details.entrySet()) {
+            if (entry.getValue() instanceof java.util.Date) {
+                entry.setValue(sdf.format((java.util.Date) entry.getValue()));
+            }
+        }
+        stmt.setString(startIndex, gson.toJson(details));
+        return startIndex + 1;
     }
     
     @Override
     public Newspaper mapRow(ResultSet rs) throws SQLException {
-        Newspaper newspaper = new Newspaper();
-        populateFromResultSet(rs, newspaper);
-        return newspaper;
+        Newspaper product = new Newspaper();
+        populateFromResultSet(rs, product);
+        return product;
     }
     
     @Override
-    public void populateFromResultSet(ResultSet rs, Newspaper newspaper) throws SQLException {
-        newspaper.setIssn(rs.getString("issn"));
-        newspaper.setFrequency(rs.getString("frequency"));
-        newspaper.setEditorInChief(rs.getString("editor_in_chief"));
-        newspaper.setPublisher(rs.getString("publisher"));
-        
-        Timestamp publicationDate = rs.getTimestamp("publication_date");
-        if (publicationDate != null) {
-            newspaper.setPublicationDate(new java.util.Date(publicationDate.getTime()));
+    public void populateFromResultSet(ResultSet rs, Newspaper product) throws SQLException {
+        String attributesJson = rs.getString("attributes");
+        if (attributesJson != null && !attributesJson.isEmpty()) {
+            Map<String, Object> details = gson.fromJson(attributesJson, new TypeToken<Map<String, Object>>(){}.getType());
+            if (details != null) {
+                if (details.containsKey("issn") && details.get("issn") != null) {
+                    product.setIssn(String.valueOf(details.get("issn")));
+                }
+                if (details.containsKey("frequency") && details.get("frequency") != null) {
+                    product.setFrequency(String.valueOf(details.get("frequency")));
+                }
+                if (details.containsKey("editor_in_chief") && details.get("editor_in_chief") != null) {
+                    product.setEditorInChief(String.valueOf(details.get("editor_in_chief")));
+                }
+                if (details.containsKey("section") && details.get("section") != null) {
+                    product.setSection(String.valueOf(details.get("section")));
+                }
+                if (details.containsKey("publisher") && details.get("publisher") != null) {
+                    product.setPublisher(String.valueOf(details.get("publisher")));
+                }
+                if (details.containsKey("publication_date") && details.get("publication_date") != null) {
+                    try {
+                        product.setPublicationDate(sdf.parse(String.valueOf(details.get("publication_date"))));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (details.containsKey("language") && details.get("language") != null) {
+                    product.setLanguage(String.valueOf(details.get("language")));
+                }
+            }
         }
-        
-        newspaper.setLanguage(rs.getString("language"));
-        newspaper.setSection(rs.getString("section"));
     }
 }

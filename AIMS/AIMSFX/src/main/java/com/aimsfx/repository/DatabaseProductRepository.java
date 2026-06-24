@@ -29,19 +29,8 @@ public class DatabaseProductRepository implements ProductRepository {
     private static final String INSERT_SQL = "INSERT INTO products (" +
             "barcode, title, category, original_price, current_price, description, " +
             "weight, dimensions, stock, status, vat_rate, product_type, " +
-            "is_current, expired_date, " +
-            // Book columns
-            "author, publisher, publication_date, pages, language, cover_type, genre, " +
-            // CD columns (artist, record_label, genre already in Book, track_count,
-            // release_date)
-            "artist, record_label, track_count, release_date, " +
-            // DVD columns (director, studio, subtitle, disc_type, duration, genre,
-            // release_date already added)
-            "director, studio, subtitle, disc_type, duration, " +
-            // Newspaper columns (issn, frequency, editor_in_chief,
-            // publisher/publication_date/language already added, section)
-            "issn, frequency, editor_in_chief, section" +
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "is_current, expired_date, attributes" +
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CAST(? AS JSONB)) "
             +
             "RETURNING product_id";
 
@@ -90,7 +79,7 @@ public class DatabaseProductRepository implements ProductRepository {
             stmt.setBoolean(idx++, true); // is_current
             stmt.setNull(idx++, Types.TIMESTAMP); // expired_date
 
-            // Type-specific columns using helper method
+            // Type-specific columns via JSON serialization
             idx = setTypeSpecificColumns(stmt, idx, product);
 
             ResultSet rs = stmt.executeQuery();
@@ -168,7 +157,7 @@ public class DatabaseProductRepository implements ProductRepository {
                     stmt.setBoolean(idx++, true); // is_current
                     stmt.setNull(idx++, Types.TIMESTAMP); // expired_date
 
-                    // Type-specific columns based on product type
+                    // Type-specific columns via JSON serialization
                     idx = setTypeSpecificColumns(stmt, idx, product);
 
                     ResultSet rs = stmt.executeQuery();
@@ -198,22 +187,14 @@ public class DatabaseProductRepository implements ProductRepository {
     }
 
     /**
-     * Helper method to set type-specific columns for PreparedStatement
-     * Returns the next parameter index after setting all columns
+     * Helper method to set type-specific columns as JSONB for PreparedStatement
+     * Returns the next parameter index after setting the attributes
      * 
      * REFACTORED: Uses Strategy Pattern via ProductMapperRegistry
-     * OCP COMPLIANT: Adding new product types doesn't require modifying this method
-     * 
-     * Each mapper handles ALL 20 type-specific columns:
-     * - Sets its own type's columns with actual values
-     * - Sets other types' columns with NULL
-     * 
+     * Now instead of setting 20 columns, it serializes the product-specific details
+     * into a single JSONB string, adhering to the Document-Relational Hybrid model.
      */
     private int setTypeSpecificColumns(PreparedStatement stmt, int startIdx, Product product) throws SQLException {
-        // TRUE STRATEGY PATTERN: Delegate entirely to the mapper
-        // No if-else chains, no switch statements
-        // OCP: To add new product type, just create new mapper - this method stays
-        // unchanged!
         ProductJdbcMapper<Product> mapper = (ProductJdbcMapper<Product>) ProductMapperRegistry
                 .getMapperForProduct(product);
         return mapper.setAllTypeSpecificColumns(stmt, startIdx, product);

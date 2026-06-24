@@ -3,24 +3,18 @@ package com.aimsfx.view.ProductView;
 import com.aimsfx.model.*;
 import com.aimsfx.controller.ProductManagerController.ProductController;
 import com.aimsfx.controller.ProductManagerController.ViewProductController;
-import com.aimsfx.exception.ProductNotFoundException;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.utils.UIUtils;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -309,8 +303,6 @@ public class ProductListView implements Initializable {
             UIUtils.showError("Error", "Failed to delete products: " + e.getMessage());
         }
     }
-
-
 
     public void refreshProductList() {
         selectionMap.clear(); // Clear old selections when refreshing

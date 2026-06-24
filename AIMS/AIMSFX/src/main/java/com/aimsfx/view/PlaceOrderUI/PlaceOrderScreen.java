@@ -8,7 +8,6 @@ import com.aimsfx.utils.UIUtils;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -182,7 +181,6 @@ public class PlaceOrderScreen implements Initializable {
                     deliveryFormHandler.getAddress(),
                     deliveryFormHandler.getDeliveryInstructions()
             );
-
             if (result.isPresent()) {
                 DeliveryInfoDialogUI controller = result.get();
                 deliveryFormHandler.updateFormFromDialog(controller);
