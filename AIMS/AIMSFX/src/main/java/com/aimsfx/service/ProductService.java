@@ -11,8 +11,8 @@ import com.aimsfx.model.ProductType;
 import com.aimsfx.model.StockChangeLog;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
-import com.aimsfx.repository.DatabaseProductRepository;
 import com.aimsfx.repository.ProductRepository;
+import com.aimsfx.repository.RemoteProductRepository;
 import com.aimsfx.repository.TrackRepository;
 import com.aimsfx.validator.CommonProductValidator;
 import com.aimsfx.validator.ProductValidator;
@@ -25,6 +25,15 @@ import java.util.List;
  * ProductService - Service Layer for Product business logic
  * 
  * PURPOSE: Encapsulates business logic and coordinates between layers
+ * 
+ * MICROSERVICES PREPARATION - BOUNDED CONTEXT ISOLATION:
+ * - This service acts as the core entry point for the 'Product/Catalog' Bounded Context.
+ * - In a future distributed architecture, this module is prepared to be extracted into 
+ *   a standalone Spring Boot Microservice repository.
+ * - We enforce strict module boundaries here: ProductService does NOT directly depend 
+ *   on Orders, Carts, or Users entities. It only deals with Catalog concerns.
+ * - This strict separation allows us to easily lift-and-shift this logic into a new 
+ *   service with its own dedicated database (as prepared with the JSONB schema).
  * 
  * SOLID PRINCIPLES APPLIED:
  * SRP: Single responsibility = Product business operations
@@ -74,7 +83,7 @@ public class ProductService {
      */
     public static ProductService getInstance() {
         if (instance == null) {
-            ProductRepository repository = new DatabaseProductRepository();
+            ProductRepository repository = new RemoteProductRepository();
             CommonProductValidator commonValidator = new CommonProductValidator();
             instance = new ProductService(repository, commonValidator);
         }

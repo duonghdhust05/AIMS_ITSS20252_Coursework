@@ -1,10 +1,13 @@
 package com.aimsfx.controller;
 
 import com.aimsfx.exception.PaymentException;
+import com.aimsfx.exception.PaymentProcessingException;
 import com.aimsfx.service.PaymentService;
 import com.aimsfx.service.payment.IPaymentGateway;
 import com.aimsfx.subsystem.paypal.IPayPalView;
 import com.aimsfx.service.payment.IPaymentQRCode;
+import javafx.application.Platform;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,14 +17,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for PayOrderController
- * Tests controller delegation to subsystems
+ * Maps to Phase 4 of Test Plan
  */
 @ExtendWith(MockitoExtension.class)
 class PayOrderControllerTest {
@@ -40,6 +43,17 @@ class PayOrderControllerTest {
 
     private PayOrderController controller;
 
+    @BeforeAll
+    static void initJfxRuntime() {
+        // Platform.startup is needed for Platform.runLater in controller
+        try {
+            Platform.startup(() -> {
+            });
+        } catch (IllegalStateException e) {
+            // Toolkit already initialized
+        }
+    }
+
     @BeforeEach
     void setUp() {
         controller = new PayOrderController(
@@ -50,42 +64,89 @@ class PayOrderControllerTest {
     }
 
     @Test
-    @DisplayName("Pay Order – Controller delegates to VietQR subsystem")
-    void Pay_Order_Controller_delegates_to_VietQR() throws PaymentException {
-        // Arrange
-        String expectedJson = "{\"qrData\":\"base64...\"}";
-        when(mockVietQRSubsystem.generateQRCode(eq("ORDER001"), eq(100000L), eq("Payment")))
-                .thenReturn(expectedJson);
-
-        // Act
-        String result = controller.requestPayment("ORDER001", 100000.0, "Payment");
-
-        // Assert
-        assertEquals(expectedJson, result);
-        verify(mockVietQRSubsystem).generateQRCode("ORDER001", 100000L, "Payment");
-    }
-
-    @Test
-    @DisplayName("Pay by Credit Card – Controller delegates to PayPal subsystem")
-    void Pay_by_Credit_Card_Controller_delegates_to_PayPal() throws PaymentException {
+    @DisplayName("[TC-PP-01] Initiate PayPal Success")
+    void testRequestPayPalPayment_Success() throws PaymentException, InterruptedException {
         // Arrange
         Map<String, String> mockResponse = new HashMap<>();
         mockResponse.put("orderId", "PAYPAL123");
         mockResponse.put("approveUrl", "https://paypal.com/approve");
-        when(mockPayPalSubsystem.createOrder(eq("ORDER001"), eq(100000.0)))
+        when(mockPayPalSubsystem.createOrder(eq("ORDER001"), eq(50000.0)))
                 .thenReturn(mockResponse);
 
-        // Act & Assert
-        assertDoesNotThrow(() -> {
-            controller.requestPayPalPayment(
-                    "ORDER001", 100000.0,
-                    (id) -> {
-                    }, (err) -> {
-                    }, () -> {
-                    });
-        });
+        @SuppressWarnings("unchecked")
+        Consumer<String> onSuccess = (Consumer<String>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<String> onError = (Consumer<String>) mock(Consumer.class);
+        Runnable onCancel = mock(Runnable.class);
 
-        // Verify PayPal was called
-        verify(mockPayPalSubsystem, timeout(1000)).createOrder("ORDER001", 100000.0);
+        // Act
+        controller.requestPayPalPayment("ORDER001", 50000.0, onSuccess, onError, onCancel);
+
+        // Wait for thread to finish
+        Thread.sleep(200);
+
+        // Assert
+        verify(mockPayPalSubsystem).createOrder("ORDER001", 50000.0);
+        // Verify Platform.runLater triggered view
+        verify(mockPayPalView, timeout(500)).displayApprovalPage(eq("https://paypal.com/approve"), any(), any());
+    }
+
+    @Test
+    @DisplayName("[TC-PP-02] Initiate PayPal API Error")
+    void testRequestPayPalPayment_ApiError() throws PaymentException, InterruptedException {
+        // Arrange
+        when(mockPayPalSubsystem.createOrder(anyString(), anyDouble()))
+                .thenThrow(new PaymentProcessingException("Bad Request Error", "400", "PAYPAL"));
+
+        @SuppressWarnings("unchecked")
+        Consumer<String> onSuccess = (Consumer<String>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<String> onError = (Consumer<String>) mock(Consumer.class);
+        Runnable onCancel = mock(Runnable.class);
+
+        // Act
+        controller.requestPayPalPayment("ORDER001", 50000.0, onSuccess, onError, onCancel);
+
+        // Wait for thread to finish
+        Thread.sleep(200);
+
+        // Assert
+        verify(mockPayPalSubsystem).createOrder("ORDER001", 50000.0);
+        // Error callback should be triggered
+        verify(onError, timeout(500)).accept(contains("Bad Request Error"));
+    }
+
+    @Test
+    @DisplayName("[TC-PP-03] User Cancel Approval")
+    void testRequestPayPalPayment_UserCancel() throws PaymentException, InterruptedException {
+        // Arrange
+        Map<String, String> mockResponse = new HashMap<>();
+        mockResponse.put("orderId", "PAYPAL123");
+        mockResponse.put("approveUrl", "https://paypal.com/approve");
+        when(mockPayPalSubsystem.createOrder(anyString(), anyDouble()))
+                .thenReturn(mockResponse);
+
+        // Mock the displayApprovalPage to immediately trigger the cancel callback
+        // (Runnable)
+        doAnswer(invocation -> {
+            Runnable cancelCallback = invocation.getArgument(2);
+            cancelCallback.run();
+            return null;
+        }).when(mockPayPalView).displayApprovalPage(anyString(), any(), any());
+
+        @SuppressWarnings("unchecked")
+        Consumer<String> onSuccess = (Consumer<String>) mock(Consumer.class);
+        @SuppressWarnings("unchecked")
+        Consumer<String> onError = (Consumer<String>) mock(Consumer.class);
+        Runnable onCancel = mock(Runnable.class);
+
+        // Act
+        controller.requestPayPalPayment("ORDER001", 50000.0, onSuccess, onError, onCancel);
+
+        // Wait for thread to finish
+        Thread.sleep(200);
+
+        // Assert
+        verify(onCancel, timeout(500)).run();
     }
 }

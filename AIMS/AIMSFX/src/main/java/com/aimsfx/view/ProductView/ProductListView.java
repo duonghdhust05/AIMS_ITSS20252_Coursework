@@ -2,7 +2,6 @@ package com.aimsfx.view.ProductView;
 
 import com.aimsfx.model.*;
 import com.aimsfx.controller.ProductManagerController.ProductController;
-import com.aimsfx.controller.ProductManagerController.ViewProductController;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.utils.UIUtils;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -47,7 +46,6 @@ public class ProductListView implements Initializable {
 
     private static final int MAX_SELECTION = 10;
     private ProductController productController;
-    private ViewProductController viewProductController;
     private Runnable onProductUpdatedCallback;
 
     // Track selected products
@@ -56,7 +54,6 @@ public class ProductListView implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         productController = ProductController.getInstance();
-        viewProductController = ViewProductController.getInstance();
         setupTableColumns();
         setupSelectColumn();
         setupActionsColumn();
@@ -127,7 +124,7 @@ public class ProductListView implements Initializable {
     }
 
     private int getSelectedCount() {
-        return (int) selectionMap.values().stream().filter(SimpleBooleanProperty::get).count();
+        return (int) selectionMap.values().stream().filter(prop -> prop.get()).count();
     }
 
     private List<Product> getSelectedProducts() {

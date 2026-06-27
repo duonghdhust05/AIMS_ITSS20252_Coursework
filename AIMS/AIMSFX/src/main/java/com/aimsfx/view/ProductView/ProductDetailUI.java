@@ -52,14 +52,11 @@ public class ProductDetailUI extends BaseView {
         this.cartManager = cartManager;
     }
 
-    private Stage dialogStage;
-
     public ProductDetailUI() {
         // Default constructor for FXML loader
     }
 
     public void setDialogStage(Stage stage) {
-        this.dialogStage = stage;
         if (closeButton != null) {
             closeButton.setOnAction(e -> stage.close());
         }

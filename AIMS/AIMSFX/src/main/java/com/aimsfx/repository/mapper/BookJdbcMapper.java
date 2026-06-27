@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -17,10 +16,10 @@ import java.util.Map;
  * DESIGN IMPROVEMENT (JSONB Migration):
  * - Eliminates sparse table columns by using a unified JSONB structure.
  * - This mapper is responsible for serializing specific details into JSON
- *   and deserializing them back from the `attributes` JSONB column.
+ * and deserializing them back from the `attributes` JSONB column.
  */
 public class BookJdbcMapper implements ProductJdbcMapper<Book> {
-    
+
     private static final Gson gson = new Gson();
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -36,19 +35,20 @@ public class BookJdbcMapper implements ProductJdbcMapper<Book> {
         stmt.setString(startIndex, gson.toJson(details));
         return startIndex + 1;
     }
-    
+
     @Override
     public Book mapRow(ResultSet rs) throws SQLException {
         Book product = new Book();
         populateFromResultSet(rs, product);
         return product;
     }
-    
+
     @Override
     public void populateFromResultSet(ResultSet rs, Book product) throws SQLException {
         String attributesJson = rs.getString("attributes");
         if (attributesJson != null && !attributesJson.isEmpty()) {
-            Map<String, Object> details = gson.fromJson(attributesJson, new TypeToken<Map<String, Object>>(){}.getType());
+            Map<String, Object> details = gson.fromJson(attributesJson, new TypeToken<Map<String, Object>>() {
+            }.getType());
             if (details != null) {
                 if (details.containsKey("author") && details.get("author") != null) {
                     product.setAuthor(String.valueOf(details.get("author")));

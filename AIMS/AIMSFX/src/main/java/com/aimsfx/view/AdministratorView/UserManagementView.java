@@ -86,7 +86,7 @@ public class UserManagementView implements Initializable {
         rolesColumn.setCellValueFactory(cellData -> {
             User user = cellData.getValue();
             String roles = user.getRoles().stream()
-                    .map(UserRole::toString)
+                    .map(role -> role.toString())
                     .collect(Collectors.joining(", "));
             return new SimpleStringProperty(roles);
         });
