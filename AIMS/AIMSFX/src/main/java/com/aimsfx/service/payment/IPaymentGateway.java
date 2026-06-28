@@ -38,6 +38,17 @@ public interface IPaymentGateway {
     Map<String, String> createOrder(String orderId, double amount) throws PaymentException;
 
     /**
+     * Create a payment order with the gateway using DTO (Secure and Network Optimized)
+     * 
+     * @param requestDTO Contains orderId, amount, and payment method securely
+     * @return Map containing gateway response
+     * @throws PaymentException if order creation fails
+     */
+    default Map<String, String> createOrder(com.aimsfx.dto.PaymentRequestDTO requestDTO) throws PaymentException {
+        return createOrder(String.valueOf(requestDTO.getOrderId()), requestDTO.getAmount().doubleValue());
+    }
+
+    /**
      * Capture/confirm a previously approved payment
      * 
      * @param gatewayOrderId The gateway's order ID (returned from createOrder)

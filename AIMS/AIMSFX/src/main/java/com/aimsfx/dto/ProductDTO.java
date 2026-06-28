@@ -17,41 +17,41 @@ import java.util.Map;
  * 
  * USAGE:
  * ProductDTO dto = ProductDTO.builder()
- *     .type("BOOK")
- *     .barcode("123456")
- *     .title("Java Programming")
- *     .originalPrice(100.0)
- *     .attribute("author", "John Doe")
- *     .attribute("publisher", "Tech Press")
- *     .build();
+ * .type("BOOK")
+ * .barcode("123456")
+ * .title("Java Programming")
+ * .originalPrice(100.0)
+ * .attribute("author", "John Doe")
+ * .attribute("publisher", "Tech Press")
+ * .build();
  */
 public class ProductDTO {
-    
+
     // Identity fields
     private final Long productId;
     private final String type;
     private final String barcode;
-    
+
     // Content fields
     private final String title;
     private final String category;
     private final String description;
-    
+
     // Pricing fields
     private final Double originalPrice;
     private final Double currentPrice;
     private final Double vatRate;
-    
+
     private final Integer stock;
     private final String status;
-    
+
     // Physical attributes
     private final Double weight;
     private final String dimensions;
-    
+
     // Type-specific attributes (replaces String... attributes)
     private final Map<String, String> specificAttributes;
-    
+
     /**
      * Private constructor - use Builder to create instances
      */
@@ -71,79 +71,79 @@ public class ProductDTO {
         this.dimensions = builder.dimensions;
         this.specificAttributes = new HashMap<>(builder.specificAttributes);
     }
-    
+
     /**
      * Create a new Builder instance
      */
     public static Builder builder() {
         return new Builder();
     }
-    
+
     // ==================== Getters ====================
-    
+
     public Long getProductId() {
         return productId;
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
     public String getBarcode() {
         return barcode;
     }
-    
+
     public String getTitle() {
         return title;
     }
-    
+
     public String getCategory() {
         return category;
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public Double getOriginalPrice() {
         return originalPrice;
     }
-    
+
     public Double getCurrentPrice() {
         return currentPrice;
     }
-    
+
     public Double getVatRate() {
         return vatRate;
     }
-    
+
     public Integer getStock() {
         return stock;
     }
-    
+
     public String getStatus() {
         return status;
     }
-    
+
     public Double getWeight() {
         return weight;
     }
-    
+
     public String getDimensions() {
         return dimensions;
     }
-    
+
     public Map<String, String> getSpecificAttributes() {
         return new HashMap<>(specificAttributes);
     }
-    
+
     /**
      * Get a specific attribute by key
      */
     public String getAttribute(String key) {
         return specificAttributes.get(key);
     }
-    
+
     /**
      * Convert specific attributes to array format using provided keys
      * OCP COMPLIANT: No hardcoded product types - keys come from Factory
@@ -152,17 +152,18 @@ public class ProductDTO {
      * @return Array of attribute values in the same order as keys
      */
     public String[] getAttributesAsArray(String[] keys) {
-        if (keys == null) return new String[0];
-        
+        if (keys == null)
+            return new String[0];
+
         String[] attributes = new String[keys.length];
         for (int i = 0; i < keys.length; i++) {
             attributes[i] = specificAttributes.getOrDefault(keys[i], "");
         }
         return attributes;
     }
-    
+
     // ==================== Builder Class ====================
-    
+
     /**
      * Builder for ProductDTO
      * Implements Fluent Interface pattern for readable construction
@@ -182,91 +183,91 @@ public class ProductDTO {
         private Double weight;
         private String dimensions;
         private Map<String, String> specificAttributes = new HashMap<>();
-        
+
         private Builder() {
             // Private constructor
         }
-        
+
         // Identity fields
         public Builder productId(Long productId) {
             this.productId = productId;
             return this;
         }
-        
+
         public Builder type(String type) {
             this.type = type;
             return this;
         }
-        
+
         public Builder barcode(String barcode) {
             this.barcode = barcode;
             return this;
         }
-        
+
         // Content fields
         public Builder title(String title) {
             this.title = title;
             return this;
         }
-        
+
         public Builder category(String category) {
             this.category = category;
             return this;
         }
-        
+
         public Builder description(String description) {
             this.description = description;
             return this;
         }
-        
+
         // Pricing fields
         public Builder originalPrice(Double originalPrice) {
             this.originalPrice = originalPrice;
             return this;
         }
-        
+
         public Builder currentPrice(Double currentPrice) {
             this.currentPrice = currentPrice;
             return this;
         }
-        
+
         public Builder vatRate(Double vatRate) {
             this.vatRate = vatRate;
             return this;
         }
-        
+
         public Builder stock(Integer stock) {
             this.stock = stock;
             return this;
         }
-        
+
         public Builder status(String status) {
             this.status = status;
             return this;
         }
-        
+
         // Physical attributes
         public Builder weight(Double weight) {
             this.weight = weight;
             return this;
         }
-        
+
         public Builder dimensions(String dimensions) {
             this.dimensions = dimensions;
             return this;
         }
-        
+
         // Type-specific attributes
         public Builder attribute(String key, String value) {
             this.specificAttributes.put(key, value);
             return this;
         }
-        
+
         public Builder attributes(Map<String, String> attributes) {
             this.specificAttributes.putAll(attributes);
             return this;
         }
-        
+
         /**
          * Set all specific attributes at once from a Map
          * OCP SOLUTION: View collects data by key, no index-based logic needed
@@ -280,29 +281,7 @@ public class ProductDTO {
             }
             return this;
         }
-        
-        /**
-         * Generic method to map array values to map using keys from Factory
-         * OCP COMPLIANT: No hardcoded product types - keys come from external source (Factory)
-         * 
-         * @param keys Array of attribute keys (from Factory.getAttributeKeys())
-         * @param values Array of attribute values (from UI or legacy code)
-         * @return this builder for method chaining
-         * @deprecated Use specificAttributes(Map) instead for cleaner code
-         */
-        @Deprecated
-        public Builder attributesFromKeys(String[] keys, String[] values) {
-            if (keys == null || values == null) return this;
-            
-            // Map keys to values by index
-            for (int i = 0; i < Math.min(keys.length, values.length); i++) {
-                if (keys[i] != null && values[i] != null) {
-                    this.specificAttributes.put(keys[i], values[i]);
-                }
-            }
-            return this;
-        }
-        
+
         /**
          * Build the ProductDTO instance
          */
@@ -320,7 +299,7 @@ public class ProductDTO {
             return new ProductDTO(this);
         }
     }
-    
+
     @Override
     public String toString() {
         return "ProductDTO{" +

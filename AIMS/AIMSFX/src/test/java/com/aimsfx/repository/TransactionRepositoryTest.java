@@ -70,7 +70,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    @DisplayName("[TC-REP-01] Update Txn Status")
+    @DisplayName("[IT-REP-01] Update Txn Status")
     void testUpdateStatus_Success() {
         // Arrange: Insert a pending transaction
         int txnId = repository.createPendingTransaction(101, 50000.0, "PAYPAL", "EXT-123");
@@ -86,10 +86,10 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    @DisplayName("Create Pending Transaction")
+    @DisplayName("[IT_PAY_007] DB Save Transaction")
     void testCreatePendingTransaction() {
         // Act
-        int txnId = repository.createPendingTransaction(102, 100000.0, "VIETQR", "VQR-456");
+        int txnId = repository.createPendingTransaction(102, 100000.0, "PAYPAL", "PAYPAL-456");
 
         // Assert
         assertTrue(txnId > 0);

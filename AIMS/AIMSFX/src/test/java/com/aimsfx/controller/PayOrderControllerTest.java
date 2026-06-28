@@ -64,7 +64,7 @@ class PayOrderControllerTest {
     }
 
     @Test
-    @DisplayName("[TC-PP-01] Initiate PayPal Success")
+    @DisplayName("[UT-PP-01] Initiate PayPal Success")
     void testRequestPayPalPayment_Success() throws PaymentException, InterruptedException {
         // Arrange
         Map<String, String> mockResponse = new HashMap<>();
@@ -92,7 +92,7 @@ class PayOrderControllerTest {
     }
 
     @Test
-    @DisplayName("[TC-PP-02] Initiate PayPal API Error")
+    @DisplayName("[UT-PP-02] Initiate PayPal API Error")
     void testRequestPayPalPayment_ApiError() throws PaymentException, InterruptedException {
         // Arrange
         when(mockPayPalSubsystem.createOrder(anyString(), anyDouble()))
@@ -117,7 +117,7 @@ class PayOrderControllerTest {
     }
 
     @Test
-    @DisplayName("[TC-PP-03] User Cancel Approval")
+    @DisplayName("[UT_PAY_008] User Cancels Payment on PayPal Screen")
     void testRequestPayPalPayment_UserCancel() throws PaymentException, InterruptedException {
         // Arrange
         Map<String, String> mockResponse = new HashMap<>();

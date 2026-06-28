@@ -119,7 +119,7 @@ public class DatabaseProductRepository implements ProductRepository {
                 }
 
                 // Step 1: Expire the current version
-                String expireSql = "UPDATE products SET is_current = false, expired_date = NOW() " +
+                String expireSql = "UPDATE products SET is_current = false, expired_date = CURRENT_TIMESTAMP " +
                         "WHERE product_id = ? AND is_current = true";
 
                 try (PreparedStatement expireStmt = conn.prepareStatement(expireSql)) {
@@ -272,8 +272,8 @@ public class DatabaseProductRepository implements ProductRepository {
     @Override
     public boolean deleteById(Long id) {
         // Soft delete: Mark as expired instead of physically deleting
-        // Set is_current = false and expired_date = NOW()
-        String sql = "UPDATE products SET is_current = false, expired_date = NOW() WHERE product_id = ? AND is_current = true";
+        // Set is_current = false and expired_date = CURRENT_TIMESTAMP
+        String sql = "UPDATE products SET is_current = false, expired_date = CURRENT_TIMESTAMP WHERE product_id = ? AND is_current = true";
 
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

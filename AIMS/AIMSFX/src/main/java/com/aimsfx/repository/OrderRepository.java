@@ -193,6 +193,7 @@ public class OrderRepository {
                 order.setTotalAmount(rs.getFloat("total_amount"));
                 order.setDeliveryFee(rs.getFloat("shipping_fee"));
                 order.setStatus(rs.getString("order_status"));
+                order.setCancelReason(rs.getString("cancel_reason"));
 
                 // Restore DeliveryInfo from database
                 DeliveryInfo deliveryInfo = new DeliveryInfo();

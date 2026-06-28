@@ -8,6 +8,9 @@ import com.aimsfx.repository.DatabaseUserRepository;
 import com.aimsfx.repository.UserRepository;
 import com.aimsfx.utils.SessionManager;
 import com.aimsfx.validator.UserValidator;
+import com.aimsfx.dto.UserLoginDTO;
+import com.aimsfx.dto.UserProfileDTO;
+import com.aimsfx.dto.UserRegisterDTO;
 import javafx.collections.ObservableList;
 
 import java.security.MessageDigest;
@@ -82,6 +85,19 @@ public class UserService {
         return user;
     }
     
+    /**
+     * Authenticate user via DTO (Optimized for network/API payload)
+     * @param loginDTO Contains username and password
+     * @return UserProfileDTO containing non-sensitive user info
+     */
+    public UserProfileDTO authenticateWithDTO(UserLoginDTO loginDTO) {
+        if (loginDTO == null || loginDTO.getUsername() == null || loginDTO.getPassword() == null) {
+            throw new java.lang.IllegalArgumentException("Login credentials cannot be null");
+        }
+        User authenticatedUser = authenticate(loginDTO.getUsername(), loginDTO.getPassword());
+        return new UserProfileDTO(authenticatedUser);
+    }
+    
     // ==================== USER CRUD ====================
     
     /**
@@ -118,6 +134,26 @@ public class UserService {
         user.setFullName(fullName.trim());
         
         return userRepository.save(user);
+    }
+    
+    /**
+     * Register new user via DTO (API/Network Optimized)
+     * @param registerDTO Contains registration info
+     * @param roles User roles to assign
+     * @return UserProfileDTO with non-sensitive info
+     */
+    public UserProfileDTO registerUserWithDTO(UserRegisterDTO registerDTO, Set<UserRole> roles) {
+        if (registerDTO == null) throw new java.lang.IllegalArgumentException("Registration data cannot be null");
+        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
+            throw new UserValidationException("Passwords do not match");
+        }
+        User createdUser = createUser(
+            registerDTO.getUsername(), 
+            registerDTO.getPassword(), 
+            roles, 
+            registerDTO.getFullName()
+        );
+        return new UserProfileDTO(createdUser);
     }
     
     /**

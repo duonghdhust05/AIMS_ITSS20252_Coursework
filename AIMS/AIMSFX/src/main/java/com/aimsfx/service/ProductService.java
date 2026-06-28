@@ -12,7 +12,7 @@ import com.aimsfx.model.StockChangeLog;
 import com.aimsfx.model.Track;
 import com.aimsfx.model.meta.AttributeMeta;
 import com.aimsfx.repository.ProductRepository;
-import com.aimsfx.repository.RemoteProductRepository;
+
 import com.aimsfx.repository.TrackRepository;
 import com.aimsfx.validator.CommonProductValidator;
 import com.aimsfx.validator.ProductValidator;
@@ -83,7 +83,7 @@ public class ProductService {
      */
     public static ProductService getInstance() {
         if (instance == null) {
-            ProductRepository repository = new RemoteProductRepository();
+            ProductRepository repository = new com.aimsfx.repository.DatabaseProductRepository();
             CommonProductValidator commonValidator = new CommonProductValidator();
             instance = new ProductService(repository, commonValidator);
         }

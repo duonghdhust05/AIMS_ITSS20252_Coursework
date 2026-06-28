@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderTest {
 
     @Test
-    @DisplayName("[TC-PO-01] Create new Order successfully with valid data")
+    @DisplayName("[UT-PO-01] Create new Order successfully with valid data")
     void testCreateOrder_Success() {
         // Arrange
         Order order = new Order();
@@ -51,5 +51,36 @@ class OrderTest {
         assertEquals(0, order.getOrderId());
         assertNotNull(order.getOrderItems(), "OrderItems should be initialized");
         assertTrue(order.getOrderItems().isEmpty(), "OrderItems should be empty");
+    }
+
+    @Test
+    @DisplayName("[UT_PAY_001] Validate Order Total Calculation")
+    void testCalculateTotalAmount() {
+        // Arrange
+        Order order = new Order();
+        
+        Product p1 = org.mockito.Mockito.mock(Product.class);
+        org.mockito.Mockito.when(p1.getCurrentPrice()).thenReturn(50.0);
+        Product p2 = org.mockito.Mockito.mock(Product.class);
+        org.mockito.Mockito.when(p2.getCurrentPrice()).thenReturn(30.0);
+        
+        OrderItem item1 = new OrderItem(p1, 1, 50.0);
+        OrderItem item2 = new OrderItem(p2, 1, 30.0);
+        
+        order.addOrderItem(item1);
+        order.addOrderItem(item2);
+        
+        // Subtotal should be 80.0
+        assertEquals(80.0f, order.calculateSubtotal());
+        
+        // Set delivery fee to 10.0
+        order.setDeliveryFee(10.0f);
+        
+        // Calculate total amount
+        // Total = 80.0 + (80.0 * 0.1) + 10.0 = 80.0 + 8.0 + 10.0 = 98.0
+        float total = order.calculateTotalAmount();
+        
+        // Assert
+        assertEquals(98.0f, total, 0.001f);
     }
 }
