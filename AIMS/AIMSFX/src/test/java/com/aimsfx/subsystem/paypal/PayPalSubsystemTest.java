@@ -49,8 +49,8 @@ class PayPalSubsystemTest {
     }
 
     @Test
-    @DisplayName("Pay by Credit Card – PayPal creates order successfully")
-    void Pay_by_Credit_Card_PayPal_creates_order_successfully() throws Exception {
+    @DisplayName("[IT_PAY_002] Successful PayPal Payment")
+    void testCreateOrder_Success() throws Exception {
         // Arrange
         when(mockConverter.convertVndToUsd(500000.0)).thenReturn(20.0);
 
@@ -75,8 +75,8 @@ class PayPalSubsystemTest {
     }
 
     @Test
-    @DisplayName("Pay by Credit Card – PayPal payment declined")
-    void Pay_by_Credit_Card_PayPal_payment_declined() throws Exception {
+    @DisplayName("[IT_PAY_003] Card Declined / Gateway Reject")
+    void testCreateOrder_Declined() throws Exception {
         // Arrange
         when(mockConverter.convertVndToUsd(anyDouble())).thenReturn(20.0);
         when(mockOrdersController.createOrder(any(CreateOrderInput.class)))
@@ -89,5 +89,24 @@ class PayPalSubsystemTest {
 
         assertEquals("PAYPAL", exception.getProvider());
         assertTrue(exception instanceof PaymentDeclinedException);
+    }
+    
+    @Test
+    @DisplayName("[IT_PAY_004] Handle PayPal API Timeout")
+    void testCreateOrder_ApiTimeout() throws Exception {
+        // Arrange
+        when(mockConverter.convertVndToUsd(anyDouble())).thenReturn(20.0);
+        when(mockOrdersController.createOrder(any(CreateOrderInput.class)))
+                .thenThrow(new RuntimeException("connect timed out"));
+
+        // Act & Assert
+        PaymentException exception = assertThrows(
+                PaymentException.class,
+                () -> subsystem.createOrder("ORDER-001", 500000.0));
+
+        assertEquals("PAYPAL", exception.getProvider());
+        // Currently PayPalSubsystem throws PaymentProcessingException for general errors
+        // with a generic message.
+        assertEquals("Unable to process payment. Please try again.", exception.getMessage());
     }
 }

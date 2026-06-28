@@ -7,7 +7,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.aimsfx.config.JasyptConfig;
+import com.aimsfx.dto.DatabaseStatusDTO;
+import com.aimsfx.dto.ConnectionPoolMetricsDTO;
 
 /**
  * Singleton class to manage PostgreSQL database connection pool using HikariCP
@@ -49,7 +50,7 @@ public class DatabaseConnection {
             props.load(input);
             this.url = props.getProperty("spring.datasource.url");
             this.username = props.getProperty("spring.datasource.username");
-            this.password = JasyptConfig.decryptProperty(props.getProperty("spring.datasource.password"));
+            this.password = props.getProperty("spring.datasource.password");
 
             // Load connection pool settings
             this.maxConnections = Integer.parseInt(props.getProperty("db.max.connections", "15"));
@@ -184,5 +185,32 @@ public class DatabaseConnection {
                 "Connection Pool Status: " + (dataSource != null && !dataSource.isClosed() ? "Active" : "Inactive")
                 + "\n" +
                 "Test Connection: " + (testConnection() ? "OK" : "Failed");
+    }
+
+    /**
+     * Get database status using DTO (Secure and Structured)
+     */
+    public DatabaseStatusDTO getDatabaseStatusDTO() {
+        boolean isOk = testConnection();
+        String status = (dataSource != null && !dataSource.isClosed()) ? "Active" : "Inactive";
+        String poolName = (dataSource != null) ? dataSource.getPoolName() : "Uninitialized";
+        return new DatabaseStatusDTO(poolName, status, isOk);
+    }
+
+    /**
+     * Get connection pool metrics using DTO (Network/API Optimized)
+     */
+    public ConnectionPoolMetricsDTO getConnectionPoolMetricsDTO() {
+        if (dataSource == null) {
+            return new ConnectionPoolMetricsDTO(0, 0, 0, maxConnections, minConnections);
+        }
+        
+        return new ConnectionPoolMetricsDTO(
+            dataSource.getHikariPoolMXBean().getActiveConnections(),
+            dataSource.getHikariPoolMXBean().getIdleConnections(),
+            dataSource.getHikariPoolMXBean().getTotalConnections(),
+            dataSource.getMaximumPoolSize(),
+            dataSource.getMinimumIdle()
+        );
     }
 }

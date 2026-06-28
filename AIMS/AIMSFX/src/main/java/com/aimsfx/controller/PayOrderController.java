@@ -143,6 +143,41 @@ public class PayOrderController {
     }
 
     /**
+     * Request PayPal payment using PaymentRequestDTO (Security and Payload Optimized)
+     */
+    public void requestPayPalPaymentWithDTO(com.aimsfx.dto.PaymentRequestDTO requestDTO,
+            Consumer<com.aimsfx.dto.TransactionResponseDTO> onPaymentSuccess,
+            Consumer<String> onPaymentError,
+            Runnable onPaymentCancel) {
+        new Thread(() -> {
+            try {
+                Map<String, String> response = payPalSubsystem.createOrder(requestDTO);
+                
+                if (response != null) {
+                    String approvalUrl = response.get("approveUrl");
+                    String paypalOrderId = response.get("orderId");
+
+                    Platform.runLater(() -> {
+                        payPalView.displayApprovalPage(approvalUrl,
+                                (successUrl) -> handleCaptureWithDTO(paypalOrderId, requestDTO,
+                                        onPaymentSuccess, onPaymentError),
+                                () -> {
+                                    System.out.println("[PayOrderController] Payment cancelled by user");
+                                    onPaymentCancel.run();
+                                });
+                    });
+                }
+            } catch (PaymentException e) {
+                System.err.println("PayPal Error [" + e.getErrorCode() + "]: " + e.getMessage());
+                Platform.runLater(() -> onPaymentError.accept(e.getMessage()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> onPaymentError.accept("Unexpected error: " + e.getMessage()));
+            }
+        }).start();
+    }
+
+    /**
      * Handle PayPal order capture after user approval
      * 
      * Flow per sequence diagram:
@@ -168,6 +203,36 @@ public class PayOrderController {
                 });
             } catch (PaymentException e) {
                 // Per sequence diagram: API call fail → return error to View
+                System.err.println("PayPal Capture Error [" + e.getErrorCode() + "]: " + e.getMessage());
+                Platform.runLater(() -> onPaymentError.accept(e.getMessage()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> onPaymentError.accept("PayPal API Error: " + e.getMessage()));
+            }
+        }).start();
+    }
+
+    private void handleCaptureWithDTO(String paypalOrderId, com.aimsfx.dto.PaymentRequestDTO requestDTO,
+            Consumer<com.aimsfx.dto.TransactionResponseDTO> onPaymentSuccess,
+            Consumer<String> onPaymentError) {
+        new Thread(() -> {
+            try {
+                boolean success = payPalSubsystem.captureOrder(paypalOrderId);
+
+                Platform.runLater(() -> {
+                    if (success) {
+                        com.aimsfx.model.TransactionInfo transaction = new com.aimsfx.model.TransactionInfo();
+                        transaction.setTransactionId(paypalOrderId);
+                        transaction.setAmount(requestDTO.getAmount());
+                        transaction.setCurrency("VND");
+                        transaction.setPaymentMethod("PAYPAL");
+                        transaction.setStatus(com.aimsfx.model.TransactionInfo.TransactionStatus.CAPTURED);
+                        onPaymentSuccess.accept(new com.aimsfx.dto.TransactionResponseDTO(transaction));
+                    } else {
+                        onPaymentError.accept("PayPal payment capture was not completed.");
+                    }
+                });
+            } catch (PaymentException e) {
                 System.err.println("PayPal Capture Error [" + e.getErrorCode() + "]: " + e.getMessage());
                 Platform.runLater(() -> onPaymentError.accept(e.getMessage()));
             } catch (Exception e) {

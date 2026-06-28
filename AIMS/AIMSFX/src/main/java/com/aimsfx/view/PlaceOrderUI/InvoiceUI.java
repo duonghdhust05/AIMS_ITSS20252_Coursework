@@ -1,7 +1,6 @@
 package com.aimsfx.view.PlaceOrderUI;
 
 import com.aimsfx.model.Invoice;
-import com.aimsfx.utils.UIUtils;
 import com.aimsfx.view.BaseView;
 
 import javafx.fxml.FXML;
@@ -55,7 +54,6 @@ public class InvoiceUI extends BaseView {
             totalLabel.setText(String.format("%.2f VND", invoice.getTotalAmount()));
         }
     }
-
 
 
     /**

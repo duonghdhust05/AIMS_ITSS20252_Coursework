@@ -1,106 +1,81 @@
 package com.aimsfx.repository.mapper;
 
 import com.aimsfx.model.DVD;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * DVDJdbcMapper - JDBC Mapper for DVD products
  * 
- * SOLID PRINCIPLES:
- * - SRP: Only responsible for mapping DVD data to/from database
- * - OCP: Can add new mappers without modifying existing code
- * - LSP: Correctly implements ProductJdbcMapper contract
- * - ISP: Interface is focused and minimal
- * - DIP: Depends on abstraction (Product, not concrete types)
- * 
- * COLUMNS HANDLED (with values):
- * - genre (VARCHAR) - in Book columns section (shared)
- * - release_date (TIMESTAMP) - in CD columns section (shared)
- * - director (VARCHAR)
- * - studio (VARCHAR)
- * - subtitle (VARCHAR)
- * - disc_type (VARCHAR)
- * - duration (INTEGER)
- * 
- * COLUMNS SET TO NULL:
- * - Book columns (except genre): author, publisher, publication_date, pages, language, cover_type
- * - CD columns (except release_date): artist, record_label, track_count
- * - Newspaper columns: issue_number, frequency, editor_in_chief, section
+ * DESIGN IMPROVEMENT (JSONB Migration):
+ * - Eliminates sparse table columns by using a unified JSONB structure.
+ * - This mapper is responsible for serializing specific details into JSON
+ *   and deserializing them back from the `attributes` JSONB column.
  */
 public class DVDJdbcMapper implements ProductJdbcMapper<DVD> {
     
+    private static final Gson gson = new Gson();
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     @Override
-    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, DVD dvd) throws SQLException {
-        int idx = startIndex;
-        
-        // ===== Book columns (7) - SET TO NULL except genre =====
-        stmt.setNull(idx++, Types.VARCHAR);    // author
-        stmt.setNull(idx++, Types.VARCHAR);    // publisher
-        stmt.setNull(idx++, Types.VARCHAR);    // publication_date
-        stmt.setNull(idx++, Types.INTEGER);    // pages
-        stmt.setNull(idx++, Types.VARCHAR);    // language
-        stmt.setNull(idx++, Types.VARCHAR);    // cover_type
-        stmt.setString(idx++, dvd.getGenre()); // genre (shared - SET WITH VALUE)
-        
-        // ===== CD columns (4) - SET TO NULL except release_date =====
-        stmt.setNull(idx++, Types.VARCHAR);    // artist
-        stmt.setNull(idx++, Types.VARCHAR);    // record_label
-        stmt.setNull(idx++, Types.INTEGER);    // track_count
-        if (dvd.getReleaseDate() != null) {
-            stmt.setTimestamp(idx++, new Timestamp(dvd.getReleaseDate().getTime())); // release_date (shared)
-        } else {
-            stmt.setNull(idx++, Types.TIMESTAMP);
+    public int setAllTypeSpecificColumns(PreparedStatement stmt, int startIndex, DVD product) throws SQLException {
+        Map<String, Object> details = product.getSpecificDetail();
+        // Format dates before serialization if needed
+        for (Map.Entry<String, Object> entry : details.entrySet()) {
+            if (entry.getValue() instanceof java.util.Date) {
+                entry.setValue(sdf.format((java.util.Date) entry.getValue()));
+            }
         }
-        
-        // ===== DVD columns (5) - SET WITH VALUES =====
-        stmt.setString(idx++, dvd.getDirector());
-        stmt.setString(idx++, dvd.getStudio());
-        stmt.setString(idx++, dvd.getSubtitle());
-        stmt.setString(idx++, dvd.getDiscType());
-        if (dvd.getDuration() != null) {
-            stmt.setInt(idx++, dvd.getDuration());
-        } else {
-            stmt.setNull(idx++, Types.INTEGER);
-        }
-        
-        // ===== Newspaper columns (4) - SET TO NULL =====
-        stmt.setNull(idx++, Types.VARCHAR);    // issue_number
-        stmt.setNull(idx++, Types.VARCHAR);    // frequency
-        stmt.setNull(idx++, Types.VARCHAR);    // editor_in_chief
-        stmt.setNull(idx++, Types.VARCHAR);    // section
-        
-        return idx;
+        stmt.setString(startIndex, gson.toJson(details));
+        return startIndex + 1;
     }
     
     @Override
     public DVD mapRow(ResultSet rs) throws SQLException {
-        DVD dvd = new DVD();
-        populateFromResultSet(rs, dvd);
-        return dvd;
+        DVD product = new DVD();
+        populateFromResultSet(rs, product);
+        return product;
     }
     
     @Override
-    public void populateFromResultSet(ResultSet rs, DVD dvd) throws SQLException {
-        dvd.setDirector(rs.getString("director"));
-        dvd.setStudio(rs.getString("studio"));
-        dvd.setSubtitle(rs.getString("subtitle"));
-        dvd.setDiscType(rs.getString("disc_type"));
-        
-        int duration = rs.getInt("duration");
-        if (!rs.wasNull()) {
-            dvd.setDuration(duration);
-        }
-        
-        dvd.setGenre(rs.getString("genre"));
-        
-        Timestamp releaseDate = rs.getTimestamp("release_date");
-        if (releaseDate != null) {
-            dvd.setReleaseDate(new java.util.Date(releaseDate.getTime()));
+    public void populateFromResultSet(ResultSet rs, DVD product) throws SQLException {
+        String attributesJson = rs.getString("attributes");
+        if (attributesJson != null && !attributesJson.isEmpty()) {
+            Map<String, Object> details = gson.fromJson(attributesJson, new TypeToken<Map<String, Object>>(){}.getType());
+            if (details != null) {
+                if (details.containsKey("director") && details.get("director") != null) {
+                    product.setDirector(String.valueOf(details.get("director")));
+                }
+                if (details.containsKey("studio") && details.get("studio") != null) {
+                    product.setStudio(String.valueOf(details.get("studio")));
+                }
+                if (details.containsKey("subtitle") && details.get("subtitle") != null) {
+                    product.setSubtitle(String.valueOf(details.get("subtitle")));
+                }
+                if (details.containsKey("disc_type") && details.get("disc_type") != null) {
+                    product.setDiscType(String.valueOf(details.get("disc_type")));
+                }
+                if (details.containsKey("duration") && details.get("duration") != null) {
+                    product.setDuration(((Number) details.get("duration")).intValue());
+                }
+                if (details.containsKey("genre") && details.get("genre") != null) {
+                    product.setGenre(String.valueOf(details.get("genre")));
+                }
+                if (details.containsKey("release_date") && details.get("release_date") != null) {
+                    try {
+                        product.setReleaseDate(sdf.parse(String.valueOf(details.get("release_date"))));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }

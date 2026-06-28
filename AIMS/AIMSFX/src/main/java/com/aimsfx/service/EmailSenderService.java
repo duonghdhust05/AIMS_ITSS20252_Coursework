@@ -7,7 +7,6 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.io.InputStream;
 import java.util.Properties;
-import com.aimsfx.config.JasyptConfig;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +52,7 @@ public class EmailSenderService implements IEmailSender {
                 smtpHost = props.getProperty("email.smtp.host", "smtp.gmail.com");
                 smtpPort = Integer.parseInt(props.getProperty("email.smtp.port", "587"));
                 smtpUsername = props.getProperty("email.username", "");
-                smtpPassword = JasyptConfig.decryptProperty(props.getProperty("email.password", ""));
+                smtpPassword = props.getProperty("email.password", "");
                 fromName = props.getProperty("email.from.name", "AIMS Store");
                 LOGGER.info("Email config loaded: host=" + smtpHost + ", port=" + smtpPort + ", from=" + smtpUsername);
             } else {

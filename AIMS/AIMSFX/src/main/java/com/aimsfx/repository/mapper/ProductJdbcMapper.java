@@ -31,16 +31,15 @@ import java.sql.SQLException;
  */
 public interface ProductJdbcMapper<T extends Product> {
     
-    int TOTAL_TYPE_SPECIFIC_COLUMNS = 20;
+    int TOTAL_TYPE_SPECIFIC_COLUMNS = 1; // It is just 1 column now (JSONB attributes)
     
     /**
-     * Set ALL type-specific columns in PreparedStatement (Single Table Inheritance)
+     * Set the attributes column in PreparedStatement as JSONB
      * 
-     * This method sets THIS product type's columns with actual values,
-     * and sets OTHER product types' columns with NULL values.
+     * This method serializes the product's type-specific details into a JSON string
+     * and sets it to the PreparedStatement.
      * 
-     * This is the main Strategy method - each mapper implements this differently
-     * based on which columns it needs to populate.
+     * This is the main Strategy method - each mapper serializes its own specific fields.
      * 
      * @param stmt The PreparedStatement to set parameters on
      * @param startIndex The starting parameter index (1-based)

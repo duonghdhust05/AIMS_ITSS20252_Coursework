@@ -7,7 +7,6 @@ import com.paypal.sdk.authentication.ClientCredentialsAuthModel; // Import 1
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import com.aimsfx.config.JasyptConfig;
 
 /**
  * PayPalConfig Class
@@ -55,7 +54,7 @@ public class PayPalConfig {
 
             // Read keys manually
             this.clientId = prop.getProperty("paypal.client.id");
-            this.clientSecret = JasyptConfig.decryptProperty(prop.getProperty("paypal.client.secret"));
+            this.clientSecret = prop.getProperty("paypal.client.secret");
 
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -36,9 +36,17 @@ public class DatabaseManager {
      */
     public static String getStatus() {
         DatabaseConnection db = DatabaseConnection.getInstance();
+        com.aimsfx.dto.DatabaseStatusDTO dbStatus = db.getDatabaseStatusDTO();
+        com.aimsfx.dto.ConnectionPoolMetricsDTO metrics = db.getConnectionPoolMetricsDTO();
+        
         return "=== DATABASE STATUS ===\n" +
-                db.getDatabaseInfo() + "\n\n" +
+                "Pool Name: " + dbStatus.getPoolName() + "\n" +
+                "Status: " + dbStatus.getStatus() + "\n" +
+                "Connection OK: " + dbStatus.isConnectionOk() + "\n\n" +
                 "=== CONNECTION POOL STATUS ===\n" +
-                db.getPoolInfo();
+                "Active Connections: " + metrics.getActiveConnections() + "\n" +
+                "Idle Connections: " + metrics.getIdleConnections() + "\n" +
+                "Total Connections: " + metrics.getTotalConnections() + "\n" +
+                "Max Pool Size: " + metrics.getMaxPoolSize();
     }
 }

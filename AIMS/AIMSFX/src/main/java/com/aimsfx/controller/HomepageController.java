@@ -105,7 +105,7 @@ public class HomepageController {
             return new ArrayList<>();
         }
         return productController.searchProducts(query, null, null, 10).stream()
-                .map(Product::getTitle)
+                .map(product -> product.getTitle())
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -183,7 +183,7 @@ public class HomepageController {
 
         User currentUser = sessionManager.getCurrentUser();
         String rolesStr = currentUser.getRoles().stream()
-                .map(UserRole::toString)
+                .map(role -> role.toString())
                 .reduce((r1, r2) -> r1 + ", " + r2)
                 .orElse("No roles");
 
